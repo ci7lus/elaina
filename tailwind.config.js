@@ -1,6 +1,7 @@
 module.exports = {
   purge: {
-    enabled: process.env.NODE_ENV === "production",
+    // workaround for parcel bug
+    enabled: process.env.IS_BUILD === "yes",
     mode: "all",
     content: ["./src/**/*.html", "./src/**/*.ts", "./src/**/*.tsx"],
     whitelist: ["body", "html", "svg"],

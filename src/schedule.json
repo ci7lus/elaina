@@ -1,0 +1,37 @@
+[
+  {
+    "type": "AbemaTV",
+    "channel": "AbemaTV",
+    "name": "AbemaNews (abema-news)",
+    "id": "30cw6pr",
+    "sid": 4095,
+    "nid": 65520,
+    "hasLogoData": true,
+    "n": 0,
+    "programs": [
+      {
+        "id": "21vxo8g0",
+        "category": "news",
+        "title": "ABEMA NEWS",
+        "fullTitle": "ABEMA NEWS",
+        "detail": "テレビ朝日クオリティでお届けする２４時間ニュースチャンネル。注目ニュースから話題の情報まで幅広くお届けします。ホットな芸能情報満載の「ABEMAエンタメニュース」、ネットで人気沸騰中の動画を集めた「週刊BUZZ動画」、最新のお天気情報など、気になる情報を空き時間に手軽にチェック。速報や緊急ニュース、注目の会見は随時、生中継でまるごと配信します！キャスターには現役の女子大学生らも登場。移動中に、お昼休みに、おやすみ前に・・・一日のニュース＆話題は「ABEMA NEWS」でチェック！<br><br><img src=\"https://hayabusa.io/abema/programs/89-112_s0_p51/thumb001.q100.w512.h288.v1606798556.webp\"><br><br>キャスト:<br>ABEMAキャスター<br><br>スタッフ:<br>テレビ朝日<br><br>(C)テレビ朝日<br>Abema News<br><br>",
+        "start": 1608361200000,
+        "end": 1608368400000,
+        "seconds": 7200,
+        "channel": {
+          "type": "AbemaTV",
+          "channel": "AbemaTV",
+          "name": "AbemaNews (abema-news)",
+          "id": "30cw6pr",
+          "sid": 4095,
+          "nid": 65520,
+          "hasLogoData": true,
+          "n": 0
+        },
+        "subTitle": "",
+        "episode": null,
+        "flags": []
+      }
+    ]
+  }
+]

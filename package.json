@@ -11,15 +11,17 @@
   "main": "dist/index.html",
   "scripts": {
     "dev": "parcel src/index.html",
-    "build": "parcel build src/index.html",
+    "build": "IS_BUILD=yes parcel build src/index.html",
     "lint": "prettier --check './src/**/*.{js,ts,tsx}'",
     "format": "prettier --write './src/**/*.{js,ts,tsx}'"
   },
   "private": true,
   "dependencies": {
+    "@chakra-ui/icons": "^1.0.2",
     "@chakra-ui/react": "^1.0.4",
     "@emotion/react": "^11.1.2",
     "@emotion/styled": "^11.0.0",
+    "dayjs": "^1.9.7",
     "dplayer": "^1.26.0",
     "framer-motion": "^3.0.0",
     "history": "^5.0.0",
