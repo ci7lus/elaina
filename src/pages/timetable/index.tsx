@@ -1,42 +1,24 @@
 import React, { useEffect, useRef, useState } from "react"
 import { Heading } from "@chakra-ui/react"
-import schedule from "../schedule.json"
 import dayjs from "dayjs"
+import { useRecoilValue } from "recoil"
+import { scheduleAtom } from "../../atoms/schedule"
+import { Link } from "rocon/react"
+import { channelsRoute } from "../../routes"
 
 export const TimetablePage: React.VFC<{}> = () => {
-  const channels = (schedule as {
-    channel: string
-    name: string
-    id: string
-    sid: number
-    nid: number
-    hasLogoData: boolean
-    programs: {
-      id: string
-      category: "news" | "anime"
-      title: string
-      start: number
-      end: number
-      seconds: number
-      detail: string
-    }[]
-  }[]).filter((channels) => 0 < channels.programs.length)
-  const today = dayjs(channels[0].programs[0].start)
-    .startOf("day")
-    .add(1, "day")
-
+  const channels = useRecoilValue(scheduleAtom)
+  const [now, setNow] = useState(dayjs())
+  const today = now.clone().startOf("day")
   const [leftPosition, setLeftPosition] = useState(0)
   const scrollRef = useRef<HTMLDivElement>(null)
-  const [timeBarPosition, setTimeBarPosition] = useState(0)
+  const timeBarPosition = ((now.hour() * 60 + now.minute()) / 60) * 180
   useEffect(() => {
-    const now = dayjs()
-    scrollRef.current?.scrollTo({ top: now.hour() * 180 - 60 })
-    const updateBarPosition = () => {
-      const now = dayjs()
-      setTimeBarPosition(((now.hour() * 60 + now.minute()) / 60) * 180)
+    scrollRef.current?.scrollTo({ top: timeBarPosition - 30 })
+    const updateNow = () => {
+      setNow(dayjs())
     }
-    updateBarPosition()
-    const timer = setInterval(updateBarPosition, 60 * 1000)
+    const timer = setInterval(updateNow, 60 * 1000)
     return () => {
       clearInterval(timer)
     }
@@ -44,29 +26,41 @@ export const TimetablePage: React.VFC<{}> = () => {
   return (
     <div>
       <div className="bg-gray-800 text-gray-200">
-        <div className="px-4 py-2 mx-auto container flex items-center justify-between">
+        <div className="py-2 mx-auto container flex items-center justify-between">
           <Heading as="h2" size="md">
             番組表
           </Heading>
           <div>絞り込みをここら辺に</div>
         </div>
       </div>
-      <div
-        className="opacity-50 text-gray-200 w-full flex items-center pl-4"
-        style={{ transform: `translateX(-${leftPosition}px)` }}
-      >
-        {channels.map((channel) => (
-          <div
-            key={channel.id}
-            className=" bg-gray-800 w-36 flex-shrink-0 text-center p-1 cursor-pointer border-r-2 border-gray-400 truncate"
-          >
-            {channel.name}
-          </div>
-        ))}
+      <div className="overflow-hidden">
+        <div
+          className="text-gray-200 w-full flex items-center pl-4 bg-gray-700"
+          style={{
+            transform: `translateX(-${leftPosition}px)`,
+            height: "40px",
+          }}
+        >
+          {channels?.map((channel) => (
+            <Link
+              route={channelsRoute.anyRoute}
+              match={{ id: channel.sid.toString() }}
+              key={channel.id}
+            >
+              <div
+                key={channel.id}
+                className="bg-gray-700 w-36 flex-shrink-0 text-center p-1 cursor-pointer border-r-2 border-gray-400 truncate"
+                title={channel.name}
+              >
+                {channel.name}
+              </div>
+            </Link>
+          ))}
+        </div>
       </div>
       <div
         className="relative overflow-auto h-full text-sm"
-        style={{ height: "calc(100vh - 162px)" }}
+        style={{ maxHeight: "calc(100vh - 162px)" }}
         onScroll={(e) => {
           setLeftPosition(e.currentTarget.scrollLeft)
         }}
@@ -74,16 +68,22 @@ export const TimetablePage: React.VFC<{}> = () => {
       >
         <div
           className="relative"
-          style={{ width: `${channels.length * 9}rem`, height: "4320px" }}
+          style={{
+            width: `${(channels || []).length * 9}rem`,
+            minWidth: "100vw",
+            height: "4320px",
+          }}
         >
           <div className="relative block w-full h-full">
             <div className="relative timetable ml-4 overflow-hidden w-full h-full bg-gray-500">
-              {channels.map((channel, idx) => {
+              {channels?.map((channel, idx) => {
                 return (
                   <React.Fragment key={idx}>
                     {channel.programs
-                      .filter((program) =>
-                        dayjs(program.start).isSame(today, "day")
+                      .filter(
+                        (program) =>
+                          dayjs(program.start).isSame(today, "day") ||
+                          dayjs(program.end).isSame(today, "day")
                       )
                       .map((program) => {
                         const start = dayjs(program.start)
@@ -99,16 +99,21 @@ export const TimetablePage: React.VFC<{}> = () => {
                             className={`absolute truncate w-36 bg-${
                               program.category === "anime" ? "pink" : "gray"
                             }-100 border border-gray-400 cursor-pointer`}
+                            title={[program.fullTitle, program.detail].join(
+                              "\n\n"
+                            )}
                           >
                             <p className="whitespace-pre-wrap leading-snug">
                               {start.format("HH:mm")} {program.title}
                             </p>
                             <p
                               className="whitespace-pre-wrap pt-1 px-2 text-xs text-gray-600"
-                              dangerouslySetInnerHTML={{
+                              /*dangerouslySetInnerHTML={{
                                 __html: program.detail,
-                              }}
-                            />
+                              }}*/
+                            >
+                              {program.detail}
+                            </p>
                           </div>
                         )
                       })}
@@ -131,7 +136,7 @@ export const TimetablePage: React.VFC<{}> = () => {
               ))}
             </div>
             <div
-              className="opacity-50 absolute w-full left-0 border-t-2 border-red-400 transition-all"
+              className="ml-4 opacity-50 absolute w-full left-0 border-t-4 border-red-400 transition-all"
               style={{
                 top: `${timeBarPosition}px`,
               }}
