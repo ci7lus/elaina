@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react"
-import { Heading } from "@chakra-ui/react"
 import dayjs from "dayjs"
 import { useRecoilValue } from "recoil"
 import { scheduleAtom } from "../../atoms/schedule"
@@ -27,9 +26,7 @@ export const TimetablePage: React.VFC<{}> = () => {
     <div>
       <div className="bg-gray-800 text-gray-200">
         <div className="py-2 mx-auto container flex items-center justify-between">
-          <Heading as="h2" size="md">
-            番組表
-          </Heading>
+          <div className="text-xl">番組表</div>
           <div>絞り込みをここら辺に</div>
         </div>
       </div>
@@ -97,6 +94,7 @@ export const TimetablePage: React.VFC<{}> = () => {
                               height: `${(program.seconds / 3600) * 180}px`,
                             }}
                             className={`absolute truncate w-36 bg-${
+                              // bg-pink-100 bg-pink-100
                               program.category === "anime" ? "pink" : "gray"
                             }-100 border border-gray-400 cursor-pointer`}
                             title={[program.fullTitle, program.detail].join(

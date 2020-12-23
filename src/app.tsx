@@ -1,7 +1,6 @@
 import React, { useEffect } from "react"
 import { isLocationNotFoundError, RoconRoot, useRoutes } from "rocon/react"
-import { ChakraProvider, Spinner } from "@chakra-ui/react"
-import { routes } from "./routes"
+import { ExactlyRoutes, routes } from "./routes"
 import { Layout } from "./layout"
 import { RecoilRoot, useRecoilState } from "recoil"
 import { scheduleAtom } from "./atoms/schedule"
@@ -10,7 +9,7 @@ import { NotFound } from "./components/global/NotFound"
 
 const UsedRoutes: React.VFC<{}> = () => {
   try {
-    return useRoutes(routes)
+    return useRoutes(ExactlyRoutes)
   } catch (e: unknown) {
     if (isLocationNotFoundError(e)) {
       return <NotFound />
@@ -35,7 +34,7 @@ const Routes: React.VFC<{}> = () => {
         className="flex items-center justify-center w-full h-full"
         style={{ minHeight: "80vh" }}
       >
-        <Spinner size="xl" color="gray.400" speed="1s" />
+        Loading...
       </div>
     )
   }
@@ -46,13 +45,11 @@ const Routes: React.VFC<{}> = () => {
 export const App: React.VFC = () => {
   return (
     <RecoilRoot>
-      <ChakraProvider>
-        <RoconRoot>
-          <Layout>
-            <Routes />
-          </Layout>
-        </RoconRoot>
-      </ChakraProvider>
+      <RoconRoot>
+        <Layout>
+          <Routes />
+        </Layout>
+      </RoconRoot>
     </RecoilRoot>
   )
 }

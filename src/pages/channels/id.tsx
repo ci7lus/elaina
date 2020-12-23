@@ -1,12 +1,12 @@
-import { Skeleton } from "@chakra-ui/react"
 import dayjs from "dayjs"
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import { ChevronsRight } from "react-feather"
 import { useRecoilValue } from "recoil"
 import { scheduleAtom } from "../../atoms/schedule"
 import { Player } from "../../components/common/Player"
 import { NotFound } from "../../components/global/NotFound"
 import { Program } from "../../types/struct"
+import { useDebounce } from "react-use"
 
 export const ChannelIdPage: React.FC<{ sid: string }> = ({ sid }) => {
   const channels = useRecoilValue(scheduleAtom)
@@ -22,33 +22,33 @@ export const ChannelIdPage: React.FC<{ sid: string }> = ({ sid }) => {
   const onGoingProgramStart = dayjs(onGoingProgram?.start).format("HH:mm")
   const onGoingProgramEnd = dayjs(onGoingProgram?.end).format("HH:mm")
   const onGoingProgramDurationInMinutes = (onGoingProgram?.seconds || 0) / 60
-  useEffect(() => {
-    const updateProgram = () => {
-      const now = dayjs()
-      const futurePrograms = programs.filter((p) => dayjs(p.end).isAfter(now))
-      setOnGoingProgram(futurePrograms.shift() || null)
-      setNextProgram(futurePrograms.shift() || null)
-    }
-    updateProgram()
-    const timer = setInterval(updateProgram, 60 * 1000)
-    return () => {
-      clearInterval(timer)
-    }
-  }, [channels])
+  useDebounce(
+    () => {
+      const updateProgram = () => {
+        const now = dayjs()
+        const futurePrograms = programs.filter((p) => dayjs(p.end).isAfter(now))
+        setOnGoingProgram(futurePrograms.shift() || null)
+        setNextProgram(futurePrograms.shift() || null)
+      }
+      updateProgram()
+      const timer = setInterval(updateProgram, 60 * 1000)
+      return () => {
+        clearInterval(timer)
+      }
+    },
+    100,
+    [channels]
+  )
   return (
     <div className="container mx-auto mt-8">
       <Player channel={channel} />
       <div className="my-4">
         <div className="text-xl">
-          <Skeleton isLoaded={!!onGoingProgram}>
-            {onGoingProgram ? onGoingProgram.fullTitle : "."}
-          </Skeleton>
+          {onGoingProgram ? onGoingProgram.fullTitle : "."}
         </div>
         <div className="text-lg">
-          <Skeleton isLoaded={!!onGoingProgram}>
-            {onGoingProgramStart}〜{onGoingProgramEnd}（
-            {onGoingProgramDurationInMinutes}分） / {channel.name}
-          </Skeleton>
+          {onGoingProgramStart}〜{onGoingProgramEnd}（
+          {onGoingProgramDurationInMinutes}分） / {channel.name}
         </div>
         <div className="items-center">
           Next

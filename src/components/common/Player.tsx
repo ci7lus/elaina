@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react"
-import DPlayer, { DPlayerVideo } from "dplayer"
+import DPlayer, { DPlayerVideo, DPlayerSubTitle } from "dplayer"
 import { RefreshCw } from "react-feather"
 import throttle from "just-throttle"
 import { Channel, CommentPayload } from "../../types/struct"
@@ -62,7 +62,7 @@ export const Player: React.VFC<{ channel: Channel }> = ({ channel }) => {
       })
     }
     if (100 < comments.length) {
-      comments.splice(comments.length - 100)
+      setComments((comments) => comments.splice(comments.length - 100))
     }
   }, [comments])
 
@@ -77,9 +77,12 @@ export const Player: React.VFC<{ channel: Channel }> = ({ channel }) => {
       lang: "ja-jp",
       pictureInPicture: true,
       airplay: true,
-      /*subtitle: {
+      subtitle: ({
         type: "webvtt",
-      },*/
+        fontSize: "20px",
+        color: "#fff",
+        bottom: "40px",
+      } as Omit<DPlayerSubTitle, "url">) as any,
       apiBackend: {
         read: (option) => {
           option.success([{}])

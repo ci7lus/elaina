@@ -18,3 +18,9 @@ export const routes = Rocon.Path()
   })
   .route("timetable", (route) => route.action(() => <TimetablePage />))
   .route("channels", (route) => route.attach(channelsRoute))
+
+export const ExactlyRoutes = Rocon.Path()
+  .exact({
+    action: () => <IndexPage />,
+  })
+  .route("elaina", (route) => route.attach(routes))
