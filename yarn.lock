@@ -2197,6 +2197,11 @@ axios@0.21.0, axios@^0.21.0:
   dependencies:
     follow-redirects "^1.10.0"
 
+b24.js@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/b24.js/-/b24.js-1.0.3.tgz#6d94cacc51d3830417d7ddf56c55eb77063783a9"
+  integrity sha512-j2hHu0asf6HxacVmGJKFSsrfoG8nC0JEjujIpsmRVkr74nC6o5gs6YF6AQD3e7YyJ8PaKuA7k2uSL9A2mAG9Og==
+
 babel-plugin-dynamic-import-node@^2.3.3:
   version "2.3.3"
   resolved "https://registry.yarnpkg.com/babel-plugin-dynamic-import-node/-/babel-plugin-dynamic-import-node-2.3.3.tgz#84fda19c976ec5c6defef57f9427b3def66e17a3"
@@ -3452,7 +3457,12 @@ esutils@^2.0.2:
   resolved "https://registry.yarnpkg.com/esutils/-/esutils-2.0.3.tgz#74d2eb4de0b8da1293711910d50775b9b710ef64"
   integrity sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==
 
-eventemitter3@^4.0.0, eventemitter3@^4.0.3:
+eventemitter3@3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-3.1.0.tgz#090b4d6cdbd645ed10bf750d4b5407942d7ba163"
+  integrity sha512-ivIvhpq/Y0uSjcHDcOIccjmYjGLcP09MFGE7ysAwkAvkXfpZlC985pH2/ui64DKazbTW/4kN3yqozUxlXzI6cA==
+
+eventemitter3@^4.0.0:
   version "4.0.7"
   resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-4.0.7.tgz#2de9b68f6528d5644ef5c59526a1b4a07306169f"
   integrity sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==
@@ -3936,12 +3946,12 @@ history@^5.0.0:
   dependencies:
     "@babel/runtime" "^7.7.6"
 
-hls.js@^0.14.17:
-  version "0.14.17"
-  resolved "https://registry.yarnpkg.com/hls.js/-/hls.js-0.14.17.tgz#0127cff2ec2f994a54eb955fe669ef6153a8e317"
-  integrity sha512-25A7+m6qqp6UVkuzUQ//VVh2EEOPYlOBg32ypr34bcPO7liBMOkKFvbjbCBfiPAOTA/7BSx1Dujft3Th57WyFg==
+hls-b24.js@^0.12.3:
+  version "0.12.3"
+  resolved "https://registry.yarnpkg.com/hls-b24.js/-/hls-b24.js-0.12.3.tgz#fb46cf31e101800800de577f5a94057d164768cf"
+  integrity sha512-C8nwzS33zKvR7grYIoHvp8wPxBvk9sEJ6dsh3Bx+T/4jNNhDksqLS73NIWqHvInjRiOsrXgEY4+h/NjNbzzh0g==
   dependencies:
-    eventemitter3 "^4.0.3"
+    eventemitter3 "3.1.0"
     url-toolkit "^2.1.6"
 
 hmac-drbg@^1.0.0:

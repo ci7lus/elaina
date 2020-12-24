@@ -1,3 +1,5 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+video::cue {
+  font-family: sans-serif;
+  font-size: 110%;
+  background-color: rgba(0, 0, 0, 0.5);
+}

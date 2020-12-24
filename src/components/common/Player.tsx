@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from "react"
-import DPlayer, { DPlayerVideo, DPlayerSubTitle } from "dplayer"
+import DPlayer, { DPlayerVideo, DPlayerEvents } from "dplayer"
 import { RefreshCw } from "react-feather"
 import throttle from "just-throttle"
 import { Channel, CommentPayload } from "../../types/struct"
-import Hls from "hls.js"
+import Hls from "hls-b24.js"
 import ReconnectingWebSocket from "reconnecting-websocket"
 import dayjs from "dayjs"
+import * as b24 from "b24.js"
 import { SayaAPI } from "../../infra/saya"
 
 export const Player: React.VFC<{ channel: Channel }> = ({ channel }) => {
@@ -16,6 +17,8 @@ export const Player: React.VFC<{ channel: Channel }> = ({ channel }) => {
       customHls: (video: HTMLVideoElement, player: DPlayer) => {
         const hls = new Hls()
         // TODO: Custom loader
+        // Workaround https://github.com/video-dev/hls.js/issues/2064
+        hls.config.enableWorker = false
         if (SayaAPI.isAuthorizationEnabled) {
           hls.config.xhrSetup = (xhr, url) => {
             xhr.setRequestHeader("Authorization", SayaAPI.authorizationToken)
@@ -23,6 +26,16 @@ export const Player: React.VFC<{ channel: Channel }> = ({ channel }) => {
         }
         hls.loadSource(video.src)
         hls.attachMedia(video)
+        const b24Renderer = new b24.WebVTTRenderer()
+        b24Renderer.init().then(() => {
+          b24Renderer.attachMedia(video)
+          b24Renderer.show()
+        })
+        hls.on(Hls.Events.FRAG_PARSING_PRIVATE_DATA, (event, data) => {
+          for (const sample of data.samples) {
+            b24Renderer.pushData(sample.pid, sample.data, sample.pts)
+          }
+        })
       },
     },
     quality: (["1080p", "720p", "360p"] as const).map((quality) => ({
@@ -67,7 +80,7 @@ export const Player: React.VFC<{ channel: Channel }> = ({ channel }) => {
   }, [comments])
 
   useEffect(() => {
-    player.current = new DPlayer({
+    const playerInstance = new DPlayer({
       container: dplayerRef.current,
       live: true,
       autoplay: true,
@@ -77,12 +90,13 @@ export const Player: React.VFC<{ channel: Channel }> = ({ channel }) => {
       lang: "ja-jp",
       pictureInPicture: true,
       airplay: true,
-      subtitle: ({
+      subtitle: {
         type: "webvtt",
         fontSize: "20px",
         color: "#fff",
         bottom: "40px",
-      } as Omit<DPlayerSubTitle, "url">) as any,
+        // TODO: Typing correctly
+      } as any,
       apiBackend: {
         read: (option) => {
           option.success([{}])
@@ -98,6 +112,16 @@ export const Player: React.VFC<{ channel: Channel }> = ({ channel }) => {
         },
       ],
     })
+
+    playerInstance.on("canplay" as DPlayerEvents.canplay, () => {
+      // TODO: Typing correctly
+      // @ts-ignore
+      playerInstance.subtitle.toggle()
+      // @ts-ignore
+      playerInstance.subtitle.toggle()
+    })
+
+    player.current = playerInstance
 
     try {
       const wsUrl = SayaAPI.getCommentSocketUrl(channel.sid)
