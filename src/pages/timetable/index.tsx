@@ -4,6 +4,7 @@ import { useRecoilValue } from "recoil"
 import { scheduleAtom } from "../../atoms/schedule"
 import { Link } from "rocon/react"
 import { channelsRoute } from "../../routes"
+import ScrollContainer from "react-indiana-drag-scroll"
 
 export const TimetablePage: React.VFC<{}> = () => {
   const channels = useRecoilValue(scheduleAtom)
@@ -55,13 +56,14 @@ export const TimetablePage: React.VFC<{}> = () => {
           ))}
         </div>
       </div>
-      <div
+      <ScrollContainer
         className="relative overflow-auto h-full text-sm"
         style={{ maxHeight: "calc(100vh - 162px)" }}
-        onScroll={(e) => {
-          setLeftPosition(e.currentTarget.scrollLeft)
+        onScroll={(scrollLeft) => {
+          setLeftPosition(scrollLeft)
         }}
-        ref={scrollRef}
+        innerRef={scrollRef}
+        hideScrollbars={false}
       >
         <div
           className="relative"
@@ -141,7 +143,7 @@ export const TimetablePage: React.VFC<{}> = () => {
             />
           </div>
         </div>
-      </div>
+      </ScrollContainer>
     </div>
   )
 }

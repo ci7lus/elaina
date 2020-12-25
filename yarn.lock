@@ -2584,6 +2584,11 @@ class-utils@^0.3.5:
     isobject "^3.0.0"
     static-extend "^0.1.1"
 
+classnames@^2.2.6:
+  version "2.2.6"
+  resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.2.6.tgz#43935bffdd291f326dad0a205309b38d00f650ce"
+  integrity sha512-JR/iSQOSt+LQIWwrwEzJ9uk0xfN3mTVYMwt1Ir5mUcSN6pU+V4zQFFaJsclJbPuAUQH+yfWef6tm7l1quW3C8Q==
+
 clean-stack@^2.0.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/clean-stack/-/clean-stack-2.2.0.tgz#ee8472dbb129e727b31e8a10a427dee9dfe4008b"
@@ -3095,6 +3100,11 @@ dayjs@^1.9.7:
   resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.9.7.tgz#4b260bb17dceed2d5f29038dfee03c65a6786fc0"
   integrity sha512-IC877KBdMhBrCfBfJXHQlo0G8keZ0Opy7YIIq5QKtUbCuHMzim8S4PyiVK4YmihI3iOF9lhfUBW4AQWHTR5WHA==
 
+debounce@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/debounce/-/debounce-1.2.0.tgz#44a540abc0ea9943018dc0eaa95cce87f65cd131"
+  integrity sha512-mYtLl1xfZLi1m4RtQYlZgJUNQjl4ZxVnHzIR8nLLgi4q1YT8o/WM+MK/f8yfcc9s5Ir5zRaPZyZU6xs1Syoocg==
+
 debug@2.6.9, debug@^2.2.0, debug@^2.3.3:
   version "2.6.9"
   resolved "https://registry.yarnpkg.com/debug/-/debug-2.6.9.tgz#5d128515df134ff327e90a4c93f4e077a536341f"
@@ -3272,6 +3282,11 @@ dotenv@^7.0.0:
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-7.0.0.tgz#a2be3cd52736673206e8a85fb5210eea29628e7c"
   integrity sha512-M3NhsLbV1i6HuGzBUH8vXrtxOk+tWmzWKDMbAVSUp3Zsjm7ywFeuwrUXhmhQyRK1q5B5GGy7hcXPbj3bnfZg2g==
+
+easy-bem@^1.0.0:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/easy-bem/-/easy-bem-1.0.2.tgz#3f759158c045465744900aa26ba8bd7d88d7a969"
+  integrity sha512-tHtLDhcEHZIMKdiiZElQoR8TcZ/6rvcNp7//93Vx/mqNLah9BOFGhhzTUfWLJs7uxZiKMdP/KzGOtzq14DrrqQ==
 
 ecc-jsbn@~0.1.1:
   version "0.1.2"
@@ -5813,7 +5828,7 @@ promise-polyfill@8.2.0:
   resolved "https://registry.yarnpkg.com/promise-polyfill/-/promise-polyfill-8.2.0.tgz#367394726da7561457aba2133c9ceefbd6267da0"
   integrity sha512-k/TC0mIcPVF6yHhUvwAp7cvL6I2fFV7TzF1DuGPI8mBh4QQazf36xCKEHKTZKRysEoTQoQdKyP25J8MPJp7j5g==
 
-prop-types@^15.7.2:
+prop-types@^15.7.0, prop-types@^15.7.2:
   version "15.7.2"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.7.2.tgz#52c41e75b8c87e72b9d9360e0206b99dcbffa6c5"
   integrity sha512-8QQikdH7//R2vurIJSutZ1smHYTcLpRWEOlHnzcWHmBYrOGUysKwSsrC89BCiFj3CbrfJ/nXFdJepOVrY1GCHQ==
@@ -5942,6 +5957,16 @@ react-hook-form@^6.13.1:
   version "6.13.1"
   resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-6.13.1.tgz#b9c0aa61f746db8169ed5e1050de21cacb1947d6"
   integrity sha512-Q0N7MYcbA8SigYufb02h9z97ZKCpIbe62rywOTPsK4Ntvh6fRTGDXSuzWuRhLHhArLoWbGrWYSNSS4tlb+OFXg==
+
+react-indiana-drag-scroll@^1.8.0:
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/react-indiana-drag-scroll/-/react-indiana-drag-scroll-1.8.0.tgz#d82237c1b3aefd3c0bb47d9380abfde130d68ecf"
+  integrity sha512-Kv67vpvNocFvSKKOF3+f8hupeyp//yxAQDfz07hJtjegzmu5rt7DzCj6JUBRcMAVfifID/+heaihFmuTAvNSTw==
+  dependencies:
+    classnames "^2.2.6"
+    debounce "^1.2.0"
+    easy-bem "^1.0.0"
+    prop-types "^15.7.0"
 
 react-is@^16.7.0, react-is@^16.8.1:
   version "16.13.1"
