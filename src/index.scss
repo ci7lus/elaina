@@ -3,3 +3,19 @@ video::cue {
   font-size: 110%;
   background-color: rgba(0, 0, 0, 0.5);
 }
+
+.emoji {
+  display: inline-block;
+  width: auto;
+  height: 1rem;
+}
+
+.playerCommentList::-webkit-scrollbar-thumb {
+  @apply bg-gray-600;
+}
+
+.playerCommentList::-webkit-scrollbar {
+  @apply bg-gray-200;
+  width: 2px;
+  height: 0px;
+}

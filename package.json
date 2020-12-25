@@ -37,6 +37,7 @@
     "redaxios": "^0.3.0",
     "rocon": "^1.1.1",
     "swr": "^0.3.11",
+    "twemoji": "^13.0.1",
     "zod": "^1.11.11"
   },
   "devDependencies": {
@@ -45,6 +46,7 @@
     "@types/just-throttle": "^1.1.0",
     "@types/react": "17.0.0",
     "@types/react-dom": "17.0.0",
+    "@types/twemoji": "^12.1.1",
     "autoprefixer": "^10.1.0",
     "parcel": "^2.0.0-nightly.486",
     "postcss": "^8.2.1",

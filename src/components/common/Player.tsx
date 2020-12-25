@@ -8,6 +8,8 @@ import ReconnectingWebSocket from "reconnecting-websocket"
 import dayjs from "dayjs"
 import * as b24 from "b24.js"
 import { SayaAPI } from "../../infra/saya"
+import { useDebounce } from "react-use"
+import twemoji from "twemoji"
 
 export const Player: React.VFC<{ channel: Channel }> = ({ channel }) => {
   const videoPayload: DPlayerVideo = {
@@ -67,17 +69,21 @@ export const Player: React.VFC<{ channel: Channel }> = ({ channel }) => {
     player.current?.switchVideo(videoPayload, danmaku)
   }
 
-  useEffect(() => {
-    if (commentListRef.current && commentScrollEnabled.current === true) {
-      commentListRef.current.scrollTo({
-        top: commentListRef.current.scrollHeight,
-        behavior: "smooth",
-      })
-    }
-    if (100 < comments.length) {
-      setComments((comments) => comments.splice(comments.length - 100))
-    }
-  }, [comments])
+  useDebounce(
+    () => {
+      if (commentListRef.current && commentScrollEnabled.current === true) {
+        commentListRef.current.scrollTo({
+          top: commentListRef.current.scrollHeight,
+          behavior: "smooth",
+        })
+      }
+      if (100 < comments.length) {
+        setComments((comments) => comments.splice(comments.length - 100))
+      }
+    },
+    50,
+    [comments]
+  )
 
   useEffect(() => {
     const playerInstance = new DPlayer({
@@ -148,6 +154,7 @@ export const Player: React.VFC<{ channel: Channel }> = ({ channel }) => {
       setPlayerHeight(playerWrapRef.current.clientHeight)
     }, 100)
     window.addEventListener("resize", onResize)
+    onResize()
 
     return () => {
       player.current?.destroy()
@@ -189,23 +196,33 @@ export const Player: React.VFC<{ channel: Channel }> = ({ channel }) => {
   </button>`*/}
         </div>
         <div
-          className="block overflow-scroll overflow-y-scroll text-sm h-full"
+          className="playerCommentList block overflow-scroll overflow-y-scroll text-sm h-full"
           ref={commentListRef}
         >
           {comments
-            .sort((a, b) => (b.time < a.time ? 1 : -1))
-            .map((i) => (
-              <div
-                key={i.no}
-                className="flex items-center space-x-1 w-full hover:bg-gray-200 select-none"
-                title={i.text}
-              >
-                <p className="truncate inline-block flex-shrink-0 p-1 border-r border-gray-400 w-20 text-center">
-                  {dayjs(i.time * 1000).format("HH:mm:ss")}
-                </p>
-                <p className="p-1 truncate inline-block">{i.text}</p>
-              </div>
-            ))}
+            .sort((a, b) => (b.no < a.no ? 1 : -1))
+            .map((i) => {
+              const time = dayjs(i.time * 1000)
+              // emoji
+              return (
+                <div
+                  key={i.no}
+                  className="flex items-center space-x-1 w-full hover:bg-gray-200 select-none"
+                >
+                  <p
+                    className="truncate inline-block flex-shrink-0 p-1 border-r border-gray-400 w-20 text-center"
+                    title={time.format()}
+                  >
+                    {time.format("HH:mm:ss")}
+                  </p>
+                  <p
+                    className="p-1 truncate inline-block"
+                    title={i.text}
+                    dangerouslySetInnerHTML={{ __html: twemoji.parse(i.text) }}
+                  ></p>
+                </div>
+              )
+            })}
         </div>
       </div>
     </div>
