@@ -1,24 +1,27 @@
 import React, { useEffect, useRef, useState } from "react"
 import dayjs from "dayjs"
-import { useRecoilValue } from "recoil"
-import { scheduleAtom } from "../../atoms/schedule"
 import { Link } from "rocon/react"
 import { channelsRoute } from "../../routes"
 import ScrollContainer from "react-indiana-drag-scroll"
+import { useTelevision } from "../../hooks/television"
 
 export const TimetablePage: React.VFC<{}> = () => {
-  const channels = useRecoilValue(scheduleAtom)
   const [now, setNow] = useState(dayjs())
-  const today = now.clone().startOf("day")
+  const today = now.clone().startOf("hour")
   const [leftPosition, setLeftPosition] = useState(0)
+  const [clientWidth, setClientWidth] = useState(0)
   const scrollRef = useRef<HTMLDivElement>(null)
-  const timeBarPosition = ((now.hour() * 60 + now.minute()) / 60) * 180
+  const timeBarPosition = (now.minute() / 60) * 180
+
+  const { services, programs } = useTelevision()
+
   useEffect(() => {
-    scrollRef.current?.scrollTo({ top: timeBarPosition - 30 })
     const updateNow = () => {
       setNow(dayjs())
     }
     const timer = setInterval(updateNow, 60 * 1000)
+    setClientWidth(scrollRef.current?.clientWidth || 0)
+
     return () => {
       clearInterval(timer)
     }
@@ -39,18 +42,18 @@ export const TimetablePage: React.VFC<{}> = () => {
             height: "40px",
           }}
         >
-          {channels?.map((channel) => (
+          {services?.map((service) => (
             <Link
               route={channelsRoute.anyRoute}
-              match={{ id: channel.sid.toString() }}
-              key={channel.id}
+              match={{ id: service.id.toString() }}
+              key={service.id}
             >
               <div
-                key={channel.id}
+                key={service.id}
                 className="bg-gray-700 w-36 flex-shrink-0 text-center p-1 cursor-pointer border-r-2 border-gray-400 truncate"
-                title={channel.name}
+                title={service.name}
               >
-                {channel.name}
+                {service.name}
               </div>
             </Link>
           ))}
@@ -61,6 +64,11 @@ export const TimetablePage: React.VFC<{}> = () => {
         style={{ maxHeight: "calc(100vh - 162px)" }}
         onScroll={(scrollLeft) => {
           setLeftPosition(scrollLeft)
+          setClientWidth(scrollRef.current?.clientWidth || 0)
+        }}
+        onEndScroll={(scrollLeft) => {
+          setLeftPosition(scrollLeft)
+          setClientWidth(scrollRef.current?.clientWidth || 0)
         }}
         innerRef={scrollRef}
         hideScrollbars={false}
@@ -68,24 +76,37 @@ export const TimetablePage: React.VFC<{}> = () => {
         <div
           className="relative"
           style={{
-            width: `${(channels || []).length * 9}rem`,
+            width: `${(services || []).length * 9}rem`,
             minWidth: "100vw",
             height: "4320px",
           }}
         >
           <div className="relative block w-full h-full">
             <div className="relative timetable ml-4 overflow-hidden w-full h-full bg-gray-500">
-              {channels?.map((channel, idx) => {
+              {services?.map((service, idx) => {
+                const leftPos = idx * 144
+                const rightPos = leftPos + 144
+
+                if (
+                  !scrollRef.current ||
+                  rightPos < leftPosition ||
+                  leftPosition + clientWidth < leftPos
+                ) {
+                  return <React.Fragment key={idx}></React.Fragment>
+                }
                 return (
                   <React.Fragment key={idx}>
-                    {channel.programs
+                    {(programs || [])
                       .filter(
                         (program) =>
-                          dayjs(program.start).isSame(today, "day") ||
-                          dayjs(program.end).isSame(today, "day")
+                          program.serviceId === service.serviceId &&
+                          0 <
+                            dayjs(program.endAt * 1000).diff(today, "minute") &&
+                          dayjs(program.startAt * 1000).diff(today, "minute") <=
+                            4320
                       )
                       .map((program) => {
-                        const start = dayjs(program.start)
+                        const start = dayjs(program.startAt * 1000)
                         const diffInMinutes = start.diff(today, "minute")
                         return (
                           <div
@@ -93,18 +114,18 @@ export const TimetablePage: React.VFC<{}> = () => {
                             style={{
                               top: `${(diffInMinutes / 60) * 180}px`,
                               left: `${idx * 9}rem`,
-                              height: `${(program.seconds / 3600) * 180}px`,
+                              height: `${(program.duration / 3600) * 180}px`,
                             }}
                             className={`absolute truncate w-36 bg-${
                               // bg-pink-100 bg-pink-100
-                              program.category === "anime" ? "pink" : "gray"
+                              program.genres[0] === "Anime" ? "pink" : "gray"
                             }-100 border border-gray-400 cursor-pointer`}
-                            title={[program.fullTitle, program.detail].join(
+                            title={[program.name, program.description].join(
                               "\n\n"
                             )}
                           >
                             <p className="whitespace-pre-wrap leading-snug">
-                              {start.format("HH:mm")} {program.title}
+                              {start.format("HH:mm")} {program.name}
                             </p>
                             <p
                               className="whitespace-pre-wrap pt-1 px-2 text-xs text-gray-600"
@@ -112,7 +133,7 @@ export const TimetablePage: React.VFC<{}> = () => {
                                 __html: program.detail,
                               }}*/
                             >
-                              {program.detail}
+                              {program.description}
                             </p>
                           </div>
                         )
@@ -125,15 +146,18 @@ export const TimetablePage: React.VFC<{}> = () => {
               className="absolute top-0 bg-gray-700 text-gray-200 font-bold "
               style={{ transform: `translateX(${leftPosition}px)` }}
             >
-              {[...Array(24).keys()].map((idx) => (
-                <div
-                  key={idx}
-                  className="text-center w-4 whitespace-pre border-t border-gray-200"
-                  style={{ height: "180px" }}
-                >
-                  {idx}
-                </div>
-              ))}
+              {[...Array(24).keys()].map((idx) => {
+                const hour = today.clone().add(idx, "hour")
+                return (
+                  <div
+                    key={idx}
+                    className="text-center w-4 whitespace-pre border-t border-gray-200"
+                    style={{ height: "180px" }}
+                  >
+                    {hour.hour()}
+                  </div>
+                )
+              })}
             </div>
             <div
               className="ml-4 opacity-50 absolute w-full left-0 border-t-4 border-red-400 transition-all"

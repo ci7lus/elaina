@@ -35,7 +35,6 @@
     "react-use": "^15.3.4",
     "recoil": "^0.1.2",
     "reconnecting-websocket": "^4.4.0",
-    "redaxios": "^0.3.0",
     "rocon": "^1.1.1",
     "swr": "^0.3.11",
     "twemoji": "^13.0.1",

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react"
 import DPlayer, { DPlayerVideo, DPlayerEvents } from "dplayer"
 import { RefreshCw } from "react-feather"
 import throttle from "just-throttle"
-import { Channel, CommentPayload } from "../../types/struct"
+import { Service, CommentPayload } from "../../types/struct"
 import Hls from "hls-b24.js"
 import ReconnectingWebSocket from "reconnecting-websocket"
 import dayjs from "dayjs"
@@ -11,10 +11,10 @@ import { SayaAPI } from "../../infra/saya"
 import { useDebounce } from "react-use"
 import twemoji from "twemoji"
 
-export const Player: React.VFC<{ channel: Channel }> = ({ channel }) => {
+export const Player: React.VFC<{ service: Service }> = ({ service }) => {
   const videoPayload: DPlayerVideo = {
     type: "customHls",
-    url: SayaAPI.getHlsUrl(channel.sid),
+    url: SayaAPI.getHlsUrl(service.id),
     customType: {
       customHls: (video: HTMLVideoElement, player: DPlayer) => {
         const hls = new Hls()
@@ -42,7 +42,7 @@ export const Player: React.VFC<{ channel: Channel }> = ({ channel }) => {
     },
     quality: (["1080p", "720p", "360p"] as const).map((quality) => ({
       name: quality,
-      url: SayaAPI.getHlsUrl(channel.sid, quality),
+      url: SayaAPI.getHlsUrl(service.id, quality),
     })),
     defaultQuality: 0,
   }
@@ -130,7 +130,7 @@ export const Player: React.VFC<{ channel: Channel }> = ({ channel }) => {
     player.current = playerInstance
 
     try {
-      const wsUrl = SayaAPI.getCommentSocketUrl(channel.sid)
+      const wsUrl = SayaAPI.getCommentSocketUrl(service.id)
       const s = new ReconnectingWebSocket(wsUrl)
       s.addEventListener("message", (e) => {
         const payload: CommentPayload = JSON.parse(e.data)

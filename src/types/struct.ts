@@ -1,22 +1,26 @@
 export type Program = {
   id: string
-  category: "news" | "anime"
-  title: string
-  fullTitle: string
-  start: number
-  end: number
-  seconds: number
-  detail: string
+  serviceId: number
+  name: string
+  startAt: number
+  endAt: number
+  duration: number
+  description: string
+  flags: string[]
+  genres: string[]
 }
 
-export type Channel = {
-  channel: string
+export type Service = {
+  channel: {
+    type: "GR"
+    group: string
+    name: string
+    services: number[]
+  }
+  id: number
   name: string
-  id: string
-  sid: number
-  nid: number
-  hasLogoData: boolean
-  programs: Program[]
+  serviceId: number
+  logoId: number
 }
 
 export type CommentPayload = {

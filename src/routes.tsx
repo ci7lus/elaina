@@ -6,7 +6,7 @@ import { TimetablePage } from "./pages/timetable"
 
 export const channelsRoute = Rocon.Path()
   .any("id", {
-    action: ({ id }) => <ChannelIdPage sid={id} />,
+    action: ({ id }) => <ChannelIdPage id={id} />,
   })
   .exact({
     action: () => <div className="container">channels</div>,
