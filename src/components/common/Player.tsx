@@ -12,11 +12,16 @@ import { useDebounce } from "react-use"
 import twemoji from "twemoji"
 
 export const Player: React.VFC<{ service: Service }> = ({ service }) => {
+  const hlsInstance = useRef<Hls | null>(null)
   const videoPayload: DPlayerVideo = {
     type: "customHls",
     url: SayaAPI.getHlsUrl(service.id),
     customType: {
       customHls: (video: HTMLVideoElement, player: DPlayer) => {
+        if (hlsInstance.current) {
+          hlsInstance.current.destroy()
+          hlsInstance.current = null
+        }
         const hls = new Hls()
         // TODO: Custom loader
         // Workaround https://github.com/video-dev/hls.js/issues/2064
@@ -38,6 +43,10 @@ export const Player: React.VFC<{ service: Service }> = ({ service }) => {
             b24Renderer.pushData(sample.pid, sample.data, sample.pts)
           }
         })
+        player.on("destroy" as DPlayerEvents.destroy, () => {
+          hls.destroy()
+        })
+        hlsInstance.current = hls
       },
     },
     quality: (["1080p", "720p", "360p"] as const).map((quality) => ({
