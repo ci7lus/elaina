@@ -21,12 +21,17 @@ export const TimetablePage: React.VFC<{}> = () => {
     const updateNow = () => {
       setNow(dayjs())
     }
+    const onResize = () => {
+      setClientWidth(scrollRef.current?.clientWidth || 0)
+      setClientHeight(scrollRef.current?.clientHeight || 0)
+    }
     const timer = setInterval(updateNow, 60 * 1000)
-    setClientWidth(scrollRef.current?.clientWidth || 0)
-    setClientHeight(scrollRef.current?.clientHeight || 0)
+    onResize()
+    window.addEventListener("resize", onResize)
 
     return () => {
       clearInterval(timer)
+      window.removeEventListener("resize", onResize)
     }
   }, [])
   return (
