@@ -35,4 +35,5 @@ const client = axios.create({
         }
       : {}),
   },
+  timeout: 5000,
 }) as AxiosInstance
