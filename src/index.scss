@@ -14,6 +14,10 @@ video::cue {
   height: 1rem;
 }
 
+.timetableScrollContainer {
+  contain: paint;
+}
+
 .playerCommentList::-webkit-scrollbar-thumb {
   @apply bg-gray-600;
 }

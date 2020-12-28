@@ -1,12 +1,17 @@
 import { useEffect } from "react"
 import { useToasts } from "react-toast-notifications"
-import { useRecoilState } from "recoil"
-import { servicesAtom, programsAtom } from "../atoms/television"
+import { useRecoilState, useRecoilValue } from "recoil"
+import {
+  servicesAtom,
+  programsAtom,
+  filteredServicesSelector,
+} from "../atoms/television"
 import { SayaAPI } from "../infra/saya"
 
 export const useTelevision = () => {
   const [services, setServices] = useRecoilState(servicesAtom)
   const [programs, setPrograms] = useRecoilState(programsAtom)
+  const filteredServices = useRecoilValue(filteredServicesSelector)
 
   const toast = useToasts()
 
@@ -21,7 +26,11 @@ export const useTelevision = () => {
         })
       })
     SayaAPI.getPrograms()
-      .then((programs) => setPrograms(programs))
+      .then((programs) =>
+        setPrograms(
+          programs.filter((program) => 0 < program.name.trim().length)
+        )
+      )
       .catch((e) => {
         console.error(e)
         toast.addToast("サービスの取得に失敗しました", {
@@ -31,5 +40,5 @@ export const useTelevision = () => {
       })
   }, [])
 
-  return { services, programs }
+  return { services, programs, filteredServices }
 }

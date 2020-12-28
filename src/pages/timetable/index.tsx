@@ -9,11 +9,13 @@ export const TimetablePage: React.VFC<{}> = () => {
   const [now, setNow] = useState(dayjs())
   const today = now.clone().startOf("hour")
   const [leftPosition, setLeftPosition] = useState(0)
+  const [topPosition, setTopPosition] = useState(0)
   const [clientWidth, setClientWidth] = useState(0)
+  const [clientHeight, setClientHeight] = useState(0)
   const scrollRef = useRef<HTMLDivElement>(null)
   const timeBarPosition = (now.minute() / 60) * 180
 
-  const { services, programs } = useTelevision()
+  const { programs, filteredServices } = useTelevision()
 
   useEffect(() => {
     const updateNow = () => {
@@ -21,6 +23,7 @@ export const TimetablePage: React.VFC<{}> = () => {
     }
     const timer = setInterval(updateNow, 60 * 1000)
     setClientWidth(scrollRef.current?.clientWidth || 0)
+    setClientHeight(scrollRef.current?.clientHeight || 0)
 
     return () => {
       clearInterval(timer)
@@ -42,7 +45,7 @@ export const TimetablePage: React.VFC<{}> = () => {
             height: "40px",
           }}
         >
-          {services?.map((service) => (
+          {filteredServices?.map((service) => (
             <Link
               route={channelsRoute.anyRoute}
               match={{ id: service.id.toString() }}
@@ -60,14 +63,16 @@ export const TimetablePage: React.VFC<{}> = () => {
         </div>
       </div>
       <ScrollContainer
-        className="relative overflow-auto h-full text-sm"
+        className="timetableScrollContainer relative overflow-auto h-full text-sm"
         style={{ maxHeight: "calc(100vh - 162px)" }}
-        onScroll={(scrollLeft) => {
+        onScroll={(scrollLeft, scrollTop) => {
           setLeftPosition(scrollLeft)
+          setTopPosition(scrollTop)
           setClientWidth(scrollRef.current?.clientWidth || 0)
         }}
-        onEndScroll={(scrollLeft) => {
+        onEndScroll={(scrollLeft, scrollTop) => {
           setLeftPosition(scrollLeft)
+          setTopPosition(scrollTop)
           setClientWidth(scrollRef.current?.clientWidth || 0)
         }}
         innerRef={scrollRef}
@@ -76,19 +81,18 @@ export const TimetablePage: React.VFC<{}> = () => {
         <div
           className="relative"
           style={{
-            width: `${(services || []).length * 9}rem`,
-            minWidth: "100vw",
+            width: `${(filteredServices || []).length * 9}rem`,
+            minWidth: "calc(100vw - 1rem)",
             height: "4320px",
           }}
         >
           <div className="relative block w-full h-full">
             <div className="relative timetable ml-4 overflow-hidden w-full h-full bg-gray-500">
-              {services?.map((service, idx) => {
+              {filteredServices?.map((service, idx) => {
                 const leftPos = idx * 144
                 const rightPos = leftPos + 144
 
                 if (
-                  !scrollRef.current ||
                   rightPos < leftPosition ||
                   leftPosition + clientWidth < leftPos
                 ) {
@@ -99,7 +103,7 @@ export const TimetablePage: React.VFC<{}> = () => {
                     {(programs || [])
                       .filter(
                         (program) =>
-                          program.serviceId === service.serviceId &&
+                          program.serviceId === service.id &&
                           0 <
                             dayjs(program.endAt * 1000).diff(today, "minute") &&
                           dayjs(program.startAt * 1000).diff(today, "minute") <=
@@ -108,13 +112,22 @@ export const TimetablePage: React.VFC<{}> = () => {
                       .map((program) => {
                         const start = dayjs(program.startAt * 1000)
                         const diffInMinutes = start.diff(today, "minute")
+                        const topPos = (diffInMinutes / 60) * 180
+                        const height = (program.duration / 3600) * 180
+                        const bottomPos = topPos + height
+                        if (
+                          bottomPos < topPosition ||
+                          topPosition + clientHeight < topPos
+                        ) {
+                          return <React.Fragment key={program.id} />
+                        }
                         return (
                           <div
                             key={program.id}
                             style={{
-                              top: `${(diffInMinutes / 60) * 180}px`,
+                              top: `${topPos}px`,
                               left: `${idx * 9}rem`,
-                              height: `${(program.duration / 3600) * 180}px`,
+                              height: `${height}px`,
                             }}
                             className={`absolute truncate w-36 bg-${
                               // bg-pink-100 bg-pink-100

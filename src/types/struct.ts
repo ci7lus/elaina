@@ -11,16 +11,17 @@ export type Program = {
 }
 
 export type Service = {
-  channel: {
-    type: "GR"
-    group: string
-    name: string
-    services: number[]
-  }
   id: number
   name: string
-  serviceId: number
+  channel: string
   logoId: number
+}
+
+export type Channel = {
+  type: "GR"
+  group: string
+  name: string
+  services: number[]
 }
 
 export type CommentPayload = {
