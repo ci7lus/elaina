@@ -10,7 +10,7 @@
   },
   "main": "dist/index.html",
   "scripts": {
-    "dev": "parcel --no-cache src/index.html",
+    "dev": "parcel src/index.html",
     "build": "IS_BUILD=yes parcel build src/index.html",
     "lint": "prettier --check './src/**/*.{js,ts,tsx}'",
     "format": "prettier --write './src/**/*.{js,ts,tsx}'"
@@ -50,7 +50,7 @@
     "@types/react-toast-notifications": "^2.4.0",
     "@types/twemoji": "^12.1.1",
     "autoprefixer": "^10.1.0",
-    "parcel": "^2.0.0-nightly.486",
+    "parcel": "^2.0.0-nightly.492",
     "postcss": "^8.2.1",
     "prettier": "^2.2.1",
     "sass": "^1.30.0",
