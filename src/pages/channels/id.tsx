@@ -17,7 +17,10 @@ export const ChannelIdPage: React.FC<{ id: string }> = ({ id }) => {
   const onGoingProgramStart =
     onGoingProgram && dayjs(onGoingProgram.startAt * 1000).format("HH:mm")
   const onGoingProgramEnd =
-    onGoingProgram && dayjs(onGoingProgram.endAt * 1000).format("HH:mm")
+    onGoingProgram &&
+    dayjs((onGoingProgram.startAt + onGoingProgram.duration) * 1000).format(
+      "HH:mm"
+    )
   const onGoingProgramDurationInMinutes =
     onGoingProgram && (onGoingProgram.duration || 0) / 60
 
@@ -30,7 +33,7 @@ export const ChannelIdPage: React.FC<{ id: string }> = ({ id }) => {
           (p) =>
             p.startAt &&
             p.serviceId === service.id &&
-            dayjs(p.endAt * 1000).isAfter(now)
+            dayjs((p.startAt + p.duration) * 1000).isAfter(now)
         )
         .sort((a, b) => (b.startAt < a.startAt ? 1 : -1))
       setOnGoingProgram(futurePrograms.shift() || null)

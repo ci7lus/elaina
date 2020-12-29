@@ -1,17 +1,30 @@
 import React, { useEffect, useRef, useState } from "react"
 import dayjs from "dayjs"
-import { Link } from "rocon/react"
-import { channelsRoute } from "../../routes"
 import ScrollContainer from "react-indiana-drag-scroll"
 import { useTelevision } from "../../hooks/television"
+import { TimetableProgramList } from "../../components/timetable/Programs"
+import { LeftTimeBar } from "../../components/timetable/TimetableParts"
+import { TimetableServiceList } from "../../components/timetable/Services"
+import { useThrottleFn } from "react-use"
 
 export const TimetablePage: React.VFC<{}> = () => {
   const [now, setNow] = useState(dayjs())
-  const today = now.clone().startOf("hour")
-  const [leftPosition, setLeftPosition] = useState(0)
-  const [topPosition, setTopPosition] = useState(0)
+  const startAt = now.clone().startOf("hour")
+  const startAtInString = startAt.format()
+  const [clientLeft, setClientLeft] = useState(0)
+  const [clientTop, setClientTop] = useState(0)
   const [clientWidth, setClientWidth] = useState(0)
   const [clientHeight, setClientHeight] = useState(0)
+  const client = useThrottleFn(
+    (clientLeft, clientTop, clientWidth, clientHeight) => ({
+      left: clientLeft,
+      top: clientTop,
+      width: clientWidth,
+      height: clientHeight,
+    }),
+    50,
+    [clientLeft, clientTop, clientWidth, clientHeight]
+  )
   const scrollRef = useRef<HTMLDivElement>(null)
   const timeBarPosition = (now.minute() / 60) * 180
 
@@ -46,38 +59,26 @@ export const TimetablePage: React.VFC<{}> = () => {
         <div
           className="text-gray-200 w-full flex items-center pl-4 bg-gray-700"
           style={{
-            transform: `translateX(-${leftPosition}px)`,
+            transform: `translateX(-${clientLeft}px)`,
             height: "40px",
           }}
         >
-          {filteredServices?.map((service) => (
-            <Link
-              route={channelsRoute.anyRoute}
-              match={{ id: service.id.toString() }}
-              key={service.id}
-            >
-              <div
-                key={service.id}
-                className="bg-gray-700 w-36 flex-shrink-0 text-center p-1 cursor-pointer border-r-2 border-gray-400 truncate"
-                title={service.name}
-              >
-                {service.name}
-              </div>
-            </Link>
-          ))}
+          {filteredServices && (
+            <TimetableServiceList services={filteredServices} />
+          )}
         </div>
       </div>
       <ScrollContainer
         className="timetableScrollContainer relative overflow-auto h-full text-sm"
         style={{ maxHeight: "calc(100vh - 162px)" }}
         onScroll={(scrollLeft, scrollTop) => {
-          setLeftPosition(scrollLeft)
-          setTopPosition(scrollTop)
+          setClientLeft(scrollLeft)
+          setClientTop(scrollTop)
           setClientWidth(scrollRef.current?.clientWidth || 0)
         }}
         onEndScroll={(scrollLeft, scrollTop) => {
-          setLeftPosition(scrollLeft)
-          setTopPosition(scrollTop)
+          setClientLeft(scrollLeft)
+          setClientTop(scrollTop)
           setClientWidth(scrollRef.current?.clientWidth || 0)
         }}
         innerRef={scrollRef}
@@ -93,89 +94,20 @@ export const TimetablePage: React.VFC<{}> = () => {
         >
           <div className="relative block w-full h-full">
             <div className="relative timetable ml-4 overflow-hidden w-full h-full bg-gray-500">
-              {filteredServices?.map((service, idx) => {
-                const leftPos = idx * 144
-                const rightPos = leftPos + 144
-
-                if (
-                  rightPos < leftPosition ||
-                  leftPosition + clientWidth < leftPos
-                ) {
-                  return <React.Fragment key={idx}></React.Fragment>
-                }
-                return (
-                  <React.Fragment key={idx}>
-                    {(programs || [])
-                      .filter(
-                        (program) =>
-                          program.serviceId === service.id &&
-                          0 <
-                            dayjs(program.endAt * 1000).diff(today, "minute") &&
-                          dayjs(program.startAt * 1000).diff(today, "minute") <=
-                            4320
-                      )
-                      .map((program) => {
-                        const start = dayjs(program.startAt * 1000)
-                        const diffInMinutes = start.diff(today, "minute")
-                        const topPos = (diffInMinutes / 60) * 180
-                        const height = (program.duration / 3600) * 180
-                        const bottomPos = topPos + height
-                        if (
-                          bottomPos < topPosition ||
-                          topPosition + clientHeight < topPos
-                        ) {
-                          return <React.Fragment key={program.id} />
-                        }
-                        return (
-                          <div
-                            key={program.id}
-                            style={{
-                              top: `${topPos}px`,
-                              left: `${idx * 9}rem`,
-                              height: `${height}px`,
-                            }}
-                            className={`absolute truncate w-36 bg-${
-                              // bg-pink-100 bg-pink-100
-                              program.genres[0] === "Anime" ? "pink" : "gray"
-                            }-100 border border-gray-400 cursor-pointer`}
-                            title={[program.name, program.description].join(
-                              "\n\n"
-                            )}
-                          >
-                            <p className="whitespace-pre-wrap leading-snug">
-                              {start.format("HH:mm")} {program.name}
-                            </p>
-                            <p
-                              className="whitespace-pre-wrap pt-1 px-2 text-xs text-gray-600"
-                              /*dangerouslySetInnerHTML={{
-                                __html: program.detail,
-                              }}*/
-                            >
-                              {program.description}
-                            </p>
-                          </div>
-                        )
-                      })}
-                  </React.Fragment>
-                )
-              })}
+              {programs && filteredServices && client && (
+                <TimetableProgramList
+                  programs={programs}
+                  services={filteredServices}
+                  startAtInString={startAtInString}
+                  client={client}
+                />
+              )}
             </div>
             <div
               className="absolute top-0 bg-gray-700 text-gray-200 font-bold "
-              style={{ transform: `translateX(${leftPosition}px)` }}
+              style={{ transform: `translateX(${clientLeft}px)` }}
             >
-              {[...Array(24).keys()].map((idx) => {
-                const hour = today.clone().add(idx, "hour")
-                return (
-                  <div
-                    key={idx}
-                    className="text-center w-4 whitespace-pre border-t border-gray-200"
-                    style={{ height: "180px" }}
-                  >
-                    {hour.hour()}
-                  </div>
-                )
-              })}
+              <LeftTimeBar startAtInString={startAtInString} />
             </div>
             <div
               className="ml-4 opacity-50 absolute w-full left-0 border-t-4 border-red-400 transition-all"

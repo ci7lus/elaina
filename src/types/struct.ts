@@ -3,11 +3,10 @@ export type Program = {
   serviceId: number
   name: string
   startAt: number
-  endAt: number
   duration: number
   description: string
   flags: string[]
-  genres: string[]
+  genres: number[]
 }
 
 export type Service = {
