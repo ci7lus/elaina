@@ -1,6 +1,9 @@
-import dayjs, { Dayjs } from "dayjs"
+import dayjs from "dayjs"
 import React, { memo } from "react"
+import { useRecoilValue } from "recoil"
+import { genresAtom } from "../../atoms/television"
 import { Program, Service } from "../../types/struct"
+import { genreColors } from "../../utils/genres"
 
 export const ProgramItem: React.VFC<{
   program: Program
@@ -9,6 +12,15 @@ export const ProgramItem: React.VFC<{
   height: number
 }> = memo(({ program, serviceCol, top, height }) => {
   const startAt = dayjs(program.startAt)
+
+  const genres = useRecoilValue(genresAtom)
+
+  const genre =
+    !!program.genres.length &&
+    genres?.find((genre) => genre.id === program.genres[0])
+  const genreColor =
+    genre && (genreColors[genre.sub] || genreColors[genre.main])
+
   return (
     <div
       key={program.id}
@@ -17,7 +29,9 @@ export const ProgramItem: React.VFC<{
         left: `${serviceCol * 9}rem`,
         height: `${height}px`,
       }}
-      className={`absolute truncate w-36 bg-gray-100 border border-gray-400 cursor-pointer`}
+      className={`absolute truncate w-36 ${
+        genreColor ? genreColor : "bg-gray-100"
+      } border border-gray-400 cursor-pointer`}
       title={[program.name, program.description].join("\n\n")}
     >
       <p className="whitespace-pre-wrap leading-snug">

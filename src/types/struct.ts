@@ -33,3 +33,10 @@ export type CommentPayload = {
   type: "right"
   commands: []
 }
+
+export type Genre = {
+  id: number
+  main: string
+  sub: string
+  count: number
+}

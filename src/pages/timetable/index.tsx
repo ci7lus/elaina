@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react"
 import dayjs from "dayjs"
 import ScrollContainer from "react-indiana-drag-scroll"
-import { useTelevision } from "../../hooks/television"
+import { useGenres, useTelevision } from "../../hooks/television"
 import { TimetableProgramList } from "../../components/timetable/Programs"
 import { LeftTimeBar } from "../../components/timetable/TimetableParts"
 import { TimetableServiceList } from "../../components/timetable/Services"
@@ -29,6 +29,8 @@ export const TimetablePage: React.VFC<{}> = () => {
   const timeBarPosition = (now.minute() / 60) * 180
 
   const { programs, filteredServices } = useTelevision()
+
+  const { genres } = useGenres()
 
   useEffect(() => {
     const updateNow = () => {
@@ -94,7 +96,7 @@ export const TimetablePage: React.VFC<{}> = () => {
         >
           <div className="relative block w-full h-full">
             <div className="relative timetable ml-4 overflow-hidden w-full h-full bg-gray-500">
-              {programs && filteredServices && client && (
+              {programs && filteredServices && client && genres && (
                 <TimetableProgramList
                   programs={programs}
                   services={filteredServices}
@@ -110,7 +112,7 @@ export const TimetablePage: React.VFC<{}> = () => {
               <LeftTimeBar startAtInString={startAtInString} />
             </div>
             <div
-              className="ml-4 opacity-50 absolute w-full left-0 border-t-4 border-red-400 transition-all"
+              className="ml-4 opacity-50 absolute w-full left-0 border-t-4 border-red-400 transition-all pointer-events-none"
               style={{
                 top: `${timeBarPosition}px`,
               }}

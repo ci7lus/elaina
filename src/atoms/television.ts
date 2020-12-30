@@ -1,5 +1,5 @@
 import { atom, selector } from "recoil"
-import { Program, Service } from "../types/struct"
+import { Genre, Program, Service } from "../types/struct"
 
 export const servicesAtom = atom<Service[] | null>({
   key: "services",
@@ -23,5 +23,10 @@ export const filteredServicesSelector = selector<Service[] | null>({
 
 export const programsAtom = atom<Program[] | null>({
   key: "programs",
+  default: null,
+})
+
+export const genresAtom = atom<Genre[] | null>({
+  key: "genres",
   default: null,
 })

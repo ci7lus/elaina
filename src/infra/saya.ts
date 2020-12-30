@@ -1,7 +1,7 @@
 import type { AxiosInstance } from "axios"
 import axios from "axios"
 import { sayaUrl, sayaAuthUser, sayaAuthPass, sayaWSUrl } from "../config"
-import { Service, Program } from "../types/struct"
+import { Service, Program, Genre } from "../types/struct"
 
 export const SayaAPI = {
   getHlsUrl: (id: number, preset: "1080p" | "720p" | "360p" = "1080p") => {
@@ -22,6 +22,10 @@ export const SayaAPI = {
   },
   async getPrograms() {
     const { data } = await client.get<Program[]>("programs")
+    return data
+  },
+  async getGenres() {
+    const { data } = await client.get<Genre[]>("genres")
     return data
   },
 }
