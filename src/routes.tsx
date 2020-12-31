@@ -1,12 +1,12 @@
 import React from "react"
 import Rocon from "rocon/react"
-import { ChannelIdPage } from "./pages/channels/id"
+import { ServiceIdPage } from "./pages/services/id"
 import { IndexPage } from "./pages/index"
 import { TimetablePage } from "./pages/timetable"
 
-export const channelsRoute = Rocon.Path()
+export const servicesRoute = Rocon.Path()
   .any("id", {
-    action: ({ id }) => <ChannelIdPage id={id} />,
+    action: ({ id }) => <ServiceIdPage id={id} />,
   })
   .exact({
     action: () => <div className="container">channels</div>,
@@ -17,7 +17,7 @@ export const routes = Rocon.Path()
     action: () => <IndexPage />,
   })
   .route("timetable", (route) => route.action(() => <TimetablePage />))
-  .route("channels", (route) => route.attach(channelsRoute))
+  .route("services", (route) => route.attach(servicesRoute))
 
 export const ExactlyRoutes = Rocon.Path()
   .exact({

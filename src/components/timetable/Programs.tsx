@@ -11,7 +11,7 @@ export const ProgramItem: React.VFC<{
   top: number
   height: number
 }> = memo(({ program, serviceCol, top, height }) => {
-  const startAt = dayjs(program.startAt)
+  const startAt = dayjs(program.startAt * 1000)
 
   const genres = useRecoilValue(genresAtom)
 
@@ -76,7 +76,10 @@ export const ServiceProgramList: React.VFC<{
           const top = (diffInMinutes / 60) * 180
           const height = (program.duration / 3600) * 180
           const bottom = top + height
-          if (bottom < client.top || client.top + client.height < top) {
+          if (
+            bottom < client.top - 180 ||
+            client.top + client.height + 180 < top
+          ) {
             return <React.Fragment key={program.id} />
           }
           return (
@@ -105,7 +108,10 @@ export const TimetableProgramList: React.VFC<{
         const leftPos = idx * 144
         const rightPos = leftPos + 144
 
-        if (rightPos < client.left || client.left + client.width < leftPos) {
+        if (
+          rightPos < client.left - 144 ||
+          client.left + client.width + 144 < leftPos
+        ) {
           return <React.Fragment key={idx}></React.Fragment>
         }
 

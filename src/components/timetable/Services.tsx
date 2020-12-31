@@ -1,6 +1,6 @@
 import React, { memo } from "react"
 import { Link } from "rocon/react"
-import { channelsRoute } from "../../routes"
+import { servicesRoute } from "../../routes"
 import { Service } from "../../types/struct"
 
 export const TimetableServiceList: React.VFC<{
@@ -9,7 +9,7 @@ export const TimetableServiceList: React.VFC<{
   <>
     {services.map((service) => (
       <Link
-        route={channelsRoute.anyRoute}
+        route={servicesRoute.anyRoute}
         match={{ id: service.id.toString() }}
         key={service.id}
       >

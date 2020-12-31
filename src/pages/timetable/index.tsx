@@ -22,7 +22,7 @@ export const TimetablePage: React.VFC<{}> = () => {
       width: clientWidth,
       height: clientHeight,
     }),
-    50,
+    200,
     [clientLeft, clientTop, clientWidth, clientHeight]
   )
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -32,13 +32,20 @@ export const TimetablePage: React.VFC<{}> = () => {
 
   const { genres } = useGenres()
 
+  const onResize = () => {
+    setClientWidth(scrollRef.current?.clientWidth || 0)
+    setClientHeight(scrollRef.current?.clientHeight || 0)
+  }
+
+  const onScroll = (scrollLeft: number, scrollTop: number) => {
+    setClientLeft(scrollLeft)
+    setClientTop(scrollTop)
+    onResize()
+  }
+
   useEffect(() => {
     const updateNow = () => {
       setNow(dayjs())
-    }
-    const onResize = () => {
-      setClientWidth(scrollRef.current?.clientWidth || 0)
-      setClientHeight(scrollRef.current?.clientHeight || 0)
     }
     const timer = setInterval(updateNow, 60 * 1000)
     onResize()
@@ -52,7 +59,7 @@ export const TimetablePage: React.VFC<{}> = () => {
   return (
     <div>
       <div className="bg-gray-800 text-gray-200">
-        <div className="py-2 mx-auto container flex items-center justify-between">
+        <div className="py-2 mx-auto container px-2 flex items-center justify-between">
           <div className="text-xl">番組表</div>
           <div>絞り込みをここら辺に</div>
         </div>
@@ -71,18 +78,10 @@ export const TimetablePage: React.VFC<{}> = () => {
         </div>
       </div>
       <ScrollContainer
-        className="timetableScrollContainer relative overflow-auto h-full text-sm"
+        className="timetableScrollContainer relative overflow-auto h-full text-sm overscroll-none"
         style={{ maxHeight: "calc(100vh - 162px)" }}
-        onScroll={(scrollLeft, scrollTop) => {
-          setClientLeft(scrollLeft)
-          setClientTop(scrollTop)
-          setClientWidth(scrollRef.current?.clientWidth || 0)
-        }}
-        onEndScroll={(scrollLeft, scrollTop) => {
-          setClientLeft(scrollLeft)
-          setClientTop(scrollTop)
-          setClientWidth(scrollRef.current?.clientWidth || 0)
-        }}
+        onScroll={onScroll}
+        onEndScroll={onScroll}
         innerRef={scrollRef}
         hideScrollbars={false}
       >

@@ -16,6 +16,11 @@ video::cue {
 
 .timetableScrollContainer {
   contain: paint;
+  max-height: calc(100vh - 162px);
+}
+
+.align-super {
+  vertical-align: super;
 }
 
 .playerCommentList::-webkit-scrollbar-thumb {
