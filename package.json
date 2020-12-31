@@ -11,12 +11,14 @@
   "main": "dist/index.html",
   "scripts": {
     "dev": "parcel src/index.html",
-    "build": "IS_BUILD=yes parcel build src/index.html",
+    "build": "IS_BUILD=yes parcel build src/index.html --no-scope-hoist",
     "lint": "prettier --check './src/**/*.{js,ts,tsx}'",
     "format": "prettier --write './src/**/*.{js,ts,tsx}'"
   },
   "private": true,
   "dependencies": {
+    "@chakra-ui/icons": "^1.0.2",
+    "@chakra-ui/react": "^1.0.4",
     "@emotion/react": "^11.1.2",
     "@emotion/styled": "^11.0.0",
     "@neneka/dplayer": "^1.26.0",
@@ -50,7 +52,7 @@
     "@types/react-toast-notifications": "^2.4.0",
     "@types/twemoji": "^12.1.1",
     "autoprefixer": "^10.1.0",
-    "parcel": "^2.0.0-nightly.492",
+    "parcel": "^2.0.0-nightly.496",
     "postcss": "^8.2.1",
     "prettier": "^2.2.1",
     "sass": "^1.30.0",

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react"
+import { Heading } from "@chakra-ui/react"
 import dayjs from "dayjs"
 import ScrollContainer from "react-indiana-drag-scroll"
 import { useGenres, useTelevision } from "../../hooks/television"
@@ -60,7 +61,9 @@ export const TimetablePage: React.VFC<{}> = () => {
     <div>
       <div className="bg-gray-800 text-gray-200">
         <div className="py-2 mx-auto container px-2 flex items-center justify-between">
-          <div className="text-xl">番組表</div>
+          <Heading as="h2" size="md">
+            番組表
+          </Heading>
           <div>絞り込みをここら辺に</div>
         </div>
       </div>

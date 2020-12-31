@@ -10,6 +10,7 @@ import { CommentPayload, Program } from "../../types/struct"
 import { SayaAPI } from "../../infra/saya"
 import ReconnectingWebSocket from "reconnecting-websocket"
 import { useDebounce } from "react-use"
+import { Skeleton } from "@chakra-ui/react"
 
 export const ServiceIdPage: React.FC<{ id: string }> = ({ id }) => {
   const { services, programs } = useTelevision()
@@ -112,11 +113,15 @@ export const ServiceIdPage: React.FC<{ id: string }> = ({ id }) => {
           />
           <div className="my-4 px-2 md:px-0">
             <div className="text-xl">
-              {onGoingProgram ? onGoingProgram.name : "."}
+              <Skeleton isLoaded={!!onGoingProgram}>
+                {onGoingProgram ? onGoingProgram.name : "."}
+              </Skeleton>
             </div>
             <div className="text-lg mt-1">
-              {onGoingProgramStart}〜{onGoingProgramEnd}（
-              {onGoingProgramDurationInMinutes}分） / {service.name}
+              <Skeleton isLoaded={!!onGoingProgram}>
+                {onGoingProgramStart}〜{onGoingProgramEnd}（
+                {onGoingProgramDurationInMinutes}分） / {service.name}
+              </Skeleton>
             </div>
             <div>
               Next
