@@ -7,12 +7,15 @@ import { NotFound } from "../../components/global/NotFound"
 import { CommentList } from "../../components/services/CommentList"
 import { useTelevision } from "../../hooks/television"
 import { CommentPayload, Program } from "../../types/struct"
-import { SayaAPI } from "../../infra/saya"
 import ReconnectingWebSocket from "reconnecting-websocket"
 import { useDebounce } from "react-use"
 import { Skeleton } from "@chakra-ui/react"
+import { useRecoilValue } from "recoil"
+import { playerSettingAtom } from "../../atoms/setting"
+import { useSaya } from "../../hooks/saya"
 
 export const ServiceIdPage: React.FC<{ id: string }> = ({ id }) => {
+  const saya = useSaya()
   const { services, programs } = useTelevision()
   const sid = parseInt(id)
   const service = useMemo(
@@ -55,6 +58,8 @@ export const ServiceIdPage: React.FC<{ id: string }> = ({ id }) => {
     }
   }, [programs])
 
+  const playerSetting = useRecoilValue(playerSettingAtom)
+
   const [comments, setComments] = useState<CommentPayload[]>([])
   const [comment, setComment] = useState<CommentPayload | null>(null)
 
@@ -72,12 +77,17 @@ export const ServiceIdPage: React.FC<{ id: string }> = ({ id }) => {
 
   useEffect(() => {
     if (!service) return
-    const wsUrl = SayaAPI.getCommentSocketUrl(service.id)
+    const wsUrl = saya.getCommentSocketUrl(service.id)
     const s = new ReconnectingWebSocket(wsUrl)
     s.addEventListener("message", (e) => {
       const payload: CommentPayload = JSON.parse(e.data)
-      setComment(payload)
-      setComments((comments) => [...comments, payload])
+      setTimeout(
+        () => {
+          setComment(payload)
+          setComments((comments) => [...comments, payload])
+        },
+        playerSetting.commentDelay ? playerSetting.commentDelay * 1000 : 0
+      )
     })
     socket.current = s
     return () => {

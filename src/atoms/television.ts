@@ -1,13 +1,15 @@
 import { atom, selector } from "recoil"
 import { Genre, Program, Service } from "../types/struct"
 
+const prefix = "elaina:television"
+
 export const servicesAtom = atom<Service[] | null>({
-  key: "services",
+  key: `${prefix}:services`,
   default: null,
 })
 
 export const filteredServicesSelector = selector<Service[] | null>({
-  key: "filtered-servicws",
+  key: `${prefix}:filtered-services`,
   get: ({ get }) => {
     const services = get(servicesAtom)
     const programs = get(programsAtom)
@@ -22,11 +24,11 @@ export const filteredServicesSelector = selector<Service[] | null>({
 })
 
 export const programsAtom = atom<Program[] | null>({
-  key: "programs",
+  key: `${prefix}:programs`,
   default: null,
 })
 
 export const genresAtom = atom<Genre[] | null>({
-  key: "genres",
+  key: `${prefix}:genres`,
   default: null,
 })

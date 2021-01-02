@@ -3,6 +3,7 @@ import Rocon from "rocon/react"
 import { ServiceIdPage } from "./pages/services/id"
 import { IndexPage } from "./pages/index"
 import { TimetablePage } from "./pages/timetable"
+import { SettingsPage } from "./pages/settings"
 
 export const servicesRoute = Rocon.Path()
   .any("id", {
@@ -18,6 +19,7 @@ export const routes = Rocon.Path()
   })
   .route("timetable", (route) => route.action(() => <TimetablePage />))
   .route("services", (route) => route.attach(servicesRoute))
+  .route("settings", (route) => route.action(() => <SettingsPage />))
 
 export const ExactlyRoutes = Rocon.Path()
   .exact({

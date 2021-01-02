@@ -52,7 +52,7 @@
     "@types/react-toast-notifications": "^2.4.0",
     "@types/twemoji": "^12.1.1",
     "autoprefixer": "^10.1.0",
-    "parcel": "^2.0.0-nightly.496",
+    "parcel": "^2.0.0-nightly.500",
     "postcss": "^8.2.1",
     "prettier": "^2.2.1",
     "sass": "^1.30.0",

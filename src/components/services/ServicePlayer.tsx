@@ -3,18 +3,19 @@ import DPlayer, { DPlayerVideo, DPlayerEvents } from "dplayer"
 import { Service, CommentPayload } from "../../types/struct"
 import Hls from "hls-b24.js"
 import * as b24 from "b24.js"
-import { SayaAPI } from "../../infra/saya"
 import { useUpdateEffect } from "react-use"
+import { useSaya } from "../../hooks/saya"
 
 export const ServicePlayer: React.VFC<{
   service: Service
   comment: CommentPayload | null
   reloadRequest: number
 }> = ({ service, comment, reloadRequest }) => {
+  const saya = useSaya()
   const hlsInstance = useRef<Hls | null>(null)
   const videoPayload: DPlayerVideo = {
     type: "customHls",
-    url: SayaAPI.getHlsUrl(service.id),
+    url: saya.getHlsUrl(service.id),
     customType: {
       customHls: (video: HTMLVideoElement, player: DPlayer) => {
         if (hlsInstance.current) {
@@ -25,9 +26,9 @@ export const ServicePlayer: React.VFC<{
         // TODO: Custom loader
         // Workaround https://github.com/video-dev/hls.js/issues/2064
         hls.config.enableWorker = false
-        if (SayaAPI.isAuthorizationEnabled) {
+        if (saya.isAuthorizationEnabled) {
           hls.config.xhrSetup = (xhr, url) => {
-            xhr.setRequestHeader("Authorization", SayaAPI.authorizationToken)
+            xhr.setRequestHeader("Authorization", saya.authorizationToken)
           }
         }
         hls.loadSource(video.src)
@@ -50,7 +51,7 @@ export const ServicePlayer: React.VFC<{
     },
     quality: (["1080p", "720p", "360p"] as const).map((quality) => ({
       name: quality,
-      url: SayaAPI.getHlsUrl(service.id, quality),
+      url: saya.getHlsUrl(service.id, quality),
     })),
     defaultQuality: 0,
   }

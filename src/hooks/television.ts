@@ -7,7 +7,7 @@ import {
   filteredServicesSelector,
   genresAtom,
 } from "../atoms/television"
-import { SayaAPI } from "../infra/saya"
+import { useSaya } from "./saya"
 
 export const useTelevision = () => {
   const [services, setServices] = useRecoilState(servicesAtom)
@@ -16,8 +16,11 @@ export const useTelevision = () => {
 
   const toast = useToasts()
 
+  const saya = useSaya()
+
   useEffect(() => {
-    SayaAPI.getServices()
+    saya
+      .getServices()
       .then((services) => setServices(services))
       .catch((e) => {
         console.error(e)
@@ -26,7 +29,8 @@ export const useTelevision = () => {
           autoDismiss: true,
         })
       })
-    SayaAPI.getPrograms()
+    saya
+      .getPrograms()
       .then((programs) =>
         setPrograms(
           programs.filter((program) => 0 < program.name.trim().length)
@@ -49,9 +53,12 @@ export const useGenres = () => {
 
   const toast = useToasts()
 
+  const saya = useSaya()
+
   useEffect(() => {
     if (genres) return
-    SayaAPI.getGenres()
+    saya
+      .getGenres()
       .then((genres) => setGenres(genres))
       .catch((e) => {
         console.error(e)

@@ -38,7 +38,13 @@ export const TheHeader: React.VFC<{}> = () => {
             </Link>
           </div>
         </div>
-        <div className="flex items-center jusify-end"></div>
+        <div className="flex items-center jusify-end">
+          <div className="flex items-center space-x-4 text-sm">
+            <Link route={routes._.settings} className="hover:text-gray-300">
+              <div className="flex items-center justify-start my-1">設定</div>
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   )

@@ -3,9 +3,13 @@ import { isLocationNotFoundError, RoconRoot, useRoutes } from "rocon/react"
 import { ChakraProvider } from "@chakra-ui/react"
 import { routes } from "./routes"
 import { Layout } from "./layout"
-import { RecoilRoot } from "recoil"
+import { RecoilRoot, useRecoilValue } from "recoil"
 import { NotFound } from "./components/global/NotFound"
 import { ToastProvider } from "react-toast-notifications"
+import { initializeState } from "./atoms/initialize"
+import { RecoilWatcher } from "./components/global/RecoilWatcher"
+import { sayaSettingAtom } from "./atoms/setting"
+import { InitialSettingPage } from "./components/global/InitialSetting"
 
 const UsedRoutes: React.VFC<{}> = () => {
   try {
@@ -21,15 +25,18 @@ const UsedRoutes: React.VFC<{}> = () => {
 }
 
 const Routes: React.VFC<{}> = () => {
+  const sayaSetting = useRecoilValue(sayaSettingAtom)
+  if (!sayaSetting.url) return <InitialSettingPage />
   return <UsedRoutes />
 }
 
 export const App: React.VFC = () => {
   return (
-    <RecoilRoot>
+    <RecoilRoot initializeState={initializeState}>
       <ChakraProvider>
         <RoconRoot>
           <ToastProvider placement="top-center" autoDismissTimeout={5000}>
+            <RecoilWatcher />
             <Layout>
               <Routes />
             </Layout>
