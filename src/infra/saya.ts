@@ -14,7 +14,11 @@ export class SayaAPI {
   }
 
   get wsUrl() {
-    const sayaWS = new URL(this.url)
+    const sayaWS = new URL(
+      this.url.startsWith("/")
+        ? `http://${location.hostname}${this.url}`
+        : this.url
+    )
     sayaWS.protocol = "wss:"
     return sayaWS.href
   }

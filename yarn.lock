@@ -1048,14 +1048,6 @@
   dependencies:
     "@chakra-ui/utils" "1.0.2"
 
-"@chakra-ui/icons@^1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@chakra-ui/icons/-/icons-1.0.2.tgz#a2bd77348c1ff3b6775ad2a02127bd9f77cafabf"
-  integrity sha512-6gPoIi8KHZI8kiWQBlOuxcZOJv6xouYI4sLX23WP2QZdTsplF9qCyZMXhbg8MHTk0YYdb0i2m/t6Y+9OcDjohA==
-  dependencies:
-    "@chakra-ui/icon" "1.0.2"
-    "@types/react" "17.0.0"
-
 "@chakra-ui/image@1.0.2":
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/@chakra-ui/image/-/image-1.0.2.tgz#737c4dc91f4428aa5a60f190908f53b970bba51c"
@@ -1591,14 +1583,15 @@
   resolved "https://registry.yarnpkg.com/@iarna/toml/-/toml-2.2.5.tgz#b32366c89b43c6f8cefbdefac778b9c828e3ba8c"
   integrity sha512-trnsAYxU3xnS1gPHPyU961coFyLkh4gAD/0zQ5mymY4yOZ+CYvsPqUbOFSw0aDM4y0tV7tiFxL/1XfXPNC6IPg==
 
-"@neneka/dplayer@^1.26.0":
-  version "1.26.0"
-  resolved "https://registry.yarnpkg.com/@neneka/dplayer/-/dplayer-1.26.0.tgz#7256282d61813f358696d01367a99809e7b23993"
-  integrity sha512-C/oLnfMV7JPPtQLTjODlxIRBs/kWBEkZtiVzZY85j4jn/VF2fp6JRwXJvAvaM/kSJ6kP+wNTKCKxa12iRgRAEw==
+"@neneka/dplayer@^1.26.0-patch.0":
+  version "1.26.0-patch.0"
+  resolved "https://registry.yarnpkg.com/@neneka/dplayer/-/dplayer-1.26.0-patch.0.tgz#e3c29d2c019fcfaa8703f4e29aeb861e8753cb68"
+  integrity sha512-W5RdgpLV/ES1nqpPR6JxycQ3c6NsQVBvTuajegSU2avrpN5mJcpIMijVzBuHT/IKLb4L5cAE6Rx7FkzwHXaXQg==
   dependencies:
     axios "0.21.0"
     balloon-css "^1.0.3"
     promise-polyfill "8.2.0"
+    twemoji "^13.0.1"
 
 "@nodelib/fs.scandir@2.1.4":
   version "2.1.4"
@@ -2485,11 +2478,6 @@
   version "2.2.6"
   resolved "https://registry.yarnpkg.com/@types/js-cookie/-/js-cookie-2.2.6.tgz#f1a1cb35aff47bc5cfb05cb0c441ca91e914c26f"
   integrity sha512-+oY0FDTO2GYKEV0YPvSshGq9t7YozVkgvXLty7zogQNuCxBhT9/3INX9Q7H1aRZ4SUDRXAKlJuA4EA5nTt7SNw==
-
-"@types/just-throttle@^1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@types/just-throttle/-/just-throttle-1.1.0.tgz#a8d71902ff7f4a0fb6b66de0653e8d6ac964b28f"
-  integrity sha512-5OQzmUhxGmVQjYe8U5qtOc2HISe0JV4ffDoGPivOHvTRiopiPAwvj06j5PN+fRukokdnTCx2choHg4+yES2uiA==
 
 "@types/lodash.mergewith@4.6.6":
   version "4.6.6"
@@ -5358,11 +5346,6 @@ jsprim@^1.2.2:
     extsprintf "1.3.0"
     json-schema "0.2.3"
     verror "1.10.0"
-
-just-throttle@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/just-throttle/-/just-throttle-1.1.0.tgz#178d305ece9876a8a0759abd8d403aafcc6e4849"
-  integrity sha512-iePC/13XYX1Tyn9C6jY+DG3UEejkDvrKsw5xxgGhtGUwYWmoJm4CoKexscBKELOu3FTyCDzjr21ZJ67AXnz+bg==
 
 kind-of@^3.0.2, kind-of@^3.0.3, kind-of@^3.2.0:
   version "3.2.2"

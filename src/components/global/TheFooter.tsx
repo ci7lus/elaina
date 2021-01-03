@@ -1,4 +1,4 @@
-import { ExternalLinkIcon } from "@chakra-ui/icons"
+import { ExternalLink } from "react-feather"
 import { Link } from "@chakra-ui/react"
 import React from "react"
 import { Heart } from "react-feather"
@@ -15,7 +15,7 @@ export const TheFooter: React.VFC<{}> = () => (
               isExternal
             >
               elaina
-              <ExternalLinkIcon mx="2px" />
+              <ExternalLink className="inline" size={12} />
             </Link>
             &nbsp;made with
             <span>
