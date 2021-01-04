@@ -13,6 +13,7 @@ import { Skeleton } from "@chakra-ui/react"
 import { useRecoilValue } from "recoil"
 import { playerSettingAtom } from "../../atoms/setting"
 import { useSaya } from "../../hooks/saya"
+import { StatsWidget } from "../../components/services/StatsWidget"
 
 export const ServiceIdPage: React.FC<{ id: string }> = ({ id }) => {
   const saya = useSaya()
@@ -52,7 +53,7 @@ export const ServiceIdPage: React.FC<{ id: string }> = ({ id }) => {
       setNextProgram(futurePrograms.shift() || null)
     }
     updateProgram()
-    const timer = setInterval(updateProgram, 60 * 1000)
+    const timer = setInterval(updateProgram, 10 * 1000)
     return () => {
       clearInterval(timer)
     }
@@ -77,7 +78,7 @@ export const ServiceIdPage: React.FC<{ id: string }> = ({ id }) => {
 
   useEffect(() => {
     if (!service) return
-    const wsUrl = saya.getCommentSocketUrl(service.id)
+    const wsUrl = saya.getServiceCommentSocketUrl(service.id)
     const s = new ReconnectingWebSocket(wsUrl)
     s.addEventListener("message", (e) => {
       const payload: CommentPayload = JSON.parse(e.data)
@@ -103,7 +104,22 @@ export const ServiceIdPage: React.FC<{ id: string }> = ({ id }) => {
     return () => {
       clearInterval(timer)
     }
-  }, [socket])
+  }, [socket.current])
+
+  const playerContainerRef = useRef<HTMLDivElement>(null)
+  const [commentsHeight, setCommentsHeight] = useState(
+    playerContainerRef.current?.clientHeight
+  )
+  useEffect(() => {
+    const onResize = () => {
+      setCommentsHeight(playerContainerRef.current?.clientHeight)
+    }
+    onResize()
+    window.addEventListener("resize", onResize)
+    return () => {
+      window.removeEventListener("resize", onResize)
+    }
+  }, [playerContainerRef.current])
 
   const [reloadRequest, setReloadRequest] = useState(0)
 
@@ -113,40 +129,18 @@ export const ServiceIdPage: React.FC<{ id: string }> = ({ id }) => {
   if (!service) return <NotFound />
 
   return (
-    <div className="container mx-auto md:mt-8 md:px-2">
+    <div className="md:container mx-auto md:mt-8 md:px-2">
       <div className="flex flex-col md:flex-row items-start justify-around">
-        <div className="w-full md:w-2/3">
+        <div className="w-full md:w-2/3" ref={playerContainerRef}>
           <ServicePlayer
             service={service}
             comment={comment}
             reloadRequest={reloadRequest}
           />
-          <div className="my-4 px-2 md:px-0">
-            <div className="text-xl">
-              <Skeleton isLoaded={!!onGoingProgram}>
-                {onGoingProgram ? onGoingProgram.name : "."}
-              </Skeleton>
-            </div>
-            <div className="text-lg mt-1">
-              <Skeleton isLoaded={!!onGoingProgram}>
-                {onGoingProgramStart}〜{onGoingProgramEnd}（
-                {onGoingProgramDurationInMinutes}分） / {service.name}
-              </Skeleton>
-            </div>
-            <div>
-              Next
-              <ChevronsRight className="inline mx-1" size={18} />
-              {nextProgram ? (
-                nextProgram.name
-              ) : (
-                <span className="text-gray-600">不明</span>
-              )}
-            </div>
-          </div>
         </div>
         <div
           className="bg-gray-50 w-full md:w-1/3 flex flex-col"
-          style={{ height: "40vw" }}
+          style={{ height: commentsHeight }}
         >
           <div className="flex justify-start items-center w-full font-sm p-2 pr-4 border-b-2 border-blue-400 space-x-2">
             <button
@@ -182,6 +176,36 @@ export const ServiceIdPage: React.FC<{ id: string }> = ({ id }) => {
             comments={comments}
             isAutoScrollEnabled={isAutoScrollEnabled}
           />
+        </div>
+      </div>
+      <div className="flex flex-col md:flex-row items-start justify-around">
+        <div className="w-full md:w-2/3 my-4 px-2 md:px-0 md:mr-2">
+          <div className="text-xl">
+            <Skeleton isLoaded={!!onGoingProgram}>
+              {onGoingProgram ? onGoingProgram.name : "."}
+            </Skeleton>
+          </div>
+          <div className="text-lg mt-1">
+            <Skeleton isLoaded={!!onGoingProgram}>
+              {onGoingProgramStart}〜{onGoingProgramEnd}（
+              {onGoingProgramDurationInMinutes}分） / {service.name}
+            </Skeleton>
+          </div>
+          <div>
+            Next
+            <ChevronsRight className="inline mx-1" size={18} />
+            {nextProgram ? (
+              nextProgram.name
+            ) : (
+              <span className="text-gray-600">不明</span>
+            )}
+          </div>
+          <div className="bg-gray-200 whitespace-pre-wrap rounded-md p-4 md:my-2 text-sm leading-relaxed">
+            {onGoingProgram?.description}
+          </div>
+        </div>
+        <div className="w-full md:w-1/3 mb-2 md:mb-0 md:my-4 px-2 md:px-0">
+          <StatsWidget serviceId={sid} socket={socket} />
         </div>
       </div>
     </div>

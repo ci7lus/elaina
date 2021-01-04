@@ -1,6 +1,6 @@
 import axios from "axios"
-import { SayaSetting } from "../types/setting"
-import { Service, Program, Genre } from "../types/struct"
+import type { SayaSetting } from "../types/setting"
+import type { Service, Program, Genre, CommentStats } from "../types/struct"
 
 export class SayaAPI {
   public url: string
@@ -39,8 +39,8 @@ export class SayaAPI {
   getHlsUrl(id: number, preset: "1080p" | "720p" | "360p" = "1080p") {
     return `${this.url}/services/${id}/hls?preset=${preset}&subtitle=true`
   }
-  getCommentSocketUrl(id: number) {
-    return `${this.wsUrl}/comments/${id}/stream`
+  getServiceCommentSocketUrl(id: number) {
+    return `${this.wsUrl}/services/${id}/comments`
   }
   get isAuthorizationEnabled() {
     return !!(this.user && this.pass)
@@ -58,6 +58,12 @@ export class SayaAPI {
   }
   async getGenres() {
     const { data } = await this.client.get<Genre[]>("genres")
+    return data
+  }
+  async getCommentStatus(serviceId: number) {
+    const { data } = await this.client.get<CommentStats>(
+      `status/comments/${serviceId}`
+    )
     return data
   }
 }
