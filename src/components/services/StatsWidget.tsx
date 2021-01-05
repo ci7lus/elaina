@@ -28,6 +28,7 @@ export const StatsWidget: React.VFC<{
   }, [socket.current])
   useEffect(() => {
     const timer = setInterval(reload, 60 * 1000)
+    setTimeout(reload, 5000)
     return () => {
       clearInterval(timer)
     }
@@ -56,7 +57,7 @@ export const StatsWidget: React.VFC<{
         </div>
       ) : (
         <div className="p-2">
-          {stats.nico && (
+          {stats.nico ? (
             <div className="flex space-x-2 px-2">
               <div className="flex items-center justify-center">
                 <a
@@ -80,6 +81,10 @@ export const StatsWidget: React.VFC<{
                   <div>{stats.nico.giftPoints.toLocaleString()}ギフトpt</div>
                 )}
               </div>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center py-8 text-gray-600">
+              対象の生放送がありません
             </div>
           )}
           {stats.twitter.map((twitter, idx) => (

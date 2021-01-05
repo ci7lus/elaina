@@ -36,19 +36,17 @@ export const ServicePlayer: React.VFC<{
         const b24Renderer = new b24.WebVTTRenderer()
         b24Renderer.init().then(() => {
           b24Renderer.attachMedia(video)
+          player.on("subtitle_show" as DPlayerEvents.subtitle_show, () => {
+            b24Renderer.show()
+          })
+          player.on("subtitle_hide" as DPlayerEvents.subtitle_hide, () => {
+            b24Renderer.hide()
+          })
         })
         hls.on(Hls.Events.FRAG_PARSING_PRIVATE_DATA, (event, data) => {
           for (const sample of data.samples) {
             b24Renderer.pushData(sample.pid, sample.data, sample.pts)
           }
-        })
-        player.on("subtitle_hide" as DPlayerEvents.subtitle_hide, () => {
-          // @ts-ignore
-          if (!b24Renderer.tracks.subtitle) return
-          b24Renderer.hide()
-        })
-        player.on("subtitle_show" as DPlayerEvents.subtitle_show, () => {
-          b24Renderer.show()
         })
 
         player.on("destroy" as DPlayerEvents.destroy, () => {

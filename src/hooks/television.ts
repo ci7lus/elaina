@@ -38,7 +38,7 @@ export const useTelevision = () => {
       )
       .catch((e) => {
         console.error(e)
-        toast.addToast("サービスの取得に失敗しました", {
+        toast.addToast("番組の取得に失敗しました", {
           appearance: "error",
           autoDismiss: true,
         })
