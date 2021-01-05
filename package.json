@@ -33,6 +33,7 @@
     "react-feather": "^2.0.9",
     "react-hook-form": "^6.13.1",
     "react-indiana-drag-scroll": "^1.8.0",
+    "react-tiny-popover": "^6.0.3",
     "react-toast-notifications": "^2.4.0",
     "react-use": "^15.3.4",
     "recoil": "^0.1.2",

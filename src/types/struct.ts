@@ -1,5 +1,5 @@
 export type Program = {
-  id: string
+  id: number
   serviceId: number
   name: string
   startAt: number
@@ -7,6 +7,20 @@ export type Program = {
   description: string
   flags: string[]
   genres: number[]
+  episode?: {
+    number: number | null
+    title: string
+  }
+  video: {
+    component: number
+    content: number
+    resolution: string
+    type: string
+  }
+  audio: {
+    component: 2
+    samplingRate: number
+  }
 }
 
 export type Service = {
