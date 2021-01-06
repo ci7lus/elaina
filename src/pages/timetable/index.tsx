@@ -1,15 +1,15 @@
 import React, { useEffect, useRef, useState } from "react"
 import { Heading } from "@chakra-ui/react"
-import dayjs from "dayjs"
 import ScrollContainer from "react-indiana-drag-scroll"
 import { useGenres, useTelevision } from "../../hooks/television"
 import { TimetableProgramList } from "../../components/timetable/Programs"
 import { LeftTimeBar } from "../../components/timetable/TimetableParts"
 import { TimetableServiceList } from "../../components/timetable/Services"
 import { useThrottleFn } from "react-use"
+import { useNow } from "../../hooks/date"
 
 export const TimetablePage: React.VFC<{}> = () => {
-  const [now, setNow] = useState(dayjs())
+  const now = useNow()
   const startAt = now.clone().startOf("hour")
   const startAtInString = startAt.format()
   const [clientLeft, setClientLeft] = useState(0)
@@ -45,15 +45,10 @@ export const TimetablePage: React.VFC<{}> = () => {
   }
 
   useEffect(() => {
-    const updateNow = () => {
-      setNow(dayjs())
-    }
-    const timer = setInterval(updateNow, 60 * 1000)
     onResize()
     window.addEventListener("resize", onResize)
 
     return () => {
-      clearInterval(timer)
       window.removeEventListener("resize", onResize)
     }
   }, [])

@@ -1,11 +1,12 @@
 import dayjs from "dayjs"
-import React, { useEffect, useMemo, useState } from "react"
+import React, { useMemo } from "react"
 import { Loading } from "../../components/global/Loading"
 import { NotFound } from "../../components/global/NotFound"
 import { useTelevision } from "../../hooks/television"
 import { useSaya } from "../../hooks/saya"
 import { Link } from "rocon/react"
 import { servicesRoute } from "../../routes"
+import { useNow } from "../../hooks/date"
 
 export const ProgramIdPage: React.FC<{ id: string }> = ({ id }) => {
   const saya = useSaya()
@@ -20,17 +21,9 @@ export const ProgramIdPage: React.FC<{ id: string }> = ({ id }) => {
       services &&
       program &&
       services.find((service) => service.id === program.serviceId),
-    []
+    [services, program]
   )
-  const [now, setNow] = useState(dayjs())
-
-  useEffect(() => {
-    const updateNow = () => setNow(dayjs())
-    const timer = setInterval(updateNow, 10 * 1000)
-    return () => {
-      clearInterval(timer)
-    }
-  }, [])
+  const now = useNow()
 
   if (!services || !programs) return <Loading />
   if (!program) return <NotFound />
@@ -52,7 +45,7 @@ export const ProgramIdPage: React.FC<{ id: string }> = ({ id }) => {
           - {endAt.format("HH:mm")}
           <span className="ml-1">({program.duration / 60}分間)</span>
         </div>
-        <div className="mt-2 whitespace-pre-wrap leading-relaxed">
+        <div className="my-2 whitespace-pre-wrap leading-relaxed">
           {program.description}
         </div>
       </div>

@@ -14,6 +14,7 @@ import { useRecoilValue } from "recoil"
 import { playerSettingAtom } from "../../atoms/setting"
 import { useSaya } from "../../hooks/saya"
 import { StatsWidget } from "../../components/services/StatsWidget"
+import { useNow } from "../../hooks/date"
 
 export const ServiceIdPage: React.FC<{ id: string }> = ({ id }) => {
   const saya = useSaya()
@@ -24,6 +25,7 @@ export const ServiceIdPage: React.FC<{ id: string }> = ({ id }) => {
     [services]
   )
 
+  const now = useNow()
   const [onGoingProgram, setOnGoingProgram] = useState<Program | null>(null)
   const [nextProgram, setNextProgram] = useState<Program | null>(null)
   const onGoingProgramStart =
@@ -35,29 +37,24 @@ export const ServiceIdPage: React.FC<{ id: string }> = ({ id }) => {
     )
   const onGoingProgramDurationInMinutes =
     onGoingProgram && (onGoingProgram.duration || 0) / 60
+  const onGoingProgramDiff =
+    onGoingProgram && dayjs(onGoingProgram.startAt * 1000).diff(now, "minute")
 
   useEffect(() => {
-    const updateProgram = () => {
-      if (!service) return
-      const now = dayjs()
-      const futurePrograms = (programs || [])
-        .filter(
-          (p) =>
-            p.startAt &&
-            p.serviceId === service.id &&
-            dayjs((p.startAt + p.duration) * 1000).isAfter(now)
-        )
-        .sort((a, b) => (b.startAt < a.startAt ? 1 : -1))
-      setOnGoingProgram(futurePrograms.shift() || null)
+    if (!service) return
+    const futurePrograms = (programs || [])
+      .filter(
+        (p) =>
+          p.startAt &&
+          p.serviceId === service.id &&
+          dayjs((p.startAt + p.duration) * 1000).isAfter(now)
+      )
+      .sort((a, b) => (b.startAt < a.startAt ? 1 : -1))
+    setOnGoingProgram(futurePrograms.shift() || null)
 
-      setNextProgram(futurePrograms.shift() || null)
-    }
-    updateProgram()
-    const timer = setInterval(updateProgram, 10 * 1000)
-    return () => {
-      clearInterval(timer)
-    }
-  }, [programs])
+    setNextProgram(futurePrograms.shift() || null)
+    return () => {}
+  }, [programs, now])
 
   const playerSetting = useRecoilValue(playerSettingAtom)
 
@@ -180,15 +177,22 @@ export const ServiceIdPage: React.FC<{ id: string }> = ({ id }) => {
       </div>
       <div className="flex flex-col md:flex-row items-start justify-around">
         <div className="w-full md:w-2/3 my-4 px-2 md:px-0 md:mr-2">
-          <div className="text-xl">
+          <div className="text-2xl">
             <Skeleton isLoaded={!!onGoingProgram}>
               {onGoingProgram ? onGoingProgram.name : "."}
             </Skeleton>
           </div>
-          <div className="text-lg mt-1">
-            <Skeleton isLoaded={!!onGoingProgram}>
-              {onGoingProgramStart}〜{onGoingProgramEnd}（
-              {onGoingProgramDurationInMinutes}分） / {service.name}
+          <div className="text-xl mt-1">
+            <Skeleton
+              isLoaded={!!(onGoingProgram && onGoingProgramDiff !== null)}
+            >
+              {onGoingProgram && onGoingProgramDiff !== null
+                ? `${onGoingProgramStart} [${Math.abs(onGoingProgramDiff)}分${
+                    0 < onGoingProgramDiff ? "後" : "前"
+                  }] - ${onGoingProgramEnd} (${onGoingProgramDurationInMinutes}分間) / ${
+                    service.name
+                  }`
+                : "."}
             </Skeleton>
           </div>
           <div>

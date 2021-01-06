@@ -2,6 +2,7 @@ import { Spinner } from "@chakra-ui/react"
 import dayjs from "dayjs"
 import React, { useEffect, useState } from "react"
 import { RefreshCw } from "react-feather"
+import { useNow } from "../../hooks/date"
 import { useSaya } from "../../hooks/saya"
 import { CommentStats } from "../../types/struct"
 
@@ -23,16 +24,10 @@ export const StatsWidget: React.VFC<{
       })
       .finally(() => setLoading(false))
   }
+  const now = useNow()
   useEffect(() => {
     reload()
-  }, [socket.current])
-  useEffect(() => {
-    const timer = setInterval(reload, 60 * 1000)
-    setTimeout(reload, 5000)
-    return () => {
-      clearInterval(timer)
-    }
-  }, [])
+  }, [socket.current, now])
 
   return (
     <div className="w-full rounded-md bg-gray-50">
