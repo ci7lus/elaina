@@ -18,7 +18,7 @@ export const filteredServicesSelector = selector<Service[] | null>({
     return services.filter(
       (service) =>
         0 <
-        programs.filter((program) => program.serviceId === service.id).length
+        programs.filter((program) => program.service.id === service.id).length
     )
   },
 })

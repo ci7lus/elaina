@@ -1,6 +1,6 @@
 export type Program = {
   id: number
-  serviceId: number
+  service: Service
   name: string
   startAt: number
   duration: number

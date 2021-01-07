@@ -19,7 +19,7 @@ export const ProgramItem: React.VFC<{
 
   const genres = useRecoilValue(genresAtom)
   const services = useRecoilValue(servicesAtom)
-  const service = services && services.find((s) => s.id === program.serviceId)
+  const service = services && services.find((s) => s.id === program.service.id)
 
   const genre =
     !!program.genres.length &&
@@ -131,7 +131,7 @@ export const ServiceProgramList: React.VFC<{
       {(programs || [])
         .filter(
           (program) =>
-            program.serviceId === service.id &&
+            program.service.id === service.id &&
             0 <
               dayjs((program.startAt + program.duration) * 1000).diff(
                 startAt,

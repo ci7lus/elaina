@@ -46,7 +46,7 @@ export const ServiceIdPage: React.FC<{ id: string }> = ({ id }) => {
       .filter(
         (p) =>
           p.startAt &&
-          p.serviceId === service.id &&
+          p.service.id === service.id &&
           dayjs((p.startAt + p.duration) * 1000).isAfter(now)
       )
       .sort((a, b) => (b.startAt < a.startAt ? 1 : -1))

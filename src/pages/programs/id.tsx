@@ -20,7 +20,7 @@ export const ProgramIdPage: React.FC<{ id: string }> = ({ id }) => {
     () =>
       services &&
       program &&
-      services.find((service) => service.id === program.serviceId),
+      services.find((service) => service.id === program.service.id),
     [services, program]
   )
   const now = useNow()
@@ -59,7 +59,7 @@ export const ProgramIdPage: React.FC<{ id: string }> = ({ id }) => {
               <div className="flex justify-end pt-2">
                 <Link
                   route={servicesRoute.anyRoute}
-                  match={{ id: program.serviceId.toString() }}
+                  match={{ id: program.service.id.toString() }}
                 >
                   <button className="bg-indigo-400 text-gray-100 rounded-md px-2 p-1">
                     視聴
