@@ -10,22 +10,16 @@ import { useNow } from "../../hooks/date"
 
 export const ProgramIdPage: React.FC<{ id: string }> = ({ id }) => {
   const saya = useSaya()
-  const { services, programs } = useTelevision()
+  const { programs } = useTelevision()
   const pid = parseInt(id)
   const program = useMemo(
     () => programs && programs.find((program) => program.id === pid),
     [programs]
   )
-  const service = useMemo(
-    () =>
-      services &&
-      program &&
-      services.find((service) => service.id === program.service.id),
-    [services, program]
-  )
+  const service = program?.service
   const now = useNow()
 
-  if (!services || !programs) return <Loading />
+  if (!programs) return <Loading />
   if (!program) return <NotFound />
 
   const startAt = dayjs(program.startAt * 1000)
@@ -34,8 +28,9 @@ export const ProgramIdPage: React.FC<{ id: string }> = ({ id }) => {
   const isNow = now.isBefore(endAt) && diff <= 0
 
   return (
-    <div className="container mx-auto px-2 mt-4 flex flex-col md:flex-row">
+    <div className="container mx-auto px-2 mt-4 flex flex-col md:flex-row md:space-x-4">
       <div className="w-full md:w-2/3">
+        <div className="text-gray-600 leading-relaxed">{program.id}</div>
         <div className="text-2xl">{program.name}</div>
         <div className="text-xl mt-1 text-gray-600">
           {startAt.format("MM/DD HH:mm")}
@@ -45,7 +40,7 @@ export const ProgramIdPage: React.FC<{ id: string }> = ({ id }) => {
           - {endAt.format("HH:mm")}
           <span className="ml-1">({program.duration / 60}分間)</span>
         </div>
-        <div className="my-2 whitespace-pre-wrap leading-relaxed">
+        <div className="my-4 whitespace-pre-wrap leading-relaxed">
           {program.description}
         </div>
       </div>

@@ -46,7 +46,7 @@ export const TimetableServiceList: React.VFC<{
         >
           <div
             key={service.id}
-            className="bg-gray-700 w-36 flex-shrink-0 text-center p-1 cursor-pointer border-r-2 border-gray-400 truncate"
+            className="bg-gray-700 w-36 flex-shrink-0 text-center p-1 cursor-pointer border-r-2 border-gray-400 truncate select-none"
             title={service.name}
             onClick={() => setIsOpen((isOpen) => !isOpen)}
           >

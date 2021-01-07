@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react"
-import { Heading } from "@chakra-ui/react"
+import { Heading, Spinner } from "@chakra-ui/react"
 import ScrollContainer from "react-indiana-drag-scroll"
 import { useGenres, useTelevision } from "../../hooks/television"
 import { TimetableProgramList } from "../../components/timetable/Programs"
@@ -7,11 +7,13 @@ import { LeftTimeBar } from "../../components/timetable/TimetableParts"
 import { TimetableServiceList } from "../../components/timetable/Services"
 import { useThrottleFn } from "react-use"
 import { useNow } from "../../hooks/date"
+import { Loading } from "../../components/global/Loading"
 
 export const TimetablePage: React.VFC<{}> = () => {
   const now = useNow()
   const startAt = now.clone().startOf("hour")
   const startAtInString = startAt.format()
+  const scrollRef = useRef<HTMLDivElement>(null)
   const [clientLeft, setClientLeft] = useState(0)
   const [clientTop, setClientTop] = useState(0)
   const [clientWidth, setClientWidth] = useState(0)
@@ -20,13 +22,13 @@ export const TimetablePage: React.VFC<{}> = () => {
     (clientLeft, clientTop, clientWidth, clientHeight) => ({
       left: clientLeft,
       top: clientTop,
-      width: clientWidth,
-      height: clientHeight,
+      width: Math.max(clientWidth, scrollRef.current?.clientWidth || 0),
+      height: Math.max(clientHeight, scrollRef.current?.clientHeight || 0),
     }),
     200,
     [clientLeft, clientTop, clientWidth, clientHeight]
   )
-  const scrollRef = useRef<HTMLDivElement>(null)
+
   const timeBarPosition = (now.minute() / 60) * 180
 
   const { programs, filteredServices } = useTelevision()
@@ -76,46 +78,48 @@ export const TimetablePage: React.VFC<{}> = () => {
         </div>
       </div>
       <ScrollContainer
-        className="timetableScrollContainer relative overflow-auto h-full text-sm overscroll-none"
-        style={{ maxHeight: "calc(100vh - 162px)" }}
+        className="timetableScrollContainer relative overflow-auto h-full text-sm overscroll-none bg-gray-500"
+        style={{ height: "calc(100vh - 162px)" }}
         onScroll={onScroll}
         onEndScroll={onScroll}
         innerRef={scrollRef}
         hideScrollbars={false}
       >
-        <div
-          className="relative"
-          style={{
-            width: `${(filteredServices || []).length * 9}rem`,
-            minWidth: "calc(100vw - 1rem)",
-            height: "4320px",
-          }}
-        >
-          <div className="relative block w-full h-full">
-            <div className="relative timetable ml-4 overflow-hidden w-full h-full bg-gray-500">
-              {programs && filteredServices && client && genres && (
+        {programs && filteredServices && client && genres ? (
+          <div
+            className="relative"
+            style={{
+              width: `${(filteredServices || []).length * 9}rem`,
+              minWidth: "calc(100vw - 1rem)",
+              height: "4320px",
+            }}
+          >
+            <div className="relative block w-full h-full">
+              <div className="relative timetable ml-4 overflow-hidden w-full h-full">
                 <TimetableProgramList
                   programs={programs}
                   services={filteredServices}
                   startAtInString={startAtInString}
                   client={client}
                 />
-              )}
+              </div>
+              <div
+                className="absolute top-0 bg-gray-700 text-gray-200 font-bold "
+                style={{ transform: `translateX(${clientLeft}px)` }}
+              >
+                <LeftTimeBar startAtInString={startAtInString} />
+              </div>
+              <div
+                className="ml-4 opacity-50 absolute w-full left-0 border-t-4 border-red-400 transition-all pointer-events-none"
+                style={{
+                  top: `${timeBarPosition}px`,
+                }}
+              />
             </div>
-            <div
-              className="absolute top-0 bg-gray-700 text-gray-200 font-bold "
-              style={{ transform: `translateX(${clientLeft}px)` }}
-            >
-              <LeftTimeBar startAtInString={startAtInString} />
-            </div>
-            <div
-              className="ml-4 opacity-50 absolute w-full left-0 border-t-4 border-red-400 transition-all pointer-events-none"
-              style={{
-                top: `${timeBarPosition}px`,
-              }}
-            />
           </div>
-        </div>
+        ) : (
+          <Loading />
+        )}
       </ScrollContainer>
     </div>
   )

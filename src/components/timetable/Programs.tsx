@@ -41,10 +41,8 @@ export const ProgramItem: React.VFC<{
           position={position}
           childRect={childRect}
           popoverRect={popoverRect}
-          arrowColor={"rgba(31, 41, 55)"}
-          arrowSize={8}
-          className="popover-arrow-container"
-          arrowClassName="popover-arrow"
+          arrowColor={"rgba(31, 41, 55, 0.9)"}
+          arrowSize={5}
         >
           <div className="bg-opacity-90 bg-gray-800 text-gray-100 rounded-md p-2 w-72">
             <div className="py-1 rounded-md w-full bg-gray-200 text-gray-800 text-center">
@@ -91,7 +89,6 @@ export const ProgramItem: React.VFC<{
     >
       <div
         onClick={() => setIsOpen((isOpen) => !isOpen)}
-        key={program.id}
         style={{
           top: `${top}px`,
           left: `${serviceCol * 9}rem`,
@@ -99,7 +96,7 @@ export const ProgramItem: React.VFC<{
         }}
         className={`absolute truncate w-36 ${
           genreColor ? genreColor : "bg-gray-100"
-        } border border-gray-400 cursor-pointer`}
+        } border border-gray-400 cursor-pointer select-none`}
         title={[program.name, program.description].join("\n\n")}
       >
         <p className="whitespace-pre-wrap leading-snug">
