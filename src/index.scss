@@ -32,3 +32,9 @@ video::cue {
   width: 2px;
   height: 0px;
 }
+
+.programDescription {
+  a {
+    @apply text-blue-600;
+  }
+}

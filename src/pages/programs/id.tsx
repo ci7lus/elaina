@@ -7,6 +7,7 @@ import { useSaya } from "../../hooks/saya"
 import { Link } from "rocon/react"
 import { servicesRoute } from "../../routes"
 import { useNow } from "../../hooks/date"
+import { AutoLinkedText } from "../../components/global/AutoLinkedText"
 
 export const ProgramIdPage: React.FC<{ id: string }> = ({ id }) => {
   const saya = useSaya()
@@ -40,8 +41,8 @@ export const ProgramIdPage: React.FC<{ id: string }> = ({ id }) => {
           - {endAt.format("HH:mm")}
           <span className="ml-1">({program.duration / 60}分間)</span>
         </div>
-        <div className="my-4 whitespace-pre-wrap leading-relaxed">
-          {program.description}
+        <div className="my-4 whitespace-pre-wrap leading-relaxed programDescription">
+          <AutoLinkedText>{program.description}</AutoLinkedText>
         </div>
       </div>
       <div className="w-full md:w-1/3">

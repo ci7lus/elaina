@@ -15,6 +15,7 @@ import { playerSettingAtom } from "../../atoms/setting"
 import { useSaya } from "../../hooks/saya"
 import { StatsWidget } from "../../components/services/StatsWidget"
 import { useNow } from "../../hooks/date"
+import { AutoLinkedText } from "../../components/global/AutoLinkedText"
 
 export const ServiceIdPage: React.FC<{ id: string }> = ({ id }) => {
   const saya = useSaya()
@@ -204,8 +205,8 @@ export const ServiceIdPage: React.FC<{ id: string }> = ({ id }) => {
               <span className="text-gray-600">不明</span>
             )}
           </div>
-          <div className="bg-gray-200 whitespace-pre-wrap rounded-md p-4 md:my-2 text-sm leading-relaxed">
-            {onGoingProgram?.description}
+          <div className="bg-gray-200 whitespace-pre-wrap rounded-md p-4 md:my-2 text-sm leading-relaxed programDescription">
+            <AutoLinkedText>{onGoingProgram?.description || ""}</AutoLinkedText>
           </div>
         </div>
         <div className="w-full md:w-1/3 mb-2 md:mb-0 md:my-4 px-2 md:px-0">
