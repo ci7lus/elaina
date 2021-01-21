@@ -2532,6 +2532,13 @@
   dependencies:
     "@types/react" "*"
 
+"@types/react-table@^7.0.26":
+  version "7.0.26"
+  resolved "https://registry.yarnpkg.com/@types/react-table/-/react-table-7.0.26.tgz#fd244f65c30697242a920d0eaef8947d85bb7755"
+  integrity sha512-LF1wKGXo5LN1MY5DqD8aaqHaIpN2atZ+NslxG0P8TNUdrZATqZ9lD6b81OQB6GjtN7n7Jw48TqfP5apOMyfulQ==
+  dependencies:
+    "@types/react" "*"
+
 "@types/react-toast-notifications@^2.4.0":
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/@types/react-toast-notifications/-/react-toast-notifications-2.4.0.tgz#0ca0732cfae5a6ef5939a676fffac6e64c78bc25"
@@ -6776,6 +6783,11 @@ react-style-singleton@^2.1.0:
     get-nonce "^1.0.0"
     invariant "^2.2.4"
     tslib "^1.0.0"
+
+react-table@^7.6.2:
+  version "7.6.2"
+  resolved "https://registry.yarnpkg.com/react-table/-/react-table-7.6.2.tgz#b60932fa6d457c2bca0da49815cd6a8fe9451f77"
+  integrity sha512-urwNZTieb+xg/+BITUIrqdH5jZfJlw7rKVAAq25iXpBPwbQojLCEKJuGycLbVwn8fzU+Ovly3y8HHNaLNrPCvQ==
 
 react-tiny-popover@^6.0.3:
   version "6.0.3"

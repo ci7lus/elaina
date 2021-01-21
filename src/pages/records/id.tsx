@@ -1,63 +1,49 @@
 import dayjs from "dayjs"
-import React, { useEffect, useMemo, useRef, useState } from "react"
-import { ChevronsDown, ChevronsRight, RefreshCw } from "react-feather"
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { ChevronsDown, RefreshCw } from "react-feather"
 import { CommentPlayer } from "../../components/common/CommentPlayer"
 import { Loading } from "../../components/global/Loading"
 import { NotFound } from "../../components/global/NotFound"
 import { CommentList } from "../../components/services/CommentList"
-import { useTelevision } from "../../hooks/television"
-import { CommentPayload, Program } from "../../types/struct"
+import { CommentPayload, ProgramRecord } from "../../types/struct"
 import ReconnectingWebSocket from "reconnecting-websocket"
 import { useDebounce } from "react-use"
 import { Skeleton } from "@chakra-ui/react"
-import { useRecoilValue } from "recoil"
-import { playerSettingAtom } from "../../atoms/setting"
 import { useSaya } from "../../hooks/saya"
-import { StatsWidget } from "../../components/services/StatsWidget"
-import { useNow } from "../../hooks/date"
 import { AutoLinkedText } from "../../components/global/AutoLinkedText"
+import { PlayerController } from "./PlayerController"
 
-export const ServiceIdPage: React.FC<{ id: string }> = ({ id }) => {
+export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
   const saya = useSaya()
-  const { services, programs } = useTelevision()
-  const sid = parseInt(id)
-  const service = useMemo(
-    () => services && services.find((c) => c.id === sid),
-    [services]
+  const pid = parseInt(id)
+  const [record, setRecord] = useState<ProgramRecord | null | false>(null)
+  const program = useMemo(() => record && record.program, [record])
+  const service = useMemo(() => program && program.service, [program])
+
+  const programStart = program && dayjs(program.startAt * 1000)
+  const programEnd =
+    program && dayjs((program.startAt + program.duration) * 1000)
+  const programDurationInMinutes = program && (program.duration || 0) / 60
+
+  const qualities = useMemo(
+    () =>
+      program &&
+      (["1080p", "720p", "360p"] as const).map((quality) => ({
+        name: quality,
+        url: saya.getRecordHlsUrl(program.id, quality),
+      })),
+    [program]
   )
 
-  const now = useNow()
-  const [onGoingProgram, setOnGoingProgram] = useState<Program | null>(null)
-  const [nextProgram, setNextProgram] = useState<Program | null>(null)
-  const onGoingProgramStart =
-    onGoingProgram && dayjs(onGoingProgram.startAt * 1000).format("HH:mm")
-  const onGoingProgramEnd =
-    onGoingProgram &&
-    dayjs((onGoingProgram.startAt + onGoingProgram.duration) * 1000).format(
-      "HH:mm"
-    )
-  const onGoingProgramDurationInMinutes =
-    onGoingProgram && (onGoingProgram.duration || 0) / 60
-  const onGoingProgramDiff =
-    onGoingProgram && dayjs(onGoingProgram.startAt * 1000).diff(now, "minute")
-
   useEffect(() => {
-    if (!service) return
-    const futurePrograms = (programs || [])
-      .filter(
-        (p) =>
-          p.startAt &&
-          p.service.id === service.id &&
-          dayjs((p.startAt + p.duration) * 1000).isAfter(now)
-      )
-      .sort((a, b) => (b.startAt < a.startAt ? 1 : -1))
-    setOnGoingProgram(futurePrograms.shift() || null)
-
-    setNextProgram(futurePrograms.shift() || null)
-    return () => {}
-  }, [programs, now])
-
-  const playerSetting = useRecoilValue(playerSettingAtom)
+    saya
+      .getRecord(pid)
+      .then((record) => setRecord(record))
+      .catch((error) => {
+        console.error(error)
+        setRecord(false)
+      })
+  }, [])
 
   const [comments, setComments] = useState<CommentPayload[]>([])
   const [comment, setComment] = useState<CommentPayload | null>(null)
@@ -72,37 +58,33 @@ export const ServiceIdPage: React.FC<{ id: string }> = ({ id }) => {
     [comments]
   )
 
+  const [position, setPosition] = useState(0)
   const socket = useRef<ReconnectingWebSocket | null>()
 
+  const syncToPosition = useCallback(() => {
+    if (!socket.current) return
+    socket.current.send(JSON.stringify({ action: "Sync", seconds: position }))
+    console.log("sync to", position)
+  }, [socket.current, position])
+
   useEffect(() => {
-    if (!service) return
-    const wsUrl = saya.getServiceCommentSocketUrl(service.id)
+    if (!program) return
+    const wsUrl = saya.getRecordCommentSocketUrl(program.id)
     const s = new ReconnectingWebSocket(wsUrl)
     s.addEventListener("message", (e) => {
       const payload: CommentPayload = JSON.parse(e.data)
-      setTimeout(
-        () => {
-          setComment(payload)
-          setComments((comments) => [...comments, payload])
-        },
-        playerSetting.commentDelay ? playerSetting.commentDelay * 1000 : 0
-      )
+      setComment(payload)
+      setComments((comments) => [...comments, payload])
+    })
+    s.addEventListener("open", () => {
+      syncToPosition()
+      setComments([])
     })
     socket.current = s
     return () => {
       s.close()
     }
-  }, [service])
-
-  useEffect(() => {
-    if (!socket.current) return
-    const timer = setInterval(() => {
-      socket.current?.send(JSON.stringify({ type: "pong" }))
-    }, 5000)
-    return () => {
-      clearInterval(timer)
-    }
-  }, [socket.current])
+  }, [program])
 
   const playerContainerRef = useRef<HTMLDivElement>(null)
   const [commentsHeight, setCommentsHeight] = useState(
@@ -119,17 +101,31 @@ export const ServiceIdPage: React.FC<{ id: string }> = ({ id }) => {
     }
   }, [playerContainerRef.current])
 
+  const [isPaused, setIsPaused] = useState(false)
+  useEffect(() => {
+    if (isPaused === false) {
+      syncToPosition()
+    }
+  }, [isPaused])
+
   const [reloadRequest, setReloadRequest] = useState(0)
 
   const [isAutoScrollEnabled, setIsAutoScrollEnabled] = useState(true)
 
-  if (!services || !programs) return <Loading />
-  if (!service) return <NotFound />
+  const seek = useCallback((s: number) => {
+    // TODO: sayaにシークがついたら追従する
+    console.log("seeked", s)
+  }, [])
 
-  const qualities = (["1080p", "720p", "360p"] as const).map((quality) => ({
-    name: quality,
-    url: saya.getServiceHlsUrl(service.id, quality),
-  }))
+  if (program === false) return <NotFound />
+  if (
+    program === null ||
+    !qualities ||
+    !programDurationInMinutes ||
+    !programStart ||
+    !programEnd
+  )
+    return <Loading />
 
   return (
     <div className="md:container mx-auto md:mt-8 md:px-2">
@@ -138,9 +134,16 @@ export const ServiceIdPage: React.FC<{ id: string }> = ({ id }) => {
           <CommentPlayer
             qualities={qualities}
             comment={comment}
-            isLive={true}
+            isLive={false}
             isAutoPlay={true}
+            onPositionChange={setPosition}
+            onPauseChange={setIsPaused}
             reloadRequest={reloadRequest}
+          />
+          <PlayerController
+            position={position}
+            duration={program.duration}
+            seek={seek}
           />
         </div>
         <div
@@ -153,6 +156,10 @@ export const ServiceIdPage: React.FC<{ id: string }> = ({ id }) => {
               title="映像リロード"
               onClick={() => {
                 setReloadRequest(new Date().getTime())
+                if (socket.current) {
+                  syncToPosition()
+                  setComments([])
+                }
               }}
             >
               <RefreshCw size={18} />
@@ -184,40 +191,26 @@ export const ServiceIdPage: React.FC<{ id: string }> = ({ id }) => {
         </div>
       </div>
       <div className="flex flex-col md:flex-row items-start justify-around">
-        <div className="w-full md:w-2/3 my-4 px-2 md:px-0 md:mr-2">
+        <div className="w-full my-2 mb-4 px-2 md:px-0 md:mr-2">
           <div className="text-2xl">
-            <Skeleton isLoaded={!!onGoingProgram}>
-              {onGoingProgram ? onGoingProgram.name : "."}
+            <Skeleton isLoaded={!!program}>
+              {program ? program.name : "."}
             </Skeleton>
           </div>
           <div className="text-xl mt-1">
-            <Skeleton
-              isLoaded={!!(onGoingProgram && onGoingProgramDiff !== null)}
-            >
-              {onGoingProgram && onGoingProgramDiff !== null
-                ? `${onGoingProgramStart} [${Math.abs(onGoingProgramDiff)}分${
-                    0 < onGoingProgramDiff ? "後" : "前"
-                  }] - ${onGoingProgramEnd} (${onGoingProgramDurationInMinutes}分間) / ${
-                    service.name
-                  }`
+            <Skeleton isLoaded={!!(program && service)}>
+              {program && service
+                ? `${programStart.format(
+                    "YYYY/MM/DD HH:mm"
+                  )} - ${programEnd.format(
+                    "HH:mm"
+                  )} (${programDurationInMinutes}分間) / ${service.name}`
                 : "."}
             </Skeleton>
           </div>
-          <div>
-            Next
-            <ChevronsRight className="inline mx-1" size={18} />
-            {nextProgram ? (
-              nextProgram.name
-            ) : (
-              <span className="text-gray-600">不明</span>
-            )}
-          </div>
           <div className="bg-gray-200 whitespace-pre-wrap rounded-md p-4 md:my-2 text-sm leading-relaxed programDescription">
-            <AutoLinkedText>{onGoingProgram?.description || ""}</AutoLinkedText>
+            <AutoLinkedText>{program.description || ""}</AutoLinkedText>
           </div>
-        </div>
-        <div className="w-full md:w-1/3 mb-2 md:mb-0 md:my-4 px-2 md:px-0">
-          <StatsWidget serviceId={sid} socket={socket} />
         </div>
       </div>
     </div>

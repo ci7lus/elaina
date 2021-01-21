@@ -23,6 +23,17 @@ export type Program = {
   }
 }
 
+export type ProgramRecord = {
+  isConflict: boolean
+  isManual: boolean
+  path: string
+  priority: number
+  program: Program
+  rule: null
+  tuner: null
+  user: { id: number; name: string }
+}
+
 export type Service = {
   id: number
   name: string

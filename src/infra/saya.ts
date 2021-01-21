@@ -1,6 +1,12 @@
 import axios from "axios"
 import type { SayaSetting } from "../types/setting"
-import type { Service, Program, Genre, CommentStats } from "../types/struct"
+import type {
+  Service,
+  Program,
+  Genre,
+  CommentStats,
+  ProgramRecord,
+} from "../types/struct"
 
 export class SayaAPI {
   public url: string
@@ -36,11 +42,17 @@ export class SayaAPI {
     })
   }
 
-  getHlsUrl(id: number, preset: "1080p" | "720p" | "360p" = "1080p") {
+  getServiceHlsUrl(id: number, preset: "1080p" | "720p" | "360p" = "1080p") {
     return `${this.url}/services/${id}/hls?preset=${preset}&subtitle=true`
+  }
+  getRecordHlsUrl(id: number, preset: "1080p" | "720p" | "360p" = "1080p") {
+    return `${this.url}/records/${id}/hls?preset=${preset}&substitle=true`
   }
   getServiceCommentSocketUrl(id: number) {
     return `${this.wsUrl}/services/${id}/comments`
+  }
+  getRecordCommentSocketUrl(id: number) {
+    return `${this.wsUrl}/records/${id}/comments`
   }
   get isAuthorizationEnabled() {
     return !!(this.user && this.pass)
@@ -58,6 +70,14 @@ export class SayaAPI {
   }
   async getGenres() {
     const { data } = await this.client.get<Genre[]>("genres")
+    return data
+  }
+  async getRecords() {
+    const { data } = await this.client.get<ProgramRecord[]>("records")
+    return data
+  }
+  async getRecord(id: number) {
+    const { data } = await this.client.get<ProgramRecord>(`records/${id}`)
     return data
   }
   async getCommentStatus(serviceId: number) {

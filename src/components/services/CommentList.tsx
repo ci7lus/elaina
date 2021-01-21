@@ -46,7 +46,7 @@ export const CommentList: React.VFC<{
       ref={ref}
     >
       {comments
-        .sort((a, b) => (b.no < a.no ? 1 : -1))
+        .sort((a, b) => (b.time < a.time ? 1 : -1))
         .map((i, idx) => (
           <Comment key={idx} comment={i} />
         ))}

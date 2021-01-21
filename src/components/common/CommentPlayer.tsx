@@ -1,21 +1,37 @@
 import React, { useEffect, useRef } from "react"
-import DPlayer, { DPlayerVideo, DPlayerEvents } from "dplayer"
-import { Service, CommentPayload } from "../../types/struct"
+import DPlayer, {
+  DPlayerVideo,
+  DPlayerEvents,
+  DPlayerVideoQuality,
+} from "dplayer"
+import { CommentPayload } from "../../types/struct"
 import Hls from "hls-b24.js"
 import * as b24 from "b24.js"
 import { useUpdateEffect } from "react-use"
 import { useSaya } from "../../hooks/saya"
 
-export const ServicePlayer: React.VFC<{
-  service: Service
+export const CommentPlayer: React.VFC<{
+  qualities: DPlayerVideoQuality[]
   comment: CommentPayload | null
+  isLive: boolean
+  isAutoPlay: boolean
+  onPositionChange?: (n: number) => unknown
+  onPauseChange?: (b: boolean) => unknown
   reloadRequest: number
-}> = ({ service, comment, reloadRequest }) => {
+}> = ({
+  qualities,
+  comment,
+  isLive,
+  isAutoPlay,
+  onPositionChange,
+  onPauseChange,
+  reloadRequest,
+}) => {
   const saya = useSaya()
   const hlsInstance = useRef<Hls | null>(null)
   const videoPayload: DPlayerVideo = {
     type: "customHls",
-    url: saya.getHlsUrl(service.id),
+    url: qualities[0].url,
     customType: {
       customHls: (video: HTMLVideoElement, player: DPlayer) => {
         if (hlsInstance.current) {
@@ -31,8 +47,11 @@ export const ServicePlayer: React.VFC<{
             xhr.setRequestHeader("Authorization", saya.authorizationToken)
           }
         }
+        hls.config.autoStartLoad = isLive
+
         hls.loadSource(video.src)
         hls.attachMedia(video)
+
         const b24Renderer = new b24.WebVTTRenderer()
         b24Renderer.init().then(() => {
           b24Renderer.attachMedia(video)
@@ -49,16 +68,37 @@ export const ServicePlayer: React.VFC<{
           }
         })
 
+        player.on("pause" as DPlayerEvents.pause, () => {
+          !isLive && hls.stopLoad()
+          onPauseChange && onPauseChange(true)
+        })
+        player.on("play" as DPlayerEvents.play, () => {
+          !isLive && hls.startLoad()
+          onPauseChange && onPauseChange(false)
+        })
+        player.on("waiting" as DPlayerEvents.stalled, () => {
+          onPauseChange && onPauseChange(true)
+        })
+        player.on("canplay" as DPlayerEvents.canplay, () => {
+          onPauseChange && onPauseChange(false)
+        })
+
+        hls.on(Hls.Events.FRAG_CHANGED, (event, data) => {
+          const position = parseInt(
+            data.frag.url.split("_").pop()?.split(".").shift() || "NaN"
+          )
+          if (Number.isNaN(position)) return
+          onPositionChange && onPositionChange(position * 2)
+        })
+
         player.on("destroy" as DPlayerEvents.destroy, () => {
           hls.destroy()
         })
+
         hlsInstance.current = hls
       },
     },
-    quality: (["1080p", "720p", "360p"] as const).map((quality) => ({
-      name: quality,
-      url: saya.getHlsUrl(service.id, quality),
-    })),
+    quality: qualities,
     defaultQuality: 0,
   }
   const danmaku = {
@@ -73,7 +113,10 @@ export const ServicePlayer: React.VFC<{
   const player = useRef<DPlayer | null>()
 
   const reload = () => {
-    player.current?.switchVideo(videoPayload, danmaku)
+    if (!player.current) return
+    player.current.pause()
+    player.current.switchVideo(videoPayload, danmaku)
+    player.current.play()
   }
 
   useUpdateEffect(() => {
@@ -81,15 +124,15 @@ export const ServicePlayer: React.VFC<{
   }, [reloadRequest])
 
   useEffect(() => {
-    if (!comment) return
+    if (!comment || player.current?.video.paused === true) return
     player.current?.danmaku.draw(comment)
   }, [comment])
 
   useEffect(() => {
     const playerInstance = new DPlayer({
       container: dplayerElementRef.current,
-      live: true,
-      autoplay: true,
+      live: isLive,
+      autoplay: isAutoPlay,
       screenshot: true,
       video: videoPayload,
       danmaku,
@@ -120,6 +163,7 @@ export const ServicePlayer: React.VFC<{
     })
 
     player.current = playerInstance
+    hlsInstance.current?.stopLoad()
 
     return () => {
       player.current?.destroy()
