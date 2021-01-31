@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react"
 import { Heading, Spinner } from "@chakra-ui/react"
 import ScrollContainer from "react-indiana-drag-scroll"
-import { useGenres, useTelevision } from "../../hooks/television"
+import { useSchedules } from "../../hooks/television"
 import { TimetableProgramList } from "../../components/timetable/Programs"
 import { LeftTimeBar } from "../../components/timetable/TimetableParts"
 import { TimetableServiceList } from "../../components/timetable/Services"
@@ -31,9 +31,7 @@ export const TimetablePage: React.VFC<{}> = () => {
 
   const timeBarPosition = (now.minute() / 60) * 180
 
-  const { programs, filteredServices } = useTelevision()
-
-  const { genres } = useGenres()
+  const { filteredSchedules } = useSchedules()
 
   const onResize = () => {
     setClientWidth(scrollRef.current?.clientWidth || 0)
@@ -72,8 +70,8 @@ export const TimetablePage: React.VFC<{}> = () => {
             height: "40px",
           }}
         >
-          {filteredServices && (
-            <TimetableServiceList services={filteredServices} />
+          {filteredSchedules && (
+            <TimetableServiceList schedules={filteredSchedules} />
           )}
         </div>
       </div>
@@ -85,11 +83,11 @@ export const TimetablePage: React.VFC<{}> = () => {
         innerRef={scrollRef}
         hideScrollbars={false}
       >
-        {programs && filteredServices && client && genres ? (
+        {filteredSchedules && client ? (
           <div
             className="relative"
             style={{
-              width: `${(filteredServices || []).length * 9}rem`,
+              width: `${(filteredSchedules || []).length * 9}rem`,
               minWidth: "calc(100vw - 1rem)",
               height: "4320px",
             }}
@@ -97,8 +95,7 @@ export const TimetablePage: React.VFC<{}> = () => {
             <div className="relative block w-full h-full">
               <div className="relative timetable ml-4 overflow-hidden w-full h-full">
                 <TimetableProgramList
-                  programs={programs}
-                  services={filteredServices}
+                  schedules={filteredSchedules}
                   startAtInString={startAtInString}
                   client={client}
                 />

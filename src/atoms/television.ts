@@ -1,34 +1,24 @@
 import { atom, selector } from "recoil"
-import { Genre, Program, Service } from "../types/struct"
+import { Channel, Genre, Schedule } from "../types/struct"
 
 const prefix = "elaina:television"
 
-export const servicesAtom = atom<Service[] | null>({
-  key: `${prefix}:services`,
+export const channelsAtom = atom<Channel[] | null>({
+  key: `${prefix}:channels`,
   default: null,
 })
 
-export const filteredServicesSelector = selector<Service[] | null>({
-  key: `${prefix}:filtered-services`,
+export const schedulesAtom = atom<Schedule[] | null>({
+  key: `${prefix}:schedules`,
+  default: null,
+})
+
+export const filteredSchedulesSelector = selector<Schedule[] | null>({
+  key: `${prefix}:filtered-schedules`,
   get: ({ get }) => {
-    const services = get(servicesAtom)
-    const programs = get(programsAtom)
-    if (!services || !programs) return null
+    const schedules = get(schedulesAtom)
+    if (!schedules) return null
 
-    return services.filter(
-      (service) =>
-        0 <
-        programs.filter((program) => program.service.id === service.id).length
-    )
+    return schedules.filter((schedule) => 0 < schedule.programs.length)
   },
-})
-
-export const programsAtom = atom<Program[] | null>({
-  key: `${prefix}:programs`,
-  default: null,
-})
-
-export const genresAtom = atom<Genre[] | null>({
-  key: `${prefix}:genres`,
-  default: null,
 })

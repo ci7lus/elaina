@@ -8,7 +8,7 @@ import { NotFound } from "./components/global/NotFound"
 import { ToastProvider } from "react-toast-notifications"
 import { initializeState } from "./atoms/initialize"
 import { RecoilWatcher } from "./components/global/RecoilWatcher"
-import { sayaSettingAtom } from "./atoms/setting"
+import { backendSettingAtom, sayaSettingAtom } from "./atoms/setting"
 import { InitialSettingPage } from "./components/global/InitialSetting"
 
 const UsedRoutes: React.VFC<{}> = () => {
@@ -26,7 +26,8 @@ const UsedRoutes: React.VFC<{}> = () => {
 
 const Routes: React.VFC<{}> = () => {
   const sayaSetting = useRecoilValue(sayaSettingAtom)
-  if (!sayaSetting.url) return <InitialSettingPage />
+  const backendSetting = useRecoilValue(backendSettingAtom)
+  if (!sayaSetting.url || !backendSetting.url) return <InitialSettingPage />
   return <UsedRoutes />
 }
 

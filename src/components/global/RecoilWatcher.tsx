@@ -1,10 +1,11 @@
 import React from "react"
 import { useRecoilTransactionObserver_UNSTABLE } from "recoil"
 import {
+  backendSettingAtom,
   playerSettingAtom,
   playerSettingParser,
   sayaSettingAtom,
-  sayaSettingParser,
+  upstreamSettingParser,
 } from "../../atoms/setting"
 
 export const RecoilWatcher: React.VFC<{}> = () => {
@@ -14,8 +15,17 @@ export const RecoilWatcher: React.VFC<{}> = () => {
         case sayaSettingAtom.key:
           try {
             const snap = snapshot.getLoadable(sayaSettingAtom).getValue()
-            sayaSettingParser.parse(snap)
+            upstreamSettingParser.parse(snap)
             localStorage.setItem(sayaSettingAtom.key, JSON.stringify(snap))
+          } catch (e) {
+            console.error(e)
+          }
+          break
+        case backendSettingAtom.key:
+          try {
+            const snap = snapshot.getLoadable(backendSettingAtom).getValue()
+            upstreamSettingParser.parse(snap)
+            localStorage.setItem(backendSettingAtom.key, JSON.stringify(snap))
           } catch (e) {
             console.error(e)
           }

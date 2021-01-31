@@ -1,46 +1,63 @@
-import { Button, Heading, Input, Portal, Spinner } from "@chakra-ui/react"
+import {
+  Button,
+  Heading,
+  Input,
+  Portal,
+  Spinner,
+  useToast,
+} from "@chakra-ui/react"
 import React, { useEffect, useMemo, useState } from "react"
 import { ArrowLeft, ArrowRight, Search } from "react-feather"
-import { useSaya } from "../../hooks/saya"
 import { useTable, usePagination, useGlobalFilter, Column } from "react-table"
 import type { ProgramRecord } from "../../types/struct"
 import dayjs from "dayjs"
 import { Link } from "rocon/react"
 import { recordsRoute } from "../../routes"
 import { useDebounce } from "react-use"
+import { useBackend } from "../../hooks/backend"
+import { useChannels } from "../../hooks/television"
+import { useToasts } from "react-toast-notifications"
 
 export const RecordsPage: React.VFC<{}> = () => {
-  const saya = useSaya()
+  const backend = useBackend()
+  const toast = useToasts()
   const [_records, setRecords] = useState<ProgramRecord[] | null>(null)
   const records = useMemo(() => _records || [], [_records])
+  const { channels } = useChannels()
 
   const columns: Column<ProgramRecord>[] = useMemo(
     () => [
       {
         id: "service",
         Header: "放送局",
-        accessor: (record: ProgramRecord) => record.program.service.name,
+        accessor: (record: ProgramRecord) =>
+          channels &&
+          channels.find((channel) => record.channelId === channel.id)?.name,
       },
       {
         id: "name",
         Header: "番組名",
-        accessor: (record: ProgramRecord) => record.program.name,
+        accessor: (record: ProgramRecord) => record.name,
       },
       {
         id: "startAt",
         Header: "放送日時",
         accessor: (record: ProgramRecord) =>
-          dayjs(record.program.startAt * 1000).format("YYYY/MM/DD HH:mm"),
+          dayjs(record.startAt).format("YYYY/MM/DD HH:mm"),
       },
       {
         id: "duration",
         Header: "長さ",
-        accessor: (record: ProgramRecord) => record.program.duration / 60,
+        accessor: (record: ProgramRecord) =>
+          (record.endAt - record.startAt) / 1000 / 60,
         Cell: ({ value }: { value: number }) => `${value}m`,
       },
     ],
-    []
+    [channels]
   )
+
+  const [total, setTotal] = useState<number | null>(null)
+  const [_pageSize, setPageSize] = useState(20)
 
   const {
     getTableProps,
@@ -49,7 +66,7 @@ export const RecordsPage: React.VFC<{}> = () => {
     prepareRow,
     page,
     pageOptions,
-    state: { pageIndex, globalFilter },
+    state: { pageIndex, globalFilter, pageSize },
     previousPage,
     nextPage,
     canPreviousPage,
@@ -60,6 +77,8 @@ export const RecordsPage: React.VFC<{}> = () => {
       columns,
       data: records || [],
       initialState: { pageSize: 20 },
+      manualPagination: true,
+      pageCount: Math.ceil((total || 0) / _pageSize),
     },
     useGlobalFilter,
     usePagination
@@ -77,8 +96,20 @@ export const RecordsPage: React.VFC<{}> = () => {
   )
 
   useEffect(() => {
-    saya.getRecords().then((programs) => setRecords(programs))
-  }, [])
+    setPageSize(pageSize)
+    backend
+      .getRecords({ offset: pageSize * pageIndex, limit: pageSize })
+      .then(({ records, total }) => {
+        setTotal(total)
+        setRecords(records)
+      })
+      .catch(() =>
+        toast.addToast("録画番組の取得に失敗しました", {
+          appearance: "error",
+          autoDismiss: true,
+        })
+      )
+  }, [pageIndex, pageSize])
   return (
     <>
       <div className="bg-gray-800 text-gray-200">
@@ -96,7 +127,7 @@ export const RecordsPage: React.VFC<{}> = () => {
         </div>
       </div>
       <div className="mx-auto px-2 py-2 overflow-auto">
-        {_records === null ? (
+        {_records === null || !channels ? (
           <div
             className="flex items-center justify-center h-full w-full"
             style={{ minHeight: "60vh" }}
@@ -132,11 +163,14 @@ export const RecordsPage: React.VFC<{}> = () => {
                     role="cell block"
                     className="table-row hover:bg-gray-200 cursor-pointer"
                     route={recordsRoute.anyRoute}
-                    match={{ id: row.original.program.id.toString() }}
+                    match={{ id: row.original.id.toString() }}
                     title={[
-                      row.original.program.name,
-                      row.original.program.description,
-                    ].join("\n\n")}
+                      row.original.name,
+                      row.original.description,
+                      row.original.extended,
+                    ]
+                      .filter((s) => !!s)
+                      .join("\n\n")}
                     {...row.getRowProps()}
                   >
                     {row.cells.map((cell, idx, cells) => {

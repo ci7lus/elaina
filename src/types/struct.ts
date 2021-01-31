@@ -1,51 +1,85 @@
 export type Program = {
   id: number
-  service: Service
-  name: string
+  channelId: number
   startAt: number
-  duration: number
-  description: string
-  flags: string[]
-  genres: number[]
-  episode?: {
-    number: number | null
-    title: string
-  }
-  video: {
-    component: number
-    content: number
-    resolution: string
-    type: string
-  }
-  audio: {
-    component: 2
-    samplingRate: number
-  }
+  endAt: number
+  isFree: boolean
+  name: string
+  description?: string
+  extended?: string
+  genre1: number
+  subGenre1: number
+  genre2: number
+  subGenre2: number
+  genre3: number
+  subGenre3: number
+  videoType: "mpeg2"
+  videoResolution: string
+  videoStreamContent: number
+  videoComponentType: number
+  audioSamplingRate: number
+  audioComponentType: number
 }
 
 export type ProgramRecord = {
-  isConflict: boolean
-  isManual: boolean
-  path: string
-  priority: number
-  program: Program
-  rule: null
-  tuner: null
-  user: { id: number; name: string }
-}
-
-export type Service = {
   id: number
+  ruleId: number
+  programId: number
+  channelId: number
+  startAt: number
+  endAt: number
   name: string
-  channel: string
-  logoId: number
+  description?: string
+  extended?: string
+  genre1: number
+  subGenre1: number
+  genre2: number
+  subGenre2: number
+  genre3: number
+  subGenre3: number
+  videoType: "mpeg2"
+  videoResolution: string
+  videoStreamContent: number
+  videoComponentType: number
+  audioSamplingRate: number
+  audioComponentType: number
+  isRecording: boolean
+  thumbnails: [number]
+  videoFiles: {
+    id: number
+    name: string
+    type: "ts"
+    size: number
+  }[]
+  dropLog: {
+    id: number
+    errorCnt: number
+    dropCnt: number
+    scramblingCnt: number
+  }
+  tags: {
+    id: number
+    name: string
+    color: string
+  }[]
+  isEncoding: boolean
+  isProtected: boolean
 }
 
 export type Channel = {
-  type: "GR"
-  group: string
+  id: number
+  serviceId: number
+  networkId: number
   name: string
-  services: number[]
+  halfWidthName: string
+  hasLogoData: boolean
+  channelType: "GR"
+  channel: string
+}
+
+export type Schedule = {
+  channel: Channel
+  programs: Program[]
 }
 
 export type CommentPayload = {

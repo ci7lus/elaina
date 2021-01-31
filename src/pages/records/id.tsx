@@ -7,43 +7,57 @@ import { NotFound } from "../../components/global/NotFound"
 import { CommentList } from "../../components/services/CommentList"
 import { CommentPayload, ProgramRecord } from "../../types/struct"
 import ReconnectingWebSocket from "reconnecting-websocket"
-import { useDebounce } from "react-use"
+import { useDebounce, useUpdateEffect } from "react-use"
 import { Skeleton } from "@chakra-ui/react"
 import { useSaya } from "../../hooks/saya"
 import { AutoLinkedText } from "../../components/global/AutoLinkedText"
-import { PlayerController } from "./PlayerController"
+import { PlayerController } from "../../components/records/PlayerController"
+import { useBackend } from "../../hooks/backend"
+import { useChannels } from "../../hooks/television"
+import { wait } from "../../utils/wait"
+import { useRefState } from "../../hooks/util"
+import { useToasts } from "react-toast-notifications"
 
 export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
   const saya = useSaya()
+  const backend = useBackend()
   const pid = parseInt(id)
+  const toast = useToasts()
+  const { channels } = useChannels()
   const [record, setRecord] = useState<ProgramRecord | null | false>(null)
-  const program = useMemo(() => record && record.program, [record])
-  const service = useMemo(() => program && program.service, [program])
-
-  const programStart = program && dayjs(program.startAt * 1000)
-  const programEnd =
-    program && dayjs((program.startAt + program.duration) * 1000)
-  const programDurationInMinutes = program && (program.duration || 0) / 60
-
-  const qualities = useMemo(
+  const service = useMemo(
     () =>
-      program &&
-      (["1080p", "720p", "360p"] as const).map((quality) => ({
-        name: quality,
-        url: saya.getRecordHlsUrl(program.id, quality),
-      })),
-    [program]
+      record &&
+      channels &&
+      channels.find((channel) => channel.id === record.channelId),
+    [record]
   )
 
+  const programStart = record && dayjs(record.startAt)
+  const programEnd = record && dayjs(record.endAt)
+  const duration = record && (record.endAt - record.startAt) / 1000
+  const programDurationInMinutes = duration && duration / 60
+
+  const isMounting = useRef(true)
+
   useEffect(() => {
-    saya
-      .getRecord(pid)
+    backend
+      .getRecord({ id: pid })
       .then((record) => setRecord(record))
       .catch((error) => {
         console.error(error)
         setRecord(false)
       })
+    return () => {
+      isMounting.current = false
+    }
   }, [])
+
+  const [currentStreamId, setCurrentStream, currentStreamRef] = useRefState(-1)
+  const [hlsUrl, setHlsUrl] = useState(backend.getHlsStreamUrl({ id: -1 }))
+  useUpdateEffect(() => {
+    setHlsUrl(backend.getHlsStreamUrl({ id: currentStreamId }))
+  }, [currentStreamId])
 
   const [comments, setComments] = useState<CommentPayload[]>([])
   const [comment, setComment] = useState<CommentPayload | null>(null)
@@ -67,24 +81,73 @@ export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
     console.log("sync to", position)
   }, [socket.current, position])
 
-  useEffect(() => {
-    if (!program) return
-    const wsUrl = saya.getRecordCommentSocketUrl(program.id)
-    const s = new ReconnectingWebSocket(wsUrl)
-    s.addEventListener("message", (e) => {
-      const payload: CommentPayload = JSON.parse(e.data)
-      setComment(payload)
-      setComments((comments) => [...comments, payload])
+  const claimRecordStream = async (record: ProgramRecord, ss: number) => {
+    const streamId = await backend.startRecordHlsStream({
+      id: record.videoFiles[0].id,
+      ss,
     })
-    s.addEventListener("open", () => {
-      syncToPosition()
-      setComments([])
-    })
-    socket.current = s
-    return () => {
-      s.close()
+    while (isMounting.current) {
+      const streams = await backend.getStreams()
+      const stream = streams.find((stream) => stream.streamId === streamId)
+      if (stream) {
+        await backend.keepStream({ id: streamId })
+        if (stream.isEnable === true) break
+      }
+      await wait(1000)
     }
-  }, [program])
+    setCurrentStream(streamId)
+    ;(async () => {
+      while (isMounting.current) {
+        await backend.keepStream({ id: streamId })
+        if (streamId !== currentStreamRef.current) break
+        await wait(1000 * 5)
+      }
+      await backend.dropStream({ id: streamId })
+    })()
+  }
+
+  const isSeeking = useRef(false)
+
+  useUpdateEffect(() => {
+    if (!record) return
+    const wsUrl = saya.getRecordCommentSocketUrl({
+      id: record.channelId,
+      startAt: record.startAt / 1000,
+      endAt: record.endAt / 1000,
+    })
+    let s: null | ReconnectingWebSocket = null
+
+    isSeeking.current = true
+    claimRecordStream(record, position)
+      .then(() => {
+        const _s = new ReconnectingWebSocket(wsUrl)
+        _s.reconnect()
+        _s.addEventListener("message", (e) => {
+          const payload: CommentPayload = JSON.parse(e.data)
+          setComment(payload)
+          setComments((comments) => [...comments, payload])
+        })
+        _s.addEventListener("open", () => {
+          syncToPosition()
+          setComments([])
+        })
+        s = _s
+        socket.current = _s
+      })
+      .catch(() => {
+        toast.addToast("番組ストリームの読み込みに失敗しました", {
+          appearance: "error",
+          autoDismiss: true,
+        })
+      })
+      .finally(() => {
+        isSeeking.current = false
+      })
+
+    return () => {
+      s?.close()
+    }
+  }, [record])
 
   const playerContainerRef = useRef<HTMLDivElement>(null)
   const [commentsHeight, setCommentsHeight] = useState(
@@ -112,18 +175,29 @@ export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
 
   const [isAutoScrollEnabled, setIsAutoScrollEnabled] = useState(true)
 
-  const seek = useCallback((s: number) => {
-    // TODO: sayaにシークがついたら追従する
-    console.log("seeked", s)
-  }, [])
+  const seek = useCallback(
+    async (s: number) => {
+      if (!record || isSeeking.current) return
+      try {
+        isSeeking.current = true
+        await claimRecordStream(record, s)
+        setPosition(s)
+      } catch (error) {
+        console.error(error)
+      } finally {
+        isSeeking.current = false
+      }
+    },
+    [record, isSeeking.current]
+  )
 
-  if (program === false) return <NotFound />
+  if (record === false) return <NotFound />
   if (
-    program === null ||
-    !qualities ||
+    record === null ||
     !programDurationInMinutes ||
     !programStart ||
-    !programEnd
+    !programEnd ||
+    !duration
   )
     return <Loading />
 
@@ -132,7 +206,7 @@ export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
       <div className="flex flex-col md:flex-row items-start justify-around">
         <div className="w-full md:w-2/3" ref={playerContainerRef}>
           <CommentPlayer
-            qualities={qualities}
+            hlsUrl={hlsUrl}
             comment={comment}
             isLive={false}
             isAutoPlay={true}
@@ -142,7 +216,7 @@ export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
           />
           <PlayerController
             position={position}
-            duration={program.duration}
+            duration={duration}
             seek={seek}
           />
         </div>
@@ -193,13 +267,13 @@ export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
       <div className="flex flex-col md:flex-row items-start justify-around">
         <div className="w-full my-2 mb-4 px-2 md:px-0 md:mr-2">
           <div className="text-2xl">
-            <Skeleton isLoaded={!!program}>
-              {program ? program.name : "."}
+            <Skeleton isLoaded={!!record}>
+              {record ? record.name : "."}
             </Skeleton>
           </div>
           <div className="text-xl mt-1">
-            <Skeleton isLoaded={!!(program && service)}>
-              {program && service
+            <Skeleton isLoaded={!!(record && service)}>
+              {record && service
                 ? `${programStart.format(
                     "YYYY/MM/DD HH:mm"
                   )} - ${programEnd.format(
@@ -209,7 +283,11 @@ export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
             </Skeleton>
           </div>
           <div className="bg-gray-200 whitespace-pre-wrap rounded-md p-4 md:my-2 text-sm leading-relaxed programDescription">
-            <AutoLinkedText>{program.description || ""}</AutoLinkedText>
+            <AutoLinkedText>
+              {[record.description, record.extended]
+                .filter((s) => !!s)
+                .join("\n\n")}
+            </AutoLinkedText>
           </div>
         </div>
       </div>

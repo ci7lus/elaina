@@ -1,12 +1,7 @@
 import axios from "axios"
 import type { SayaSetting } from "../types/setting"
-import type {
-  Service,
-  Program,
-  Genre,
-  CommentStats,
-  ProgramRecord,
-} from "../types/struct"
+import type { CommentStats } from "../types/struct"
+import querystring from "querystring"
 
 export class SayaAPI {
   public url: string
@@ -14,7 +9,7 @@ export class SayaAPI {
   public pass: string | null
   constructor({ url, user, pass }: SayaSetting) {
     if (!url) throw new Error("Saya url is not provided")
-    this.url = url
+    this.url = url.endsWith("/") ? url.substr(0, url.length - 1) : url
     this.user = user
     this.pass = pass
   }
@@ -42,43 +37,28 @@ export class SayaAPI {
     })
   }
 
-  getServiceHlsUrl(id: number, preset: "1080p" | "720p" | "360p" = "1080p") {
-    return `${this.url}/services/${id}/hls?preset=${preset}&subtitle=true`
+  getLiveCommentSocketUrl({ id }: { id: number }) {
+    return `${this.wsUrl}/comments/${id}/live`
   }
-  getRecordHlsUrl(id: number, preset: "1080p" | "720p" | "360p" = "1080p") {
-    return `${this.url}/records/${id}/hls?preset=${preset}&substitle=true`
-  }
-  getServiceCommentSocketUrl(id: number) {
-    return `${this.wsUrl}/services/${id}/comments`
-  }
-  getRecordCommentSocketUrl(id: number) {
-    return `${this.wsUrl}/records/${id}/comments`
+  getRecordCommentSocketUrl({
+    id,
+    startAt,
+    endAt,
+  }: {
+    id: number
+    startAt: number
+    endAt: number
+  }) {
+    return `${this.wsUrl}/comments/${id}/timeshift?${querystring.stringify({
+      startAt,
+      endAt,
+    })}`
   }
   get isAuthorizationEnabled() {
     return !!(this.user && this.pass)
   }
   get authorizationToken() {
     return `Basic ${btoa(`${this.user}:${this.pass}`)}`
-  }
-  async getServices() {
-    const { data } = await this.client.get<Service[]>("services")
-    return data
-  }
-  async getPrograms() {
-    const { data } = await this.client.get<Program[]>("programs")
-    return data
-  }
-  async getGenres() {
-    const { data } = await this.client.get<Genre[]>("genres")
-    return data
-  }
-  async getRecords() {
-    const { data } = await this.client.get<ProgramRecord[]>("records")
-    return data
-  }
-  async getRecord(id: number) {
-    const { data } = await this.client.get<ProgramRecord>(`records/${id}`)
-    return data
   }
   async getCommentStatus(serviceId: number) {
     const { data } = await this.client.get<CommentStats>(

@@ -7,6 +7,7 @@ import {
   Tabs,
 } from "@chakra-ui/react"
 import React from "react"
+import { BackendSettingForm } from "../../components/settings/Backend"
 import { PlayerSettingForm } from "../../components/settings/Player"
 import { SayaSettingForm } from "../../components/settings/Saya"
 
@@ -18,13 +19,18 @@ export const SettingsPage = () => {
       </Heading>
       <Tabs>
         <TabList>
-          <Tab>Saya</Tab>
+          <Tab>バックエンド</Tab>
           <Tab>プレイヤー</Tab>
         </TabList>
 
         <TabPanels>
           <TabPanel>
-            <SayaSettingForm />
+            <div>
+              <BackendSettingForm />
+            </div>
+            <div>
+              <SayaSettingForm />
+            </div>
           </TabPanel>
           <TabPanel>
             <PlayerSettingForm />

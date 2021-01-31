@@ -14,13 +14,13 @@ export const PlayerController: React.VFC<{
 }> = memo(({ position, duration, seek }) => (
   <div className="bg-gray-50 rounded-md flex items-center space-x-2 py-1 px-2">
     <button onClick={() => seek(0)}>
-      <SkipBack size={22} />
+      <SkipBack size={16} />
     </button>
     <button onClick={() => seek(position - 60)} title="1分戻る">
-      <RotateCcw size={22} />
+      <RotateCcw size={16} />
     </button>
     <button onClick={() => seek(position + 60)} title="1分進める">
-      <RotateCw size={22} />
+      <RotateCw size={16} />
     </button>
     <div className="mx-2 text-sm font-bold">
       {Math.floor(position / 60)

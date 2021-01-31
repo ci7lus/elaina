@@ -1,73 +1,68 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useToasts } from "react-toast-notifications"
 import { useRecoilState, useRecoilValue } from "recoil"
 import {
-  servicesAtom,
-  programsAtom,
-  filteredServicesSelector,
-  genresAtom,
+  channelsAtom,
+  filteredSchedulesSelector,
+  schedulesAtom,
 } from "../atoms/television"
-import { useSaya } from "./saya"
+import { Program } from "../types/struct"
+import { useBackend } from "./backend"
 
-export const useTelevision = () => {
-  const [services, setServices] = useRecoilState(servicesAtom)
-  const [programs, setPrograms] = useRecoilState(programsAtom)
-  const filteredServices = useRecoilValue(filteredServicesSelector)
-
+export const useChannels = () => {
+  const [channels, setChannels] = useRecoilState(channelsAtom)
   const toast = useToasts()
-
-  const saya = useSaya()
+  const backend = useBackend()
 
   useEffect(() => {
-    saya
-      .getServices()
-      .then((services) => setServices(services))
+    backend
+      .getChannels()
+      .then((schedules) => setChannels(schedules))
       .catch((e) => {
         console.error(e)
-        toast.addToast("サービスの取得に失敗しました", {
-          appearance: "error",
-          autoDismiss: true,
-        })
-      })
-    saya
-      .getPrograms()
-      .then((programs) =>
-        setPrograms(
-          programs.filter((program) => 0 < program.name.trim().length)
-        )
-      )
-      .catch((e) => {
-        console.error(e)
-        toast.addToast("番組の取得に失敗しました", {
+        toast.addToast("番組表の取得に失敗しました", {
           appearance: "error",
           autoDismiss: true,
         })
       })
   }, [])
 
-  return { services, programs, filteredServices }
+  return { channels }
 }
 
-export const useGenres = () => {
-  const [genres, setGenres] = useRecoilState(genresAtom)
-
-  const toast = useToasts()
-
-  const saya = useSaya()
+export const useProgram = ({ id }: { id: number }) => {
+  const [program, setProgram] = useState<Program | null | false>(null)
+  const backend = useBackend()
 
   useEffect(() => {
-    if (genres) return
-    saya
-      .getGenres()
-      .then((genres) => setGenres(genres))
+    backend
+      .getProgram({ id })
+      .then((program) => setProgram(program))
+      .catch(() => setProgram(false))
+  }, [])
+
+  return { program }
+}
+
+export const useSchedules = () => {
+  const [schedules, setSchedules] = useRecoilState(schedulesAtom)
+  const filteredSchedules = useRecoilValue(filteredSchedulesSelector)
+
+  const toast = useToasts()
+  const backend = useBackend()
+
+  useEffect(() => {
+    backend
+      .getSchedules({})
+      .then((schedules) => setSchedules(schedules))
       .catch((e) => {
         console.error(e)
-        toast.addToast("ジャンルの取得に失敗しました", {
+        toast.addToast("番組表の取得に失敗しました", {
           appearance: "error",
           autoDismiss: true,
         })
       })
   }, [])
 
-  return { genres }
+  return { schedules, filteredSchedules }
 }

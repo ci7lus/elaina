@@ -2,30 +2,30 @@ import { Link } from "rocon/react"
 import dayjs from "dayjs"
 import React, { memo, useState } from "react"
 import { ArrowContainer, Popover } from "react-tiny-popover"
-import { useRecoilValue } from "recoil"
-import { genresAtom, servicesAtom } from "../../atoms/television"
-import { Program, Service } from "../../types/struct"
+import { Channel, Program, Schedule } from "../../types/struct"
 import { genreColors } from "../../utils/genres"
 import { programsRoute } from "../../routes"
+import { Genre, SubGenre } from "../../constants"
 
 export const ProgramItem: React.VFC<{
+  channel: Channel
   program: Program
-  serviceCol: number
+  channelCol: number
   top: number
   height: number
-}> = memo(({ program, serviceCol, top, height }) => {
-  const startAt = dayjs(program.startAt * 1000)
+}> = memo(({ channel, program, channelCol, top, height }) => {
+  const startAt = dayjs(program.startAt)
   const remain = startAt.diff(dayjs(), "minute")
-
-  const genres = useRecoilValue(genresAtom)
-  const services = useRecoilValue(servicesAtom)
-  const service = services && services.find((s) => s.id === program.service.id)
+  const duration = (program.endAt - program.startAt) / 1000
 
   const genre =
-    !!program.genres.length &&
-    genres?.find((genre) => genre.id === program.genres[0])
+    !!program.genre1 && program.genre1 in Genre && Genre[program.genre1]
+  const subGenre =
+    !!program.subGenre1 &&
+    program.genre1 in SubGenre &&
+    SubGenre[program.genre1][program.subGenre1]
   const genreColor =
-    genre && (genreColors[genre.sub] || genreColors[genre.main])
+    genre && ((subGenre && genreColors[subGenre]) || genreColors[genre])
 
   const [isOpen, setIsOpen] = useState(false)
 
@@ -48,15 +48,13 @@ export const ProgramItem: React.VFC<{
             <div className="py-1 rounded-md w-full bg-gray-200 text-gray-800 text-center">
               <div className="font-bold">
                 <span className="text-lg">{startAt.format("MM/DD HH:mm")}</span>
-                <span className="text-gray-600 pl-1">
-                  +{program.duration / 60}min
-                </span>
+                <span className="text-gray-600 pl-1">+{duration / 60}min</span>
               </div>
               <div className="text-sm text-gray-600">
                 <span>
                   {Math.abs(remain)}分{0 < remain ? "後" : "前"}
                 </span>
-                {service && <span className="ml-1">{service.name}</span>}
+                {channel && <span className="ml-1">{channel.name}</span>}
               </div>
             </div>
             <div className="mt-2 text-sm leading-relaxed">
@@ -64,12 +62,13 @@ export const ProgramItem: React.VFC<{
                 <span
                   className={`rounded-md px-2 py-1 text-gray-800 ${genreColor} mr-1`}
                 >
-                  {genre.main}
+                  {genre}
+                  {subGenre && ` / ${subGenre}`}
                 </span>
               )}
               <span className="font-semibold">{program.name}</span>
               <div className="mt-1 text-xs">
-                {100 < program.description.length
+                {program.description && 100 < program.description.length
                   ? program.description.substring(0, 100) + "..."
                   : program.description}
               </div>
@@ -90,14 +89,16 @@ export const ProgramItem: React.VFC<{
       <div
         onClick={() => setIsOpen((isOpen) => !isOpen)}
         style={{
-          top: `${top}px`,
-          left: `${serviceCol * 9}rem`,
+          top: `${Math.max(top, 0)}px`,
+          left: `${channelCol * 9}rem`,
           height: `${height}px`,
         }}
         className={`absolute truncate w-36 ${
           genreColor ? genreColor : "bg-gray-100"
         } border border-gray-400 cursor-pointer select-none`}
-        title={[program.name, program.description].join("\n\n")}
+        title={[program.name, program.description]
+          .filter((s) => !!s)
+          .join("\n\n")}
       >
         <p className="whitespace-pre-wrap leading-snug">
           {startAt.format("HH:mm")} {program.name}
@@ -115,32 +116,27 @@ export const ProgramItem: React.VFC<{
   )
 })
 
-export const ServiceProgramList: React.VFC<{
+export const ChannelProgramList: React.VFC<{
   programs: Program[]
-  service: Service
+  channel: Channel
   startAtInString: string
-  serviceCol: number
+  channelCol: number
   client: { left: number; top: number; width: number; height: number }
-}> = memo(({ programs, service, startAtInString, serviceCol, client }) => {
+}> = memo(({ programs, channel, startAtInString, channelCol, client }) => {
   const startAt = dayjs(startAtInString)
   return (
     <React.Fragment>
       {(programs || [])
         .filter(
           (program) =>
-            program.service.id === service.id &&
-            0 <
-              dayjs((program.startAt + program.duration) * 1000).diff(
-                startAt,
-                "minute"
-              ) &&
-            dayjs(program.startAt * 1000).diff(startAt, "minute") <= 4320
+            0 < dayjs(program.endAt).diff(startAt, "minute") &&
+            dayjs(program.startAt).diff(startAt, "minute") <= 4320
         )
         .map((program) => {
-          const start = dayjs(program.startAt * 1000)
+          const start = dayjs(program.startAt)
           const diffInMinutes = start.diff(startAt, "minute")
           const top = (diffInMinutes / 60) * 180
-          const height = (program.duration / 3600) * 180
+          const height = ((program.endAt - program.startAt) / 1000 / 3600) * 180
           const bottom = top + height
           if (
             bottom < client.top - 180 ||
@@ -152,7 +148,8 @@ export const ServiceProgramList: React.VFC<{
             <ProgramItem
               key={program.id}
               program={program}
-              serviceCol={serviceCol}
+              channel={channel}
+              channelCol={channelCol}
               top={top}
               height={height}
             />
@@ -163,14 +160,13 @@ export const ServiceProgramList: React.VFC<{
 })
 
 export const TimetableProgramList: React.VFC<{
-  services: Service[]
-  programs: Program[]
+  schedules: Schedule[]
   startAtInString: string
   client: { left: number; top: number; width: number; height: number }
-}> = memo(({ services, programs, startAtInString, client }) => {
+}> = memo(({ schedules, startAtInString, client }) => {
   return (
     <>
-      {services.map((service, idx) => {
+      {schedules.map((schedule, idx) => {
         const leftPos = idx * 144
         const rightPos = leftPos + 144
 
@@ -182,11 +178,11 @@ export const TimetableProgramList: React.VFC<{
         }
 
         return (
-          <ServiceProgramList
+          <ChannelProgramList
             key={idx}
-            programs={programs}
-            serviceCol={idx}
-            service={service}
+            channelCol={idx}
+            channel={schedule.channel}
+            programs={schedule.programs}
             startAtInString={startAtInString}
             client={client}
           />
