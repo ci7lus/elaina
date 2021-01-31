@@ -9,12 +9,14 @@ import Hls from "hls-b24.js"
 import * as b24 from "aribb24.js"
 import { useUpdateEffect } from "react-use"
 import { useSaya } from "../../hooks/saya"
+import { Spinner } from "@chakra-ui/react"
 
 export const CommentPlayer: React.VFC<{
-  hlsUrl: string
+  hlsUrl: string | null
   comment: CommentPayload | null
   isLive: boolean
   isAutoPlay: boolean
+  isLoading?: boolean
   onPositionChange?: React.Dispatch<React.SetStateAction<number>>
   onPauseChange?: (b: boolean) => unknown
   reloadRequest: number
@@ -23,6 +25,7 @@ export const CommentPlayer: React.VFC<{
   comment,
   isLive,
   isAutoPlay,
+  isLoading,
   onPositionChange,
   onPauseChange,
   reloadRequest,
@@ -30,80 +33,77 @@ export const CommentPlayer: React.VFC<{
   const saya = useSaya()
   const hlsInstance = useRef<Hls | null>(null)
   const isPlaying = useRef(false)
-  const videoPayload: () => DPlayerVideo = useCallback(
-    () => ({
-      type: "customHls",
-      url: hlsUrl,
-      customType: {
-        customHls: (video: HTMLVideoElement, player: DPlayer) => {
-          if (hlsInstance.current) {
-            hlsInstance.current.destroy()
-            hlsInstance.current = null
+  const videoPayload: (hlsUrl: string) => DPlayerVideo = (hlsUrl) => ({
+    type: "customHls",
+    url: hlsUrl,
+    customType: {
+      customHls: (video: HTMLVideoElement, player: DPlayer) => {
+        if (hlsInstance.current) {
+          hlsInstance.current.destroy()
+          hlsInstance.current = null
+        }
+        const hls = new Hls()
+        // TODO: Custom loader
+        // Workaround https://github.com/video-dev/hls.js/issues/2064
+        hls.config.enableWorker = false
+        if (saya.isAuthorizationEnabled) {
+          hls.config.xhrSetup = (xhr, url) => {
+            xhr.setRequestHeader("Authorization", saya.authorizationToken)
           }
-          const hls = new Hls()
-          // TODO: Custom loader
-          // Workaround https://github.com/video-dev/hls.js/issues/2064
-          hls.config.enableWorker = false
-          if (saya.isAuthorizationEnabled) {
-            hls.config.xhrSetup = (xhr, url) => {
-              xhr.setRequestHeader("Authorization", saya.authorizationToken)
-            }
-          }
-          hls.config.autoStartLoad = isLive
+        }
+        hls.config.autoStartLoad = isLive
 
-          hls.loadSource(video.src)
-          hls.attachMedia(video)
+        hls.loadSource(video.src)
+        hls.attachMedia(video)
 
-          const b24Renderer = new b24.CanvasRenderer({
-            forceStrokeColor: "black",
-          })
-          b24Renderer.attachMedia(video)
+        const b24Renderer = new b24.CanvasRenderer({
+          forceStrokeColor: "black",
+        })
+        b24Renderer.attachMedia(video)
+        b24Renderer.show()
+
+        player.on("subtitle_show" as DPlayerEvents.subtitle_show, () => {
           b24Renderer.show()
+        })
+        player.on("subtitle_hide" as DPlayerEvents.subtitle_hide, () => {
+          b24Renderer.hide()
+        })
+        hls.on(Hls.Events.FRAG_PARSING_PRIVATE_DATA, (event, data) => {
+          for (const sample of data.samples) {
+            b24Renderer.pushData(sample.pid, sample.data, sample.pts)
+          }
+        })
+        hls.on(Hls.Events.DESTROYING, () => {
+          b24Renderer.dispose()
+        })
 
-          player.on("subtitle_show" as DPlayerEvents.subtitle_show, () => {
-            b24Renderer.show()
-          })
-          player.on("subtitle_hide" as DPlayerEvents.subtitle_hide, () => {
-            b24Renderer.hide()
-          })
-          hls.on(Hls.Events.FRAG_PARSING_PRIVATE_DATA, (event, data) => {
-            for (const sample of data.samples) {
-              b24Renderer.pushData(sample.pid, sample.data, sample.pts)
-            }
-          })
-          hls.on(Hls.Events.DESTROYING, () => {
-            b24Renderer.dispose()
-          })
+        player.on("pause" as DPlayerEvents.pause, () => {
+          !isLive && hls.stopLoad()
+          onPauseChange && onPauseChange(true)
+          isPlaying.current = false
+        })
+        player.on("play" as DPlayerEvents.play, () => {
+          !isLive && hls.startLoad()
+          onPauseChange && onPauseChange(false)
+          isPlaying.current = true
+        })
+        player.on("waiting" as DPlayerEvents.stalled, () => {
+          onPauseChange && onPauseChange(true)
+          isPlaying.current = false
+        })
+        player.on("canplay" as DPlayerEvents.canplay, () => {
+          onPauseChange && onPauseChange(false)
+          isPlaying.current = true
+        })
 
-          player.on("pause" as DPlayerEvents.pause, () => {
-            !isLive && hls.stopLoad()
-            onPauseChange && onPauseChange(true)
-            isPlaying.current = false
-          })
-          player.on("play" as DPlayerEvents.play, () => {
-            !isLive && hls.startLoad()
-            onPauseChange && onPauseChange(false)
-            isPlaying.current = true
-          })
-          player.on("waiting" as DPlayerEvents.stalled, () => {
-            onPauseChange && onPauseChange(true)
-            isPlaying.current = false
-          })
-          player.on("canplay" as DPlayerEvents.canplay, () => {
-            onPauseChange && onPauseChange(false)
-            isPlaying.current = true
-          })
+        player.on("destroy" as DPlayerEvents.destroy, () => {
+          hls.destroy()
+        })
 
-          player.on("destroy" as DPlayerEvents.destroy, () => {
-            hls.destroy()
-          })
-
-          hlsInstance.current = hls
-        },
+        hlsInstance.current = hls
       },
-    }),
-    [hlsUrl]
-  )
+    },
+  })
   const danmaku = {
     id: "elaina",
     user: "elaina",
@@ -116,9 +116,9 @@ export const CommentPlayer: React.VFC<{
   const player = useRef<DPlayer | null>()
 
   const reload = useCallback(() => {
-    if (!player.current) return
+    if (!player.current || !hlsUrl) return
     player.current.pause()
-    player.current.switchVideo(videoPayload(), danmaku)
+    player.current.switchVideo(videoPayload(hlsUrl), danmaku)
     player.current.play()
   }, [hlsUrl])
 
@@ -132,12 +132,13 @@ export const CommentPlayer: React.VFC<{
   }, [comment])
 
   useEffect(() => {
+    if (!hlsUrl) return
     const playerInstance = new DPlayer({
       container: dplayerElementRef.current,
       live: isLive,
       autoplay: isAutoPlay,
       screenshot: true,
-      video: videoPayload(),
+      video: videoPayload(hlsUrl),
       danmaku,
       lang: "ja-jp",
       pictureInPicture: true,
@@ -180,16 +181,23 @@ export const CommentPlayer: React.VFC<{
       player.current = null
       clearInterval(timer)
     }
-  }, [])
+  }, [hlsUrl])
   return (
     <div
       className="relative bg-black"
       style={{ paddingTop: "56.25%" }}
       ref={playerWrapRef}
     >
-      <div className="absolute left-0 top-0 w-full h-full">
-        <div ref={dplayerElementRef}></div>
-      </div>
+      {hlsUrl && (
+        <div className="absolute left-0 top-0 w-full h-full">
+          <div ref={dplayerElementRef}></div>
+        </div>
+      )}
+      {(!hlsUrl || isLoading) && (
+        <div className="absolute left-0 top-0 h-full w-full flex items-center justify-center">
+          <Spinner size="xl" color="gray.100" speed="1s" />
+        </div>
+      )}
     </div>
   )
 }

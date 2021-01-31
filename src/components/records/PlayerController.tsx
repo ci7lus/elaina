@@ -11,18 +11,33 @@ export const PlayerController: React.VFC<{
   position: number
   duration: number
   seek: (n: number) => unknown
-}> = memo(({ position, duration, seek }) => (
-  <div className="bg-gray-50 rounded-md flex items-center space-x-2 py-1 px-2">
-    <button onClick={() => seek(0)}>
+  isSeeking: boolean
+}> = memo(({ position, duration, seek, isSeeking }) => (
+  <div className="bg-gray-50 rounded-md flex items-center space-x-3 py-1 px-2">
+    <button
+      onClick={() => !isSeeking && seek(0)}
+      disabled={isSeeking}
+      className={`${isSeeking && "opacity-50 cursor-not-allowed"}`}
+    >
       <SkipBack size={16} />
     </button>
-    <button onClick={() => seek(position - 60)} title="1分戻る">
+    <button
+      onClick={() => !isSeeking && seek(position - 60)}
+      title="1分戻る"
+      disabled={isSeeking}
+      className={`${isSeeking && "opacity-50 cursor-not-allowed"}`}
+    >
       <RotateCcw size={16} />
     </button>
-    <button onClick={() => seek(position + 60)} title="1分進める">
+    <button
+      onClick={() => !isSeeking && seek(position + 60)}
+      title="1分進める"
+      disabled={isSeeking}
+      className={`${isSeeking && "opacity-50 cursor-not-allowed"}`}
+    >
       <RotateCw size={16} />
     </button>
-    <div className="mx-2 text-sm font-bold">
+    <div className="mx-2 text-sm font-bold font-mono">
       {Math.floor(position / 60)
         .toString()
         .padStart(2, "0")}
@@ -41,10 +56,12 @@ export const PlayerController: React.VFC<{
       value={position}
       focusThumbOnChange={false}
     >
-      <SliderTrack>
-        <SliderFilledTrack />
+      <SliderTrack
+        className={`${isSeeking && "opacity-50 cursor-not-allowed"}`}
+      >
+        <SliderFilledTrack className={`${isSeeking && "cursor-not-allowed"}`} />
       </SliderTrack>
-      <SliderThumb />
+      <SliderThumb className={`${isSeeking && "cursor-not-allowed"}`} />
     </Slider>
   </div>
 ))

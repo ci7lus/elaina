@@ -24,7 +24,7 @@ export const ServiceIdPage: React.FC<{ id: string }> = ({ id }) => {
   const sid = parseInt(id)
   const [schedule, setSchedule] = useState<Schedule | null | false>(null)
 
-  const [hlsUrl, setHlsUrl] = useState(backend.getHlsStreamUrl({ id: -1 }))
+  const [hlsUrl, setHlsUrl] = useState<string | null>(null)
 
   useEffect(() => {
     backend

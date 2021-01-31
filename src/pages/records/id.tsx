@@ -54,7 +54,7 @@ export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
   }, [])
 
   const [currentStreamId, setCurrentStream, currentStreamRef] = useRefState(-1)
-  const [hlsUrl, setHlsUrl] = useState(backend.getHlsStreamUrl({ id: -1 }))
+  const [hlsUrl, setHlsUrl] = useState<string | null>(null)
   useUpdateEffect(() => {
     setHlsUrl(backend.getHlsStreamUrl({ id: currentStreamId }))
   }, [currentStreamId])
@@ -106,7 +106,7 @@ export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
     })()
   }
 
-  const isSeeking = useRef(false)
+  const [isSeeking, setIsSeeking] = useState(false)
 
   useUpdateEffect(() => {
     if (!record) return
@@ -117,7 +117,7 @@ export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
     })
     let s: null | ReconnectingWebSocket = null
 
-    isSeeking.current = true
+    setIsSeeking(true)
     claimRecordStream(record, position)
       .then(() => {
         const _s = new ReconnectingWebSocket(wsUrl)
@@ -140,9 +140,7 @@ export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
           autoDismiss: true,
         })
       })
-      .finally(() => {
-        isSeeking.current = false
-      })
+      .finally(() => setIsSeeking(false))
 
     return () => {
       s?.close()
@@ -177,18 +175,18 @@ export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
 
   const seek = useCallback(
     async (s: number) => {
-      if (!record || isSeeking.current) return
+      if (!record || isSeeking) return
       try {
-        isSeeking.current = true
+        setIsSeeking(true)
         await claimRecordStream(record, s)
         setPosition(s)
       } catch (error) {
         console.error(error)
       } finally {
-        isSeeking.current = false
+        setIsSeeking(false)
       }
     },
-    [record, isSeeking.current]
+    [record, isSeeking]
   )
 
   if (record === false) return <NotFound />
@@ -210,6 +208,7 @@ export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
             comment={comment}
             isLive={false}
             isAutoPlay={true}
+            isLoading={isSeeking}
             onPositionChange={setPosition}
             onPauseChange={setIsPaused}
             reloadRequest={reloadRequest}
@@ -218,6 +217,7 @@ export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
             position={position}
             duration={duration}
             seek={seek}
+            isSeeking={isSeeking}
           />
         </div>
         <div
