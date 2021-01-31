@@ -2700,6 +2700,11 @@ aria-hidden@^1.1.1:
   dependencies:
     tslib "^1.0.0"
 
+aribb24.js@^0.0.20:
+  version "0.0.20"
+  resolved "https://registry.yarnpkg.com/aribb24.js/-/aribb24.js-0.0.20.tgz#a25c5b0ad210e4be96d8572c8f52848dc6501cb8"
+  integrity sha512-QaLUzdZkI7xQb5fX9tyymiJt2U/6a8V1buQjEFH180ekkDjdA0F2rrm2KWVmmmAhBx/lV69bmTucyR4mCzbSmA==
+
 arr-diff@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/arr-diff/-/arr-diff-4.0.0.tgz#d6461074febfec71e7e15235761a329a5dc7c520"
@@ -2839,11 +2844,6 @@ axios@^0.21.1:
   integrity sha512-dKQiRHxGD9PPRIUNIWvZhPTPpl1rf/OxTYKsqKUDjBwYylTvV7SjSHJb9ratfyzM6wCdLCOYLzs73qpg5c4iGA==
   dependencies:
     follow-redirects "^1.10.0"
-
-b24.js@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/b24.js/-/b24.js-1.0.3.tgz#6d94cacc51d3830417d7ddf56c55eb77063783a9"
-  integrity sha512-j2hHu0asf6HxacVmGJKFSsrfoG8nC0JEjujIpsmRVkr74nC6o5gs6YF6AQD3e7YyJ8PaKuA7k2uSL9A2mAG9Og==
 
 babel-plugin-dynamic-import-node@^2.3.3:
   version "2.3.3"

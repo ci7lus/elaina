@@ -6,7 +6,7 @@ import DPlayer, {
 } from "dplayer"
 import { CommentPayload } from "../../types/struct"
 import Hls from "hls-b24.js"
-import * as b24 from "b24.js"
+import * as b24 from "aribb24.js"
 import { useUpdateEffect } from "react-use"
 import { useSaya } from "../../hooks/saya"
 
@@ -54,20 +54,25 @@ export const CommentPlayer: React.VFC<{
           hls.loadSource(video.src)
           hls.attachMedia(video)
 
-          const b24Renderer = new b24.WebVTTRenderer()
-          b24Renderer.init().then(() => {
-            b24Renderer.attachMedia(video)
-            player.on("subtitle_show" as DPlayerEvents.subtitle_show, () => {
-              b24Renderer.show()
-            })
-            player.on("subtitle_hide" as DPlayerEvents.subtitle_hide, () => {
-              b24Renderer.hide()
-            })
+          const b24Renderer = new b24.CanvasRenderer({
+            forceStrokeColor: "black",
+          })
+          b24Renderer.attachMedia(video)
+          b24Renderer.show()
+
+          player.on("subtitle_show" as DPlayerEvents.subtitle_show, () => {
+            b24Renderer.show()
+          })
+          player.on("subtitle_hide" as DPlayerEvents.subtitle_hide, () => {
+            b24Renderer.hide()
           })
           hls.on(Hls.Events.FRAG_PARSING_PRIVATE_DATA, (event, data) => {
             for (const sample of data.samples) {
               b24Renderer.pushData(sample.pid, sample.data, sample.pts)
             }
+          })
+          hls.on(Hls.Events.DESTROYING, () => {
+            b24Renderer.dispose()
           })
 
           player.on("pause" as DPlayerEvents.pause, () => {
