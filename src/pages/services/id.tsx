@@ -200,7 +200,7 @@ export const ServiceIdPage: React.FC<{ id: string }> = ({ id }) => {
         </div>
       </div>
       <div className="flex flex-col md:flex-row items-start justify-around">
-        <div className="w-full md:w-2/3 my-4 px-2 md:px-0 md:mr-2">
+        <div className="w-full _md:w-2/3 my-4 px-2 md:px-0 md:mr-2">
           <div className="text-2xl">
             <Skeleton isLoaded={!!onGoingProgram}>
               {onGoingProgram ? onGoingProgram.name : "."}
@@ -236,9 +236,9 @@ export const ServiceIdPage: React.FC<{ id: string }> = ({ id }) => {
             </AutoLinkedText>
           </div>
         </div>
-        <div className="w-full md:w-1/3 mb-2 md:mb-0 md:my-4 px-2 md:px-0">
+        {/*<div className="w-full md:w-1/3 mb-2 md:mb-0 md:my-4 px-2 md:px-0">
           <StatsWidget serviceId={schedule.channel.id} socket={socket} />
-        </div>
+              </div>*/}
       </div>
     </div>
   )
