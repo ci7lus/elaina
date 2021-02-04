@@ -1,7 +1,7 @@
 import { Heading, Spinner } from "@chakra-ui/react"
 import React, { useEffect, useMemo, useState } from "react"
 import { ArrowLeft, ArrowRight, Search } from "react-feather"
-import { useTable, usePagination, Column } from "react-table"
+import { useTable, usePagination, Column, useGlobalFilter } from "react-table"
 import type { ProgramRecord } from "../../types/struct"
 import dayjs from "dayjs"
 import { Link } from "rocon/react"
@@ -59,19 +59,23 @@ export const RecordsPage: React.VFC<{}> = () => {
     prepareRow,
     page,
     pageOptions,
-    state: { pageIndex, pageSize },
+    state: { pageIndex, pageSize, globalFilter },
     previousPage,
     nextPage,
     canPreviousPage,
     canNextPage,
+    gotoPage,
+    setGlobalFilter,
   } = useTable(
     {
       columns,
       data: records || [],
       initialState: { pageSize: 20 },
       manualPagination: true,
+      manualGlobalFilter: true,
       pageCount: Math.ceil((total || 0) / _pageSize),
     },
+    useGlobalFilter,
     usePagination
   )
 
@@ -85,7 +89,7 @@ export const RecordsPage: React.VFC<{}> = () => {
       .getRecords({
         offset: pageSize * pageIndex,
         limit: pageSize,
-        keyword: searchTerm || undefined,
+        keyword: globalFilter || undefined,
       })
       .then(({ records, total }) => {
         setTotal(total)
@@ -97,7 +101,11 @@ export const RecordsPage: React.VFC<{}> = () => {
           autoDismiss: true,
         })
       )
-  }, [pageIndex, pageSize, searchTerm])
+  }, [pageIndex, pageSize, globalFilter])
+  useEffect(() => {
+    gotoPage(0)
+    setGlobalFilter(searchTerm)
+  }, [searchTerm])
   return (
     <>
       <div className="bg-gray-800 text-gray-200">

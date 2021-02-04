@@ -8,7 +8,6 @@ import { CommentList } from "../../components/channels/CommentList"
 import { CommentPayload, ProgramRecord } from "../../types/struct"
 import ReconnectingWebSocket from "reconnecting-websocket"
 import { useDebounce, useUpdateEffect } from "react-use"
-import { Skeleton } from "@chakra-ui/react"
 import { useSaya } from "../../hooks/saya"
 import { AutoLinkedText } from "../../components/global/AutoLinkedText"
 import { PlayerController } from "../../components/records/PlayerController"
@@ -32,11 +31,6 @@ export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
       channels.find((channel) => channel.id === record.channelId),
     [record]
   )
-
-  const programStart = record && dayjs(record.startAt)
-  const programEnd = record && dayjs(record.endAt)
-  const duration = record && (record.endAt - record.startAt) / 1000
-  const programDurationInMinutes = duration && duration / 60
 
   const isMounting = useRef(true)
 
@@ -72,38 +66,40 @@ export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
     [comments]
   )
 
-  const [position, setPosition] = useState(0)
+  const [position, setPosition, positionRef] = useRefState(0)
   const socket = useRef<ReconnectingWebSocket | null>()
 
-  const syncToPosition = useCallback(() => {
-    if (!socket.current) return
-    socket.current.send(JSON.stringify({ action: "Sync", seconds: position }))
-  }, [socket.current, position])
+  const syncToPosition = () =>
+    send({ action: "Sync", seconds: positionRef.current })
 
-  const claimRecordStream = async (record: ProgramRecord, ss: number) => {
-    const streamId = await backend.startRecordHlsStream({
-      id: record.videoFiles[0].id,
-      ss,
-    })
-    while (isMounting.current) {
-      const streams = await backend.getStreams()
-      const stream = streams.find((stream) => stream.streamId === streamId)
-      if (stream) {
-        await backend.keepStream({ id: streamId })
-        if (stream.isEnable === true) break
-      }
-      await wait(1000)
-    }
-    setCurrentStream(streamId)
-    ;(async () => {
+  const claimRecordStream = useCallback(
+    async (ss: number) => {
+      if (!record) return
+      const streamId = await backend.startRecordHlsStream({
+        id: record.videoFiles[0].id,
+        ss,
+      })
       while (isMounting.current) {
-        await backend.keepStream({ id: streamId })
-        if (streamId !== currentStreamRef.current) break
-        await wait(1000 * 5)
+        const streams = await backend.getStreams()
+        const stream = streams.find((stream) => stream.streamId === streamId)
+        if (stream) {
+          await backend.keepStream({ id: streamId })
+          if (stream.isEnable === true) break
+        }
+        await wait(1000)
       }
-      await backend.dropStream({ id: streamId })
-    })()
-  }
+      setCurrentStream(streamId)
+      ;(async () => {
+        while (isMounting.current) {
+          await backend.keepStream({ id: streamId })
+          if (streamId !== currentStreamRef.current) break
+          await wait(1000 * 5)
+        }
+        await backend.dropStream({ id: streamId })
+      })()
+    },
+    [record]
+  )
 
   const [isSeeking, setIsSeeking] = useState(false)
 
@@ -134,9 +130,9 @@ export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
     socket.current = s
 
     setIsSeeking(true)
-    claimRecordStream(record, position)
+    claimRecordStream(positionRef.current)
       .then(() => {
-        s.send(JSON.stringify({ action: "Ready" }))
+        send({ action: "Ready" })
       })
       .catch(() => {
         toast.addToast("番組ストリームの読み込みに失敗しました", {
@@ -166,13 +162,18 @@ export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
     }
   }, [playerContainerRef.current])
 
+  const send = (arg: Object) => {
+    if (!socket.current) return
+    socket.current.send(JSON.stringify(arg))
+  }
+
   const [isPaused, setIsPaused] = useState(false)
   useEffect(() => {
     if (isPaused) {
-      socket.current?.send(JSON.stringify({ action: "Pause" }))
+      send({ action: "Pause" })
     } else {
       syncToPosition()
-      socket.current?.send(JSON.stringify({ action: "Resume" }))
+      send({ action: "Resume" })
     }
   }, [isPaused])
 
@@ -185,7 +186,7 @@ export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
       if (!record || isSeeking) return
       try {
         setIsSeeking(true)
-        await claimRecordStream(record, s)
+        await claimRecordStream(s)
         setPosition(s)
       } catch (error) {
         console.error(error)
@@ -197,14 +198,9 @@ export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
   )
 
   if (record === false) return <NotFound />
-  if (
-    record === null ||
-    !programDurationInMinutes ||
-    !programStart ||
-    !programEnd ||
-    !duration
-  )
-    return <Loading />
+  if (record === null || !channel) return <Loading />
+
+  const duration = (record.endAt - record.startAt) / 1000
 
   return (
     <div className="md:container mx-auto md:mt-8 md:px-2">
@@ -273,21 +269,11 @@ export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
       </div>
       <div className="flex flex-col md:flex-row items-start justify-around">
         <div className="w-full my-2 mb-4 px-2 md:px-0 md:mr-2">
-          <div className="text-2xl">
-            <Skeleton isLoaded={!!record}>
-              {record ? record.name : "."}
-            </Skeleton>
-          </div>
+          <div className="text-2xl">{record.name}</div>
           <div className="text-xl mt-1">
-            <Skeleton isLoaded={!!(record && channel)}>
-              {record && channel
-                ? `${programStart.format(
-                    "YYYY/MM/DD HH:mm"
-                  )} - ${programEnd.format(
-                    "HH:mm"
-                  )} (${programDurationInMinutes}分間) / ${channel.name}`
-                : "."}
-            </Skeleton>
+            {`${dayjs(record.startAt).format("YYYY/MM/DD HH:mm")} - ${dayjs(
+              record.endAt
+            ).format("HH:mm")} (${duration / 60}分間) / ${channel.name}`}
           </div>
           <div className="bg-gray-200 whitespace-pre-wrap rounded-md p-4 md:my-2 text-sm leading-relaxed programDescription">
             <AutoLinkedText>
