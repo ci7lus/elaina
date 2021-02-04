@@ -9,13 +9,6 @@ on:
     branches-ignore:
       - "releases/**"
 
-  pull_request:
-    types:
-      - opened
-      - synchronize
-    paths-ignore:
-      - "*.md"
-
   release:
     types:
       - published
