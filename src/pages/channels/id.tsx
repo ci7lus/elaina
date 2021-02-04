@@ -4,7 +4,7 @@ import { ChevronsDown, ChevronsRight, RefreshCw } from "react-feather"
 import { CommentPlayer } from "../../components/common/CommentPlayer"
 import { Loading } from "../../components/global/Loading"
 import { NotFound } from "../../components/global/NotFound"
-import { CommentList } from "../../components/services/CommentList"
+import { CommentList } from "../../components/channels/CommentList"
 import { CommentPayload, Program, Schedule } from "../../types/struct"
 import ReconnectingWebSocket from "reconnecting-websocket"
 import { useDebounce } from "react-use"
@@ -12,13 +12,13 @@ import { Skeleton } from "@chakra-ui/react"
 import { useRecoilValue } from "recoil"
 import { playerSettingAtom } from "../../atoms/setting"
 import { useSaya } from "../../hooks/saya"
-import { StatsWidget } from "../../components/services/StatsWidget"
+import { StatsWidget } from "../../components/channels/StatsWidget"
 import { useNow } from "../../hooks/date"
 import { AutoLinkedText } from "../../components/global/AutoLinkedText"
 import { useBackend } from "../../hooks/backend"
 import { wait } from "../../utils/wait"
 
-export const ServiceIdPage: React.FC<{ id: string }> = ({ id }) => {
+export const ChannelIdPage: React.FC<{ id: string }> = ({ id }) => {
   const saya = useSaya()
   const backend = useBackend()
   const sid = parseInt(id)

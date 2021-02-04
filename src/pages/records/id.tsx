@@ -4,7 +4,7 @@ import { ChevronsDown, RefreshCw } from "react-feather"
 import { CommentPlayer } from "../../components/common/CommentPlayer"
 import { Loading } from "../../components/global/Loading"
 import { NotFound } from "../../components/global/NotFound"
-import { CommentList } from "../../components/services/CommentList"
+import { CommentList } from "../../components/channels/CommentList"
 import { CommentPayload, ProgramRecord } from "../../types/struct"
 import ReconnectingWebSocket from "reconnecting-websocket"
 import { useDebounce, useUpdateEffect } from "react-use"
@@ -25,7 +25,7 @@ export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
   const toast = useToasts()
   const { channels } = useChannels()
   const [record, setRecord] = useState<ProgramRecord | null | false>(null)
-  const service = useMemo(
+  const channel = useMemo(
     () =>
       record &&
       channels &&
@@ -279,13 +279,13 @@ export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
             </Skeleton>
           </div>
           <div className="text-xl mt-1">
-            <Skeleton isLoaded={!!(record && service)}>
-              {record && service
+            <Skeleton isLoaded={!!(record && channel)}>
+              {record && channel
                 ? `${programStart.format(
                     "YYYY/MM/DD HH:mm"
                   )} - ${programEnd.format(
                     "HH:mm"
-                  )} (${programDurationInMinutes}分間) / ${service.name}`
+                  )} (${programDurationInMinutes}分間) / ${channel.name}`
                 : "."}
             </Skeleton>
           </div>

@@ -28,7 +28,7 @@ export const RecordsPage: React.VFC<{}> = () => {
   const columns: Column<ProgramRecord>[] = useMemo(
     () => [
       {
-        id: "service",
+        id: "channel",
         Header: "放送局",
         accessor: (record: ProgramRecord) =>
           channels &&

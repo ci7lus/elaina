@@ -4,7 +4,7 @@ import ScrollContainer from "react-indiana-drag-scroll"
 import { useSchedules } from "../../hooks/television"
 import { TimetableProgramList } from "../../components/timetable/Programs"
 import { LeftTimeBar } from "../../components/timetable/TimetableParts"
-import { TimetableServiceList } from "../../components/timetable/Services"
+import { TimetableChannelList } from "../../components/timetable/Channels"
 import { useThrottleFn } from "react-use"
 import { useNow } from "../../hooks/date"
 import { Loading } from "../../components/global/Loading"
@@ -71,7 +71,7 @@ export const TimetablePage: React.VFC<{}> = () => {
           }}
         >
           {filteredSchedules && (
-            <TimetableServiceList schedules={filteredSchedules} />
+            <TimetableChannelList schedules={filteredSchedules} />
           )}
         </div>
       </div>

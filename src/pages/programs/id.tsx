@@ -4,7 +4,7 @@ import { Loading } from "../../components/global/Loading"
 import { NotFound } from "../../components/global/NotFound"
 import { useChannels, useProgram } from "../../hooks/television"
 import { Link } from "rocon/react"
-import { servicesRoute } from "../../routes"
+import { channelsRoute } from "../../routes"
 import { useNow } from "../../hooks/date"
 import { AutoLinkedText } from "../../components/global/AutoLinkedText"
 import { Genre, SubGenre } from "../../constants"
@@ -66,7 +66,7 @@ export const ProgramIdPage: React.FC<{ id: string }> = ({ id }) => {
               <div className="text-lg">{channel.name}</div>
               <div className="flex justify-end pt-2">
                 <Link
-                  route={servicesRoute.anyRoute}
+                  route={channelsRoute.anyRoute}
                   match={{ id: channel.id.toString() }}
                 >
                   <button className="bg-indigo-400 text-gray-100 rounded-md px-2 p-1">

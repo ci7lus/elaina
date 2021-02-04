@@ -1,11 +1,11 @@
 import { ArrowContainer, Popover } from "react-tiny-popover"
 import React, { memo, useState } from "react"
 import { Link } from "rocon/react"
-import { servicesRoute } from "../../routes"
+import { channelsRoute } from "../../routes"
 import { Schedule } from "../../types/struct"
 import { Button } from "@chakra-ui/react"
 
-export const TimetableServiceList: React.VFC<{
+export const TimetableChannelList: React.VFC<{
   schedules: Schedule[]
 }> = memo(({ schedules }) => (
   <>
@@ -31,7 +31,7 @@ export const TimetableServiceList: React.VFC<{
                 <div className="text-lg">{schedule.channel.name}</div>
                 <div className="flex justify-end mt-4">
                   <Link
-                    route={servicesRoute.anyRoute}
+                    route={channelsRoute.anyRoute}
                     match={{ id: schedule.channel.id.toString() }}
                     key={schedule.channel.id}
                   >
