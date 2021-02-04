@@ -14,7 +14,8 @@
     "build": "env IS_BUILD=yes parcel build src/index.html --no-scope-hoist",
     "build:analyze": "env PARCEL_BUNDLE_ANALYZER=1 IS_BUILD=yes parcel build src/index.html --no-scope-hoist",
     "lint": "prettier --check './src/**/*.{js,ts,tsx}'",
-    "format": "prettier --write './src/**/*.{js,ts,tsx}'"
+    "format": "prettier --write './src/**/*.{js,ts,tsx}'",
+    "serve": "servor dist index.html 1234"
   },
   "private": true,
   "dependencies": {
@@ -42,6 +43,7 @@
     "recoil": "^0.1.2",
     "reconnecting-websocket": "^4.4.0",
     "rocon": "^1.2.1",
+    "servor": "^4.0.2",
     "swr": "^0.4.1",
     "twemoji": "^13.0.1",
     "zod": "^1.11.11"
