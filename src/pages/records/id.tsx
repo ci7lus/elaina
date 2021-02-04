@@ -78,7 +78,6 @@ export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
   const syncToPosition = useCallback(() => {
     if (!socket.current) return
     socket.current.send(JSON.stringify({ action: "Sync", seconds: position }))
-    console.log("sync to", position)
   }, [socket.current, position])
 
   const claimRecordStream = async (record: ProgramRecord, ss: number) => {
@@ -115,24 +114,29 @@ export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
       startAt: record.startAt / 1000,
       endAt: record.endAt / 1000,
     })
-    let s: null | ReconnectingWebSocket = null
+
+    let isFirst = true
+    const s = new ReconnectingWebSocket(wsUrl)
+    s.reconnect()
+    s.addEventListener("message", (e) => {
+      const payload: CommentPayload = JSON.parse(e.data)
+      setComment(payload)
+      setComments((comments) => [...comments, payload])
+    })
+    s.addEventListener("open", () => {
+      if (isFirst) {
+        isFirst = false
+        return
+      }
+      syncToPosition()
+      setComments([])
+    })
+    socket.current = s
 
     setIsSeeking(true)
     claimRecordStream(record, position)
       .then(() => {
-        const _s = new ReconnectingWebSocket(wsUrl)
-        _s.reconnect()
-        _s.addEventListener("message", (e) => {
-          const payload: CommentPayload = JSON.parse(e.data)
-          setComment(payload)
-          setComments((comments) => [...comments, payload])
-        })
-        _s.addEventListener("open", () => {
-          syncToPosition()
-          setComments([])
-        })
-        s = _s
-        socket.current = _s
+        s.send(JSON.stringify({ action: "Ready" }))
       })
       .catch(() => {
         toast.addToast("番組ストリームの読み込みに失敗しました", {
@@ -143,7 +147,7 @@ export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
       .finally(() => setIsSeeking(false))
 
     return () => {
-      s?.close()
+      s.close()
     }
   }, [record])
 
@@ -164,8 +168,11 @@ export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
 
   const [isPaused, setIsPaused] = useState(false)
   useEffect(() => {
-    if (isPaused === false) {
+    if (isPaused) {
+      socket.current?.send(JSON.stringify({ action: "Pause" }))
+    } else {
       syncToPosition()
+      socket.current?.send(JSON.stringify({ action: "Resume" }))
     }
   }, [isPaused])
 

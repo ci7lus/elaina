@@ -86,6 +86,7 @@ export type CommentPayload = {
   channel: "jk5"
   no: number
   time: number
+  timeMs: number
   author: string
   text: string
   color: string

@@ -9,10 +9,10 @@ const Comment: React.VFC<{ comment: CommentPayload }> = memo(({ comment }) => {
   return (
     <div className="flex items-center space-x-1 w-full hover:bg-gray-200 select-none">
       <p
-        className="truncate inline-block flex-shrink-0 p-1 border-r border-gray-400 w-20 text-center"
+        className="truncate inline-block flex-shrink-0 p-1 border-r border-gray-400 w-14 text-center"
         title={time.format()}
       >
-        {time.format("HH:mm:ss")}
+        {time.format("mm:ss")}
       </p>
       <p
         className="p-1 truncate inline-block"
@@ -46,7 +46,15 @@ export const CommentList: React.VFC<{
       ref={ref}
     >
       {comments
-        .sort((a, b) => (b.time < a.time ? 1 : -1))
+        .sort((a, b) =>
+          b.time === a.time
+            ? b.timeMs < a.timeMs
+              ? 1
+              : -1
+            : b.time < a.time
+            ? 1
+            : -1
+        )
         .map((i, idx) => (
           <Comment key={idx} comment={i} />
         ))}
