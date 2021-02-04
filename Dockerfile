@@ -12,6 +12,7 @@ RUN yarn run build
 
 # Static file serving
 FROM nginx:stable-alpine
+LABEL maintainer="ci7lus <ci7l@googlegroups.com>"
 
 ARG PORT=1234
 RUN { \
