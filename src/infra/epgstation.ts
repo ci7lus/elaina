@@ -167,7 +167,7 @@ export class EPGStationAPI {
     ruleId?: number
     channelId?: number
     genre?: number
-    keyword?: number
+    keyword?: string
     hasOriginalFile?: boolean
   }) {
     const { data } = await this.client.get<{

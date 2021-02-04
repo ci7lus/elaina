@@ -1,22 +1,15 @@
-import {
-  Button,
-  Heading,
-  Input,
-  Portal,
-  Spinner,
-  useToast,
-} from "@chakra-ui/react"
+import { Heading, Spinner } from "@chakra-ui/react"
 import React, { useEffect, useMemo, useState } from "react"
 import { ArrowLeft, ArrowRight, Search } from "react-feather"
-import { useTable, usePagination, useGlobalFilter, Column } from "react-table"
+import { useTable, usePagination, Column } from "react-table"
 import type { ProgramRecord } from "../../types/struct"
 import dayjs from "dayjs"
 import { Link } from "rocon/react"
 import { recordsRoute } from "../../routes"
-import { useDebounce } from "react-use"
 import { useBackend } from "../../hooks/backend"
 import { useChannels } from "../../hooks/television"
 import { useToasts } from "react-toast-notifications"
+import { RecordSearchModal } from "../../components/records/SearchModal"
 
 export const RecordsPage: React.VFC<{}> = () => {
   const backend = useBackend()
@@ -66,12 +59,11 @@ export const RecordsPage: React.VFC<{}> = () => {
     prepareRow,
     page,
     pageOptions,
-    state: { pageIndex, globalFilter, pageSize },
+    state: { pageIndex, pageSize },
     previousPage,
     nextPage,
     canPreviousPage,
     canNextPage,
-    setGlobalFilter,
   } = useTable(
     {
       columns,
@@ -80,25 +72,21 @@ export const RecordsPage: React.VFC<{}> = () => {
       manualPagination: true,
       pageCount: Math.ceil((total || 0) / _pageSize),
     },
-    useGlobalFilter,
     usePagination
   )
 
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false)
 
-  const [filterState, setFilterState] = useState(globalFilter)
-  useDebounce(
-    () => {
-      setGlobalFilter(filterState)
-    },
-    100,
-    [filterState]
-  )
+  const [searchTerm, setSearchTerm] = useState<string | null>(null)
 
   useEffect(() => {
     setPageSize(pageSize)
     backend
-      .getRecords({ offset: pageSize * pageIndex, limit: pageSize })
+      .getRecords({
+        offset: pageSize * pageIndex,
+        limit: pageSize,
+        keyword: searchTerm || undefined,
+      })
       .then(({ records, total }) => {
         setTotal(total)
         setRecords(records)
@@ -109,7 +97,7 @@ export const RecordsPage: React.VFC<{}> = () => {
           autoDismiss: true,
         })
       )
-  }, [pageIndex, pageSize])
+  }, [pageIndex, pageSize, searchTerm])
   return (
     <>
       <div className="bg-gray-800 text-gray-200">
@@ -216,36 +204,11 @@ export const RecordsPage: React.VFC<{}> = () => {
         </button>
       </div>
       {isSearchModalOpen && (
-        <Portal>
-          <div className="fixed w-full h-full left-0 top-0 ">
-            <div
-              className="z-10 absolute w-full h-full left-0 top-0 bg-gray-800 opacity-25"
-              onClick={() => setIsSearchModalOpen(false)}
-            ></div>
-            <div className="w-full h-full flex items-center justify-center">
-              <div className="z-20 p-4 rounded-md bg-gray-100">
-                <div className="text-lg mb-4">検索</div>
-                <Input
-                  className="bg-gray-100 mb-4"
-                  placeholder="タイトル"
-                  value={filterState || ""}
-                  onChange={(e) => setFilterState(e.target.value || undefined)}
-                />
-                <div className="flex items-center justify-start space-x-4">
-                  <Button
-                    colorScheme="blue"
-                    onClick={() => {
-                      setIsSearchModalOpen(false)
-                    }}
-                  >
-                    検索
-                  </Button>
-                  <Button colorScheme="gray">リセット</Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Portal>
+        <RecordSearchModal
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          onClose={() => setIsSearchModalOpen(false)}
+        />
       )}
     </>
   )
