@@ -17,6 +17,7 @@ import { useNow } from "../../hooks/date"
 import { AutoLinkedText } from "../../components/global/AutoLinkedText"
 import { useBackend } from "../../hooks/backend"
 import { wait } from "../../utils/wait"
+import { CaptureButton } from "../../components/common/CaptureButton"
 
 export const ChannelIdPage: React.FC<{ id: string }> = ({ id }) => {
   const saya = useSaya()
@@ -164,6 +165,8 @@ export const ChannelIdPage: React.FC<{ id: string }> = ({ id }) => {
           style={{ height: commentsHeight }}
         >
           <div className="flex justify-start items-center w-full font-sm p-2 pr-4 border-b-2 border-blue-400 space-x-2">
+            <CaptureButton withComment={true} />
+            <CaptureButton withComment={false} />
             <button
               className="rounded-md bg-gray-100 hover:bg-gray-200 p-1 cursor-pointer"
               title="映像リロード"
@@ -186,10 +189,7 @@ export const ChannelIdPage: React.FC<{ id: string }> = ({ id }) => {
             >
               <ChevronsDown size={18} />
             </button>
-            {/*`<button className="rounded-md bg-gray-200 p-1 cursor-pointer">
-            <Camera size={18} />
-          </button>
-          <button className="rounded-md bg-blue-400 p-1 cursor-pointer">
+            {/*`<button className="rounded-md bg-blue-400 p-1 cursor-pointer">
             <Twitter fill="#FFF" strokeWidth="0" size={18} />
   </button>`*/}
           </div>
