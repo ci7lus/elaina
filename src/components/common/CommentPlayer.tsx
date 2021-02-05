@@ -5,11 +5,11 @@ import DPlayer, {
   DPlayerVideoQuality,
 } from "dplayer"
 import { CommentPayload } from "../../types/struct"
-import Hls from "hls-b24.js"
+import Hls from "@neneka/hls.js"
 import * as b24 from "aribb24.js"
 import { useUpdateEffect } from "react-use"
-import { useSaya } from "../../hooks/saya"
 import { Spinner } from "@chakra-ui/react"
+import { useBackend } from "../../hooks/backend"
 
 export const CommentPlayer: React.VFC<{
   hlsUrl: string | null
@@ -30,7 +30,7 @@ export const CommentPlayer: React.VFC<{
   onPauseChange,
   reloadRequest,
 }) => {
-  const saya = useSaya()
+  const backend = useBackend()
   const hlsInstance = useRef<Hls | null>(null)
   const isPlaying = useRef(false)
   const videoPayload: (hlsUrl: string) => DPlayerVideo = (hlsUrl) => ({
@@ -43,12 +43,10 @@ export const CommentPlayer: React.VFC<{
           hlsInstance.current = null
         }
         const hls = new Hls()
-        // TODO: Custom loader
-        // Workaround https://github.com/video-dev/hls.js/issues/2064
-        hls.config.enableWorker = false
-        if (saya.isAuthorizationEnabled) {
+
+        if (backend.isAuthorizationEnabled) {
           hls.config.xhrSetup = (xhr, url) => {
-            xhr.setRequestHeader("Authorization", saya.authorizationToken)
+            xhr.setRequestHeader("Authorization", backend.authorizationToken)
           }
         }
         hls.config.autoStartLoad = isLive

@@ -1592,6 +1592,14 @@
     promise-polyfill "8.2.0"
     twemoji "^13.0.1"
 
+"@neneka/hls.js@^0.12.3-0.canary.6675":
+  version "0.12.3-0.canary.6675"
+  resolved "https://registry.yarnpkg.com/@neneka/hls.js/-/hls.js-0.12.3-0.canary.6675.tgz#3e878055e711de05302e8b7c001f13cc61a6960c"
+  integrity sha512-J6GSiMUalUhH4VSHeW0vVSUZvRwU2PPnDkVPbP8YpS2T1yyoAHohKoLf/yS205UdpIXVlAfgMqyLRuEJy4cqzQ==
+  dependencies:
+    eventemitter3 "^4.0.7"
+    url-toolkit "^2.2.1"
+
 "@nodelib/fs.scandir@2.1.4":
   version "2.1.4"
   resolved "https://registry.yarnpkg.com/@nodelib/fs.scandir/-/fs.scandir-2.1.4.tgz#d4b3549a5db5de2683e0c1071ab4f140904bbf69"
@@ -2454,11 +2462,6 @@
   resolved "https://registry.yarnpkg.com/@types/dplayer/-/dplayer-1.25.1.tgz#649162a3dce31afd8027577bb6a5f728a16acad3"
   integrity sha512-dZxgqzI6rbO/gHd2ejcC3tHYSYC4Scoh+kPewV4cAI76ye9ySuLsnRoOYvVt9xy3H6Wn8UV95ayEkXFRB10bxg==
 
-"@types/hls.js@^0.13.3":
-  version "0.13.3"
-  resolved "https://registry.yarnpkg.com/@types/hls.js/-/hls.js-0.13.3.tgz#eb982a866125745eadee468c989fc9e189f24019"
-  integrity sha512-Po8ZPCsAcPPuf5OODPEkb6cdWJ/w4BdX1veP7IIOc2WG0x1SW4GEQ1+FHKN1AMG2AePJfNUceJbh5PKtP92yRQ==
-
 "@types/http-proxy@^1.17.4":
   version "1.17.4"
   resolved "https://registry.yarnpkg.com/@types/http-proxy/-/http-proxy-1.17.4.tgz#e7c92e3dbe3e13aa799440ff42e6d3a17a9d045b"
@@ -2700,10 +2703,10 @@ aria-hidden@^1.1.1:
   dependencies:
     tslib "^1.0.0"
 
-aribb24.js@^0.0.20:
-  version "0.0.20"
-  resolved "https://registry.yarnpkg.com/aribb24.js/-/aribb24.js-0.0.20.tgz#a25c5b0ad210e4be96d8572c8f52848dc6501cb8"
-  integrity sha512-QaLUzdZkI7xQb5fX9tyymiJt2U/6a8V1buQjEFH180ekkDjdA0F2rrm2KWVmmmAhBx/lV69bmTucyR4mCzbSmA==
+aribb24.js@^0.0.25:
+  version "0.0.25"
+  resolved "https://registry.yarnpkg.com/aribb24.js/-/aribb24.js-0.0.25.tgz#fe3d8ef258a425fcfff811434edeb79f5e2a4a77"
+  integrity sha512-xGYWMNp1EcbN5xz29962EI79wIF5+fd6mO0s80NW5r686rmnU3Qo2oxmuRcd6TZxlvYch5hxr2jscXYKRxgO4w==
 
 arr-diff@^4.0.0:
   version "4.0.0"
@@ -4230,12 +4233,7 @@ esutils@^2.0.2:
   resolved "https://registry.yarnpkg.com/esutils/-/esutils-2.0.3.tgz#74d2eb4de0b8da1293711910d50775b9b710ef64"
   integrity sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==
 
-eventemitter3@3.1.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-3.1.0.tgz#090b4d6cdbd645ed10bf750d4b5407942d7ba163"
-  integrity sha512-ivIvhpq/Y0uSjcHDcOIccjmYjGLcP09MFGE7ysAwkAvkXfpZlC985pH2/ui64DKazbTW/4kN3yqozUxlXzI6cA==
-
-eventemitter3@^4.0.0:
+eventemitter3@^4.0.0, eventemitter3@^4.0.7:
   version "4.0.7"
   resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-4.0.7.tgz#2de9b68f6528d5644ef5c59526a1b4a07306169f"
   integrity sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==
@@ -4742,14 +4740,6 @@ history@^5.0.0:
   integrity sha512-3NyRMKIiFSJmIPdq7FxkNMJkQ7ZEtVblOQ38VtKaA0zZMW1Eo6Q6W8oDKEflr1kNNTItSnk4JMCO1deeSgbLLg==
   dependencies:
     "@babel/runtime" "^7.7.6"
-
-hls-b24.js@^0.12.3:
-  version "0.12.3"
-  resolved "https://registry.yarnpkg.com/hls-b24.js/-/hls-b24.js-0.12.3.tgz#fb46cf31e101800800de577f5a94057d164768cf"
-  integrity sha512-C8nwzS33zKvR7grYIoHvp8wPxBvk9sEJ6dsh3Bx+T/4jNNhDksqLS73NIWqHvInjRiOsrXgEY4+h/NjNbzzh0g==
-  dependencies:
-    eventemitter3 "3.1.0"
-    url-toolkit "^2.1.6"
 
 hmac-drbg@^1.0.0:
   version "1.0.1"
@@ -8003,7 +7993,7 @@ urix@^0.1.0:
   resolved "https://registry.yarnpkg.com/urix/-/urix-0.1.0.tgz#da937f7a62e21fec1fd18d49b35c2935067a6c72"
   integrity sha1-2pN/emLiH+wf0Y1Js1wpNQZ6bHI=
 
-url-toolkit@^2.1.6:
+url-toolkit@^2.2.1:
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/url-toolkit/-/url-toolkit-2.2.1.tgz#89009ed3d62a3574de079532a7266c14d2cc1c4f"
   integrity sha512-8+DzgrtDZYZGhHaAop5WGVghMdCfOLGbhcArsJD0qDll71FXa7EeKxi2hilPIscn2nwMz4PRjML32Sz4JTN0Xw==
