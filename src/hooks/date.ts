@@ -1,5 +1,7 @@
 import dayjs from "dayjs"
 import { useEffect, useState } from "react"
+import ja from "dayjs/locale/ja"
+dayjs.locale(ja)
 
 export const useNow = () => {
   const [now, setNow] = useState(dayjs())

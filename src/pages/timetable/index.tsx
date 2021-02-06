@@ -1,17 +1,18 @@
 import React, { useEffect, useRef, useState } from "react"
-import { Heading, Spinner } from "@chakra-ui/react"
+import { Heading } from "@chakra-ui/react"
 import ScrollContainer from "react-indiana-drag-scroll"
 import { useSchedules } from "../../hooks/television"
 import { TimetableProgramList } from "../../components/timetable/Programs"
 import { LeftTimeBar } from "../../components/timetable/TimetableParts"
-import { TimetableChannelList } from "../../components/timetable/Channels"
+import { TimetableChannel } from "../../components/timetable/Channels"
 import { useThrottleFn } from "react-use"
 import { useNow } from "../../hooks/date"
 import { Loading } from "../../components/global/Loading"
 
 export const TimetablePage: React.VFC<{}> = () => {
   const now = useNow()
-  const startAt = now.clone().startOf("hour")
+  const [add, setAdd] = useState(0)
+  const startAt = now.clone().add(add, "day").startOf("hour")
   const startAtInString = startAt.format()
   const scrollRef = useRef<HTMLDivElement>(null)
   const [clientLeft, setClientLeft] = useState(0)
@@ -31,7 +32,9 @@ export const TimetablePage: React.VFC<{}> = () => {
 
   const timeBarPosition = (now.minute() / 60) * 180
 
-  const { filteredSchedules } = useSchedules()
+  const { filteredSchedules } = useSchedules({
+    startAt: startAt.toDate().getTime(),
+  })
 
   const onResize = () => {
     setClientWidth(scrollRef.current?.clientWidth || 0)
@@ -55,11 +58,37 @@ export const TimetablePage: React.VFC<{}> = () => {
   return (
     <div>
       <div className="bg-gray-800 text-gray-200">
-        <div className="py-2 mx-auto container px-2 flex items-center justify-between">
-          <Heading as="h2" size="md">
+        <div className="py-2 mx-auto container px-2 flex items-center justify-between space-x-4">
+          <Heading as="h2" size="md" flexShrink={0}>
             番組表
           </Heading>
-          <div>絞り込みをここら辺に</div>
+          <div className="flex overflow-scroll">
+            {[...Array(7).keys()].map((i) => {
+              const date = now.clone().add(i, "day")
+              const weekday = date.format("dd")
+              const color =
+                weekday === "日"
+                  ? "text-red-400"
+                  : weekday === "土"
+                  ? "text-blue-400"
+                  : ""
+              return (
+                <button
+                  key={i}
+                  className={`flex-shrink-0 text-center px-2 border-r-2 border-gray-600 truncate select-none font-semibold ${
+                    add === i && "bg-gray-600"
+                  } ${color}`}
+                  type="button"
+                  onClick={() => {
+                    setAdd(i)
+                  }}
+                  disabled={add === i}
+                >
+                  {date.format("D (dd)")}
+                </button>
+              )
+            })}
+          </div>
         </div>
       </div>
       <div className="overflow-hidden">
@@ -70,9 +99,10 @@ export const TimetablePage: React.VFC<{}> = () => {
             height: "40px",
           }}
         >
-          {filteredSchedules && (
-            <TimetableChannelList schedules={filteredSchedules} />
-          )}
+          {filteredSchedules &&
+            filteredSchedules.map((schedule) => (
+              <TimetableChannel schedule={schedule} key={schedule.channel.id} />
+            ))}
         </div>
       </div>
       <ScrollContainer
@@ -107,7 +137,9 @@ export const TimetablePage: React.VFC<{}> = () => {
                 <LeftTimeBar startAtInString={startAtInString} />
               </div>
               <div
-                className="ml-4 opacity-50 absolute w-full left-0 border-t-4 border-red-400 transition-all pointer-events-none"
+                className={`ml-4 opacity-50 absolute w-full left-0 border-t-4 ${
+                  add === 0 ? "border-red-400" : "border-red-200"
+                } transition-all pointer-events-none"`}
                 style={{
                   top: `${timeBarPosition}px`,
                 }}

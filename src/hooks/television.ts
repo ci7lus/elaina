@@ -1,3 +1,4 @@
+import dayjs from "dayjs"
 import { useEffect, useState } from "react"
 import { useToasts } from "react-toast-notifications"
 import { useRecoilState, useRecoilValue } from "recoil"
@@ -44,7 +45,7 @@ export const useProgram = ({ id }: { id: number }) => {
   return { program }
 }
 
-export const useSchedules = () => {
+export const useSchedules = ({ startAt }: { startAt?: number }) => {
   const [schedules, setSchedules] = useRecoilState(schedulesAtom)
   const filteredSchedules = useRecoilValue(filteredSchedulesSelector)
 
@@ -52,8 +53,10 @@ export const useSchedules = () => {
   const backend = useBackend()
 
   useEffect(() => {
+    const endAt = startAt && dayjs(startAt).add(1, "day").toDate().getTime()
+
     backend
-      .getSchedules({})
+      .getSchedules({ startAt, endAt })
       .then((schedules) => setSchedules(schedules))
       .catch((e) => {
         console.error(e)
@@ -62,7 +65,7 @@ export const useSchedules = () => {
           autoDismiss: true,
         })
       })
-  }, [])
+  }, [startAt])
 
   return { schedules, filteredSchedules }
 }
