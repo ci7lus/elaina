@@ -5,7 +5,7 @@ import DPlayer, {
   DPlayerVideoQuality,
 } from "dplayer"
 import { CommentPayload } from "../../types/struct"
-import Hls from "@neneka/hls.js"
+import Hls from "hls-b24.js"
 import * as b24 from "aribb24.js"
 import { useUpdateEffect } from "react-use"
 import { Spinner } from "@chakra-ui/react"

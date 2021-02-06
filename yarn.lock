@@ -1592,14 +1592,6 @@
     promise-polyfill "8.2.0"
     twemoji "^13.0.1"
 
-"@neneka/hls.js@^0.12.3-0.canary.6675":
-  version "0.12.3-0.canary.6675"
-  resolved "https://registry.yarnpkg.com/@neneka/hls.js/-/hls.js-0.12.3-0.canary.6675.tgz#3e878055e711de05302e8b7c001f13cc61a6960c"
-  integrity sha512-J6GSiMUalUhH4VSHeW0vVSUZvRwU2PPnDkVPbP8YpS2T1yyoAHohKoLf/yS205UdpIXVlAfgMqyLRuEJy4cqzQ==
-  dependencies:
-    eventemitter3 "^4.0.7"
-    url-toolkit "^2.2.1"
-
 "@nodelib/fs.scandir@2.1.4":
   version "2.1.4"
   resolved "https://registry.yarnpkg.com/@nodelib/fs.scandir/-/fs.scandir-2.1.4.tgz#d4b3549a5db5de2683e0c1071ab4f140904bbf69"
@@ -4740,6 +4732,14 @@ history@^5.0.0:
   integrity sha512-3NyRMKIiFSJmIPdq7FxkNMJkQ7ZEtVblOQ38VtKaA0zZMW1Eo6Q6W8oDKEflr1kNNTItSnk4JMCO1deeSgbLLg==
   dependencies:
     "@babel/runtime" "^7.7.6"
+
+hls-b24.js@^1.0.0-beta.4.0.canary.6766:
+  version "1.0.0-beta.4.0.canary.6766"
+  resolved "https://registry.yarnpkg.com/hls-b24.js/-/hls-b24.js-1.0.0-beta.4.0.canary.6766.tgz#97cb6591c7136f5fcf2260f9c15b3de808d12427"
+  integrity sha512-PHzsl0CKO2Eds0QDpec4a2GQfjwqigHaRohRZNQs2CIzDHn6oUI9LvOKy3WQFh9d8rWx9KvWFLGpNdJIxwRUKQ==
+  dependencies:
+    eventemitter3 "^4.0.7"
+    url-toolkit "^2.2.1"
 
 hmac-drbg@^1.0.0:
   version "1.0.1"
