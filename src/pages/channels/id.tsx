@@ -85,7 +85,7 @@ export const ChannelIdPage: React.FC<{ id: string }> = ({ id }) => {
       setTimeout(() => {
         setComment(payload)
         setComments((comments) => [...comments, payload])
-      }, (playerSetting.commentDelay ?? 0) * 1000)
+      }, Math.abs((playerSetting.commentDelay || 0) * 1000 - payload.timeMs || 0))
     })
     socket.current = s
 

@@ -10,6 +10,7 @@ import * as b24 from "aribb24.js"
 import { useUpdateEffect } from "react-use"
 import { Spinner } from "@chakra-ui/react"
 import { useBackend } from "../../hooks/backend"
+import { trimCommentForFlow } from "../../utils/comment"
 
 export const CommentPlayer: React.VFC<{
   hlsUrl: string | null
@@ -126,7 +127,8 @@ export const CommentPlayer: React.VFC<{
 
   useEffect(() => {
     if (!comment || player.current?.video.paused === true) return
-    player.current?.danmaku.draw(comment)
+    const payload = { ...comment, text: trimCommentForFlow(comment.text) }
+    player.current?.danmaku.draw(payload)
   }, [comment])
 
   useEffect(() => {
