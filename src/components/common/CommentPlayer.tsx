@@ -20,7 +20,6 @@ export const CommentPlayer: React.VFC<{
   isLoading?: boolean
   onPositionChange?: React.Dispatch<React.SetStateAction<number>>
   onPauseChange?: (b: boolean) => unknown
-  reloadRequest: number
 }> = ({
   hlsUrl,
   comment,
@@ -29,7 +28,6 @@ export const CommentPlayer: React.VFC<{
   isLoading,
   onPositionChange,
   onPauseChange,
-  reloadRequest,
 }) => {
   const backend = useBackend()
   const hlsInstance = useRef<Hls | null>(null)
@@ -114,16 +112,12 @@ export const CommentPlayer: React.VFC<{
   const dplayerElementRef = useRef<HTMLDivElement>(null)
   const player = useRef<DPlayer | null>()
 
-  const reload = useCallback(() => {
+  useUpdateEffect(() => {
     if (!player.current || !hlsUrl) return
     player.current.pause()
     player.current.switchVideo(videoPayload(hlsUrl), danmaku)
     player.current.play()
   }, [hlsUrl])
-
-  useUpdateEffect(() => {
-    reload()
-  }, [reloadRequest, hlsUrl])
 
   useEffect(() => {
     if (!comment || player.current?.video.paused === true) return
@@ -158,12 +152,7 @@ export const CommentPlayer: React.VFC<{
           callback()
         },
       },
-      contextmenu: [
-        {
-          text: "リロード",
-          click: reload,
-        },
-      ],
+      contextmenu: [],
     })
 
     player.current = playerInstance

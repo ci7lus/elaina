@@ -45,19 +45,9 @@ export const CommentList: React.VFC<{
       className="playerCommentList block overflow-scroll overflow-y-scroll text-sm h-full"
       ref={ref}
     >
-      {comments
-        .sort((a, b) =>
-          b.time === a.time
-            ? b.timeMs < a.timeMs
-              ? 1
-              : -1
-            : b.time < a.time
-            ? 1
-            : -1
-        )
-        .map((i, idx) => (
-          <Comment key={idx} comment={i} />
-        ))}
+      {comments.map((i, idx) => (
+        <Comment key={idx} comment={i} />
+      ))}
     </div>
   )
 }

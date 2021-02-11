@@ -43,6 +43,7 @@ export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
         console.error(error)
         setRecord(false)
       })
+    isMounting.current = true
     return () => {
       isMounting.current = false
     }
@@ -73,36 +74,47 @@ export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
   const syncToPosition = () =>
     send({ action: "Sync", seconds: positionRef.current })
 
+  const [isLoading, setIsLoading, isLoadingRef] = useRefState(false)
+
   const claimRecordStream = useCallback(
     async (ss: number) => {
-      if (!record) return
-      const streamId = await backend.startRecordHlsStream({
-        id: record.videoFiles[0].id,
-        ss,
-      })
-      while (isMounting.current) {
-        const streams = await backend.getStreams()
-        const stream = streams.find((stream) => stream.streamId === streamId)
-        if (stream) {
-          await backend.keepStream({ id: streamId })
-          if (stream.isEnable === true) break
-        }
-        await wait(1000)
-      }
-      setCurrentStream(streamId)
-      ;(async () => {
+      if (!record || isLoadingRef.current) return
+      setIsLoading(true)
+      try {
+        const streamId = await backend.startRecordHlsStream({
+          id: record.videoFiles[0].id,
+          ss,
+        })
         while (isMounting.current) {
-          await backend.keepStream({ id: streamId })
-          if (streamId !== currentStreamRef.current) break
-          await wait(1000 * 5)
+          const streams = await backend.getStreams()
+          const stream = streams.find((stream) => stream.streamId === streamId)
+          if (stream) {
+            await backend.keepStream({ id: streamId })
+            if (stream.isEnable === true) break
+          }
+          await wait(1000)
         }
-        await backend.dropStream({ id: streamId })
-      })()
+        setCurrentStream(streamId)
+        ;(async () => {
+          while (isMounting.current) {
+            await backend.keepStream({ id: streamId })
+            if (streamId !== currentStreamRef.current) break
+            await wait(1000)
+          }
+          await backend.dropStream({ id: streamId })
+        })()
+      } catch (error) {
+        toast.addToast("番組ストリームの読み込みに失敗しました", {
+          appearance: "error",
+          autoDismiss: true,
+        })
+        return Promise.reject(error)
+      } finally {
+        setIsLoading(false)
+      }
     },
     [record]
   )
-
-  const [isSeeking, setIsSeeking] = useState(false)
 
   useUpdateEffect(() => {
     if (!record) return
@@ -126,22 +138,13 @@ export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
         return
       }
       syncToPosition()
-      setComments([])
+      send({ action: "Ready" })
     })
     socket.current = s
 
-    setIsSeeking(true)
-    claimRecordStream(positionRef.current)
-      .then(() => {
-        send({ action: "Ready" })
-      })
-      .catch(() => {
-        toast.addToast("番組ストリームの読み込みに失敗しました", {
-          appearance: "error",
-          autoDismiss: true,
-        })
-      })
-      .finally(() => setIsSeeking(false))
+    claimRecordStream(positionRef.current).then(() => {
+      send({ action: "Ready" })
+    })
 
     return () => {
       s.close()
@@ -178,24 +181,22 @@ export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
     }
   }, [isPaused])
 
-  const [reloadRequest, setReloadRequest] = useState(0)
-
   const [isAutoScrollEnabled, setIsAutoScrollEnabled] = useState(true)
 
   const seek = useCallback(
     async (s: number) => {
-      if (!record || isSeeking) return
+      if (!record || isLoadingRef.current) return
       try {
-        setIsSeeking(true)
+        setIsLoading(true)
         await claimRecordStream(s)
         setPosition(s)
       } catch (error) {
         console.error(error)
       } finally {
-        setIsSeeking(false)
+        setIsLoading(false)
       }
     },
-    [record, isSeeking]
+    [record]
   )
 
   if (record === false) return <NotFound />
@@ -212,16 +213,15 @@ export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
             comment={comment}
             isLive={false}
             isAutoPlay={true}
-            isLoading={isSeeking}
+            isLoading={isLoading}
             onPositionChange={setPosition}
             onPauseChange={setIsPaused}
-            reloadRequest={reloadRequest}
           />
           <PlayerController
             position={position}
             duration={duration}
             seek={seek}
-            isSeeking={isSeeking}
+            isSeeking={isLoading}
           />
         </div>
         <div
@@ -235,11 +235,7 @@ export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
               className="rounded-md bg-gray-100 hover:bg-gray-200 p-1 cursor-pointer"
               title="映像リロード"
               onClick={() => {
-                setReloadRequest(new Date().getTime())
-                if (socket.current) {
-                  syncToPosition()
-                  setComments([])
-                }
+                seek(positionRef.current)
               }}
             >
               <RefreshCw size={18} />

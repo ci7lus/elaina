@@ -1,5 +1,5 @@
 import dayjs from "dayjs"
-import React, { useEffect, useMemo, useRef, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { ChevronsDown, ChevronsRight, RefreshCw } from "react-feather"
 import { CommentPlayer } from "../../components/common/CommentPlayer"
 import { Loading } from "../../components/global/Loading"
@@ -7,7 +7,7 @@ import { NotFound } from "../../components/global/NotFound"
 import { CommentList } from "../../components/channels/CommentList"
 import { CommentPayload, Program, Schedule } from "../../types/struct"
 import ReconnectingWebSocket from "reconnecting-websocket"
-import { useDebounce } from "react-use"
+import { useDebounce, useUpdateEffect } from "react-use"
 import { Skeleton } from "@chakra-ui/react"
 import { useRecoilValue } from "recoil"
 import { playerSettingAtom } from "../../atoms/setting"
@@ -18,6 +18,7 @@ import { AutoLinkedText } from "../../components/global/AutoLinkedText"
 import { useBackend } from "../../hooks/backend"
 import { wait } from "../../utils/wait"
 import { CaptureButton } from "../../components/common/CaptureButton"
+import { useRefState } from "../../hooks/util"
 
 export const ChannelIdPage: React.FC<{ id: string }> = ({ id }) => {
   const saya = useSaya()
@@ -25,25 +26,28 @@ export const ChannelIdPage: React.FC<{ id: string }> = ({ id }) => {
   const sid = parseInt(id)
   const [schedule, setSchedule] = useState<Schedule | null | false>(null)
 
+  const [currentStreamId, setCurrentStream, currentStreamRef] = useRefState(-1)
   const [hlsUrl, setHlsUrl] = useState<string | null>(null)
+  useUpdateEffect(() => {
+    setHlsUrl(backend.getHlsStreamUrl({ id: currentStreamId }))
+  }, [currentStreamId])
+
+  const isMounting = useRef(true)
 
   useEffect(() => {
     backend
       .getChannelSchedules({ channelId: sid, days: 1 })
       .then((schedule) => setSchedule(schedule))
       .catch(() => setSchedule(false))
+    isMounting.current = true
+    return () => {
+      isMounting.current = false
+    }
   }, [])
 
   const now = useNow()
   const [onGoingProgram, setOnGoingProgram] = useState<Program | null>(null)
   const [nextProgram, setNextProgram] = useState<Program | null>(null)
-  const onGoingProgramStart =
-    onGoingProgram && dayjs(onGoingProgram.startAt).format("HH:mm")
-  const onGoingProgramEnd =
-    onGoingProgram && dayjs(onGoingProgram.endAt).format("HH:mm")
-  const onGoingProgramDurationInMinutes =
-    onGoingProgram &&
-    (onGoingProgram.endAt - onGoingProgram.startAt) / 1000 / 60
   const onGoingProgramDiff =
     onGoingProgram && dayjs(onGoingProgram.startAt).diff(now, "minute")
 
@@ -72,6 +76,41 @@ export const ChannelIdPage: React.FC<{ id: string }> = ({ id }) => {
     [comments]
   )
 
+  const [isLoading, setIsLoading, isLoadingRef] = useRefState(false)
+
+  const claimChannelStream = useCallback(async () => {
+    if (!schedule || isLoadingRef.current) return
+    try {
+      setIsLoading(true)
+      const streamId = await backend.startChannelHlsStream({
+        id: schedule.channel.id,
+      })
+      while (isMounting.current) {
+        const streams = await backend.getStreams()
+        const stream = streams.find((stream) => stream.streamId === streamId)
+        if (stream) {
+          await backend.keepStream({ id: streamId })
+          if (stream.isEnable === true) break
+        }
+        await wait(1000)
+      }
+      setCurrentStream(streamId)
+      ;(async () => {
+        while (isMounting.current) {
+          await backend.keepStream({ id: streamId })
+          if (streamId !== currentStreamRef.current) break
+          await wait(1000)
+        }
+        await backend.dropStream({ id: streamId })
+      })()
+    } catch (error) {
+      console.error(error)
+      return Promise.reject(error)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [schedule])
+
   const socket = useRef<ReconnectingWebSocket | null>()
 
   useEffect(() => {
@@ -89,30 +128,9 @@ export const ChannelIdPage: React.FC<{ id: string }> = ({ id }) => {
     })
     socket.current = s
 
-    let isComponentContinue = true
-    ;(async () => {
-      const streamId = await backend.startChannelHlsStream({
-        id: schedule.channel.id,
-      })
-      while (isComponentContinue) {
-        const streams = await backend.getStreams()
-        const stream = streams.find((stream) => stream.streamId === streamId)
-        if (stream) {
-          await backend.keepStream({ id: streamId })
-          if (stream.isEnable === true) break
-        }
-        await wait(1000)
-      }
-      setHlsUrl(backend.getHlsStreamUrl({ id: streamId }))
-      while (isComponentContinue) {
-        await backend.keepStream({ id: streamId })
-        await wait(1000 * 5)
-      }
-      await backend.dropStream({ id: streamId })
-    })()
+    claimChannelStream()
     return () => {
       s.close()
-      isComponentContinue = false
     }
   }, [schedule])
 
@@ -141,8 +159,6 @@ export const ChannelIdPage: React.FC<{ id: string }> = ({ id }) => {
     }
   }, [playerContainerRef.current])
 
-  const [reloadRequest, setReloadRequest] = useState(0)
-
   const [isAutoScrollEnabled, setIsAutoScrollEnabled] = useState(true)
 
   if (schedule === null) return <Loading />
@@ -157,7 +173,7 @@ export const ChannelIdPage: React.FC<{ id: string }> = ({ id }) => {
             comment={comment}
             isLive={true}
             isAutoPlay={true}
-            reloadRequest={reloadRequest}
+            isLoading={isLoading}
           />
         </div>
         <div
@@ -170,9 +186,7 @@ export const ChannelIdPage: React.FC<{ id: string }> = ({ id }) => {
             <button
               className="rounded-md bg-gray-100 hover:bg-gray-200 p-1 cursor-pointer"
               title="映像リロード"
-              onClick={() => {
-                setReloadRequest(new Date().getTime())
-              }}
+              onClick={() => claimChannelStream()}
             >
               <RefreshCw size={18} />
             </button>
@@ -211,11 +225,13 @@ export const ChannelIdPage: React.FC<{ id: string }> = ({ id }) => {
               isLoaded={!!(onGoingProgram && onGoingProgramDiff !== null)}
             >
               {onGoingProgram && onGoingProgramDiff !== null
-                ? `${onGoingProgramStart} [${Math.abs(onGoingProgramDiff)}分${
-                    0 < onGoingProgramDiff ? "後" : "前"
-                  }] - ${onGoingProgramEnd} (${onGoingProgramDurationInMinutes}分間) / ${
-                    schedule.channel.name
-                  }`
+                ? `${dayjs(onGoingProgram.startAt).format("HH:mm")} [${Math.abs(
+                    onGoingProgramDiff
+                  )}分${0 < onGoingProgramDiff ? "後" : "前"}] - ${dayjs(
+                    onGoingProgram.endAt
+                  ).format("HH:mm")} (${
+                    (onGoingProgram.endAt - onGoingProgram.startAt) / 1000 / 60
+                  }分間) / ${schedule.channel.name}`
                 : "."}
             </Skeleton>
           </div>
