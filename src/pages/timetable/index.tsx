@@ -62,7 +62,7 @@ export const TimetablePage: React.VFC<{}> = () => {
           <Heading as="h2" size="md" flexShrink={0}>
             番組表
           </Heading>
-          <div className="flex overflow-scroll">
+          <div className="flex overflow-auto scrollbar-h-1-200-600">
             {[...Array(7).keys()].map((i) => {
               const date = now.clone().add(i, "day")
               const weekday = date.format("dd")
@@ -106,7 +106,7 @@ export const TimetablePage: React.VFC<{}> = () => {
         </div>
       </div>
       <ScrollContainer
-        className="timetableScrollContainer relative overflow-auto h-full text-sm overscroll-none bg-gray-500"
+        className="timetableScrollContainer scrollbar-wh-2-200-600 relative overflow-auto h-full text-sm overscroll-none bg-gray-500"
         style={{ height: "calc(100vh - 162px)" }}
         onScroll={onScroll}
         onEndScroll={onScroll}

@@ -18,12 +18,8 @@ export const ProgramItem: React.VFC<{
   const remain = startAt.diff(dayjs(), "minute")
   const duration = (program.endAt - program.startAt) / 1000
 
-  const genre =
-    !!program.genre1 && program.genre1 in Genre && Genre[program.genre1]
-  const subGenre =
-    !!program.subGenre1 &&
-    program.genre1 in SubGenre &&
-    SubGenre[program.genre1][program.subGenre1]
+  const genre = Genre[program.genre1]
+  const subGenre = genre && SubGenre[program.genre1][program.subGenre1]
   const genreColor =
     genre && ((subGenre && genreColors[subGenre]) || genreColors[genre])
 
@@ -60,7 +56,9 @@ export const ProgramItem: React.VFC<{
             <div className="mt-2 text-sm leading-relaxed">
               {genre && (
                 <span
-                  className={`rounded-md px-2 py-1 text-gray-800 ${genreColor} mr-1`}
+                  className={`rounded-md px-2 py-1 text-gray-800 ${
+                    genreColor || "bg-gray-100"
+                  } mr-1`}
                 >
                   {genre}
                   {subGenre && ` / ${subGenre}`}
@@ -91,10 +89,10 @@ export const ProgramItem: React.VFC<{
         style={{
           top: `${Math.max(top, 0)}px`,
           left: `${channelCol * 9}rem`,
-          height: `${height}px`,
+          height: `${0 < top ? height : height + top}px`,
         }}
         className={`absolute truncate w-36 ${
-          genreColor ? genreColor : "bg-gray-100"
+          genreColor || "bg-gray-100"
         } border border-gray-400 cursor-pointer select-none`}
         title={[program.name, program.description]
           .filter((s) => !!s)

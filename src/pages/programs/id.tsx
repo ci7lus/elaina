@@ -28,28 +28,38 @@ export const ProgramIdPage: React.FC<{ id: string }> = ({ id }) => {
   const isNow = now.isBefore(endAt) && diff <= 0
   const duration = (program.endAt - program.startAt) / 1000
 
-  const genre =
-    !!program.genre1 && program.genre1 in Genre && Genre[program.genre1]
-  const subGenre =
-    !!program.subGenre1 &&
-    program.genre1 in SubGenre &&
-    SubGenre[program.genre1][program.subGenre1]
+  const genre1 = Genre[program.genre1]
+  const subGenre1 = genre1 && SubGenre[program.genre1][program.subGenre1]
+  const genre2 = Genre[program.genre2]
+  const subGenre2 = genre2 && SubGenre[program.genre2][program.subGenre2]
+  const genre3 = Genre[program.genre3]
+  const subGenre3 = genre3 && SubGenre[program.genre3][program.subGenre3]
 
   return (
     <div className="container mx-auto px-2 mt-4 flex flex-col md:flex-row md:space-x-4">
       <div className="w-full md:w-2/3">
-        <div className="text-gray-600 leading-relaxed">
-          {genre}
-          {subGenre && ` / ${subGenre}`}
-        </div>
         <div className="text-2xl">{program.name}</div>
-        <div className="text-xl mt-1 text-gray-600">
+        <div className="text-xl my-1 text-gray-600">
           {startAt.format("MM/DD HH:mm")}
           <span className={`mx-1 ${isNow && "text-red-400"}`}>
             [{Math.abs(diff)}分{0 < diff ? "後" : "前"}]
           </span>
           - {endAt.format("HH:mm")}
           <span className="ml-1">({duration / 60}分間)</span>
+        </div>
+        <div className="text-gray-600 leading-relaxed">
+          {[
+            [genre1, subGenre1],
+            [genre2, subGenre2],
+            [genre3, subGenre3],
+          ]
+            .filter(([genre]) => !!genre)
+            .map(([genre, subGenre]) => (
+              <p>
+                {genre}
+                {subGenre && ` / ${subGenre}`}
+              </p>
+            ))}
         </div>
         <div className="my-4 whitespace-pre-wrap leading-relaxed programDescription">
           <AutoLinkedText>

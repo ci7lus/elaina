@@ -42,7 +42,7 @@ export const CommentList: React.VFC<{
   )
   return (
     <div
-      className="playerCommentList block overflow-scroll overflow-y-scroll text-sm h-full"
+      className="scrollbar-w-1-200-600 block overflow-scroll overflow-y-scroll text-sm h-full"
       ref={ref}
     >
       {comments.map((i, idx) => (

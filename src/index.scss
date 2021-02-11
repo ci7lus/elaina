@@ -19,18 +19,38 @@ video::cue {
   max-height: calc(100vh - 162px);
 }
 
+.scrollbar-wh-2-200-600::-webkit-scrollbar-thumb {
+  @apply bg-gray-600;
+}
+
+.scrollbar-wh-2-200-600::-webkit-scrollbar {
+  @apply bg-gray-200;
+  @apply w-1;
+  @apply h-1;
+}
+
 .align-super {
   vertical-align: super;
 }
 
-.playerCommentList::-webkit-scrollbar-thumb {
+.scrollbar-w-1-200-600::-webkit-scrollbar-thumb {
   @apply bg-gray-600;
 }
 
-.playerCommentList::-webkit-scrollbar {
+.scrollbar-w-1-200-600::-webkit-scrollbar {
   @apply bg-gray-200;
-  width: 2px;
-  height: 0px;
+  width: 1px;
+  @apply h-0;
+}
+
+.scrollbar-h-1-200-600::-webkit-scrollbar-thumb {
+  @apply bg-gray-600;
+}
+
+.scrollbar-h-1-200-600::-webkit-scrollbar {
+  @apply bg-gray-200;
+  @apply w-0;
+  height: 1px;
 }
 
 .programDescription {
