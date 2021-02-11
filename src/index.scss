@@ -58,3 +58,7 @@ video::cue {
     @apply text-blue-600;
   }
 }
+
+.react-contexify__item--disabled {
+  opacity: 1 !important;
+}

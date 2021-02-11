@@ -83,7 +83,7 @@ export type Schedule = {
 }
 
 export type CommentPayload = {
-  channel: "jk5"
+  source: string
   no: number
   time: number
   timeMs: number
