@@ -7,6 +7,7 @@ import { SettingsPage } from "./pages/settings"
 import { ProgramIdPage } from "./pages/programs/id"
 import { RecordsPage } from "./pages/records"
 import { RecordIdPage } from "./pages/records/id"
+import { ChannelsPage } from "./pages/channels"
 
 export const programsRoute = Rocon.Path()
   .any("id", {
@@ -29,7 +30,7 @@ export const channelsRoute = Rocon.Path()
     action: ({ id }) => <ChannelIdPage id={id} />,
   })
   .exact({
-    action: () => <div className="container mx-auto px-2">channels</div>,
+    action: () => <ChannelsPage />,
   })
 
 export const routes = Rocon.Path()

@@ -73,7 +73,7 @@ export type Channel = {
   name: string
   halfWidthName: string
   hasLogoData: boolean
-  channelType: "GR"
+  channelType: "GR" | "BS" | "SKY"
   channel: string
 }
 

@@ -78,6 +78,9 @@ export class EPGStationAPI {
     )
     return data.streamId
   }
+  getChannelLogoUrl({ id }: { id: number }) {
+    return `${this.url}/channels/${id}/logo`
+  }
   get isAuthorizationEnabled() {
     return !!(this.user && this.pass)
   }

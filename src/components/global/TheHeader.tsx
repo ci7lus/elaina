@@ -32,12 +32,13 @@ export const TheHeader: React.VFC<{}> = () => {
               </div>
             </div>
           </Link>
-          <div className="flex items-center space-x-4 text-sm">
+          <div className="flex items-center space-x-5 text-sm">
+            <Link route={routes._.channels} className="hover:text-gray-300">
+              <div className="flex items-center justify-start my-1">放送中</div>
+            </Link>
             <Link route={routes._.timetable} className="hover:text-gray-300">
               <div className="flex items-center justify-start my-1">番組表</div>
             </Link>
-          </div>
-          <div className="flex items-center space-x-4 text-sm">
             <Link route={routes._.records} className="hover:text-gray-300">
               <div className="flex items-center justify-start my-1">録画済</div>
             </Link>
