@@ -100,15 +100,3 @@ export type Genre = {
   sub: string
   count: number
 }
-
-export type CommentStats = {
-  nico?: {
-    source: string
-    comments: number
-    commentsPerMinute: number
-    viewers: number
-    adPoints: number
-    giftPoints: number
-  }
-  twitter: { source: string; comments: number; commentsPerMinute: number }[]
-}

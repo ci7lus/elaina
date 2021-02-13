@@ -1,7 +1,7 @@
 import axios from "axios"
 import type { SayaSetting } from "../types/setting"
-import type { CommentStats } from "../types/struct"
 import querystring from "querystring"
+import type { ChannelComment, CommentStats } from "../types/saya"
 
 export class SayaAPI {
   public url: string
@@ -63,6 +63,16 @@ export class SayaAPI {
   async getCommentStatus(serviceId: number) {
     const { data } = await this.client.get<CommentStats>(
       `status/comments/${serviceId}`
+    )
+    return data
+  }
+  async getChannelComments() {
+    const { data } = await this.client.get<ChannelComment[]>("comments")
+    return data
+  }
+  async getChannelComment({ id }: { id: number }) {
+    const { data } = await this.client.get<ChannelComment>(
+      `comments/${id}/info`
     )
     return data
   }

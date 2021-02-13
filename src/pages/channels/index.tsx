@@ -16,6 +16,7 @@ import { Genre, SubGenre } from "../../constants"
 import { genreColors } from "../../utils/genres"
 import { ChevronsRight } from "react-feather"
 import { useBackend } from "../../hooks/backend"
+import { useChannelComments, useSaya } from "../../hooks/saya"
 
 export const ChannelsPage: React.VFC<{}> = () => {
   const now = useNow()
@@ -25,6 +26,8 @@ export const ChannelsPage: React.VFC<{}> = () => {
   const { filteredSchedules } = useSchedules({
     startAt: startAt.toDate().getTime(),
   })
+
+  const { channelComments } = useChannelComments()
 
   const _selected = { color: "white", bg: "blue.400" }
 
@@ -73,6 +76,9 @@ export const ChannelsPage: React.VFC<{}> = () => {
                   const logo =
                     channel.hasLogoData === true &&
                     backend.getChannelLogoUrl({ id: channel.id })
+                  const channelComment = channelComments?.find((ch) =>
+                    ch.channel.serviceIds.includes(channel.serviceId)
+                  )
                   return (
                     <Link
                       key={channel.id}
@@ -122,6 +128,11 @@ export const ChannelsPage: React.VFC<{}> = () => {
                               )}分後] - ${nextProgram.name}`
                             : "なし"}
                         </div>
+                        {channelComment && channelComment.last && (
+                          <div className="truncate p-2 mt-2 leading-snug bg-gray-100 rounded-md">
+                            {channelComment.last}
+                          </div>
+                        )}
                       </div>
                     </Link>
                   )
