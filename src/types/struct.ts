@@ -83,6 +83,7 @@ export type Schedule = {
 }
 
 export type CommentPayload = {
+  sourceUrl: string | null
   source: string
   no: number
   time: number

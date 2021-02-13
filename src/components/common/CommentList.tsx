@@ -115,17 +115,6 @@ export const CommentList: React.VFC<{
           console.error(error)
         }
         break
-      case "copySource":
-        try {
-          await navigator.clipboard.writeText(props.source)
-          toast.addToast("ソースをコピーしました", {
-            appearance: "success",
-            autoDismiss: true,
-          })
-        } catch (error) {
-          console.error(error)
-        }
-        break
     }
   }
 
@@ -152,14 +141,21 @@ export const CommentList: React.VFC<{
         </Item>
         <Separator />
         <Item id="copyAuthor" onClick={handleItemClick}>
-          {ctxComment && ctxComment.author}
+          {ctxComment?.author}
         </Item>
         <Item id="copyTime" onClick={handleItemClick}>
           {ctxComment &&
             dayjs(ctxComment.time * 1000 + ctxComment.timeMs).format()}
         </Item>
-        <Item id="copySource" onClick={handleItemClick}>
-          {ctxComment && ctxComment.source}
+        <Item id="copySource" disabled>
+          {ctxComment &&
+            (ctxComment?.sourceUrl ? (
+              <a href={ctxComment.sourceUrl} target="_blank">
+                {ctxComment.source}
+              </a>
+            ) : (
+              ctxComment.source
+            ))}
         </Item>
       </Menu>
     </div>
