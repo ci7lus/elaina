@@ -200,4 +200,11 @@ export class EPGStationAPI {
     )
     return data
   }
+  async getRecordings({ offset, limit }: { offset?: number; limit?: number }) {
+    const { data } = await this.client.get<{ records: ProgramRecord[] }>(
+      "api/recording",
+      { params: { isHalfWidth: true, offset, limit } }
+    )
+    return data.records
+  }
 }
