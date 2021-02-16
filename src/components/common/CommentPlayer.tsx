@@ -120,9 +120,12 @@ export const CommentPlayer: React.VFC<{
   }, [hlsUrl])
 
   useEffect(() => {
-    if (!comment || player.current?.video.paused === true) return
-    const payload = { ...comment, text: trimCommentForFlow(comment.text) }
-    player.current?.danmaku.draw(payload)
+    if (!player.current || !comment || player.current.video.paused === true)
+      return
+    const commentText = trimCommentForFlow(comment.text)
+    if (commentText.trim().length === 0) return
+    const payload = { ...comment, text: commentText }
+    player.current.danmaku.draw(payload)
   }, [comment])
 
   useEffect(() => {

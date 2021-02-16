@@ -30,9 +30,10 @@ export const backendSettingAtom = atom<BackendSetting>({
 
 export const playerSettingAtom = atom<PlayerSetting>({
   key: `${prefix}:player`,
-  default: { commentDelay: null },
+  default: { commentDelay: null, recordCommentDelay: 1 },
 })
 
 export const playerSettingParser = $.object({
-  commentDelay: $.number().nullable(),
+  commentDelay: $.number().nullable().optional(),
+  recordCommentDelay: $.number().nullable().optional(),
 })

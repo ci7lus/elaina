@@ -17,6 +17,8 @@ import { wait } from "../../utils/wait"
 import { useRefState } from "../../hooks/util"
 import { useToasts } from "react-toast-notifications"
 import { CaptureButton } from "../../components/common/CaptureButton"
+import { useRecoilValue } from "recoil"
+import { playerSettingAtom } from "../../atoms/setting"
 
 export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
   const saya = useSaya()
@@ -55,6 +57,8 @@ export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
     setHlsUrl(backend.getHlsStreamUrl({ id: currentStreamId }))
   }, [currentStreamId])
 
+  const playerSetting = useRecoilValue(playerSettingAtom)
+
   const [comments, setComments] = useState<CommentPayload[]>([])
   const [comment, setComment] = useState<CommentPayload | null>(null)
 
@@ -72,7 +76,13 @@ export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
   const socket = useRef<ReconnectingWebSocket | null>()
 
   const syncToPosition = () =>
-    send({ action: "Sync", seconds: positionRef.current })
+    send({
+      action: "Sync",
+      seconds: Math.max(
+        positionRef.current - (playerSetting.recordCommentDelay ?? 1),
+        0
+      ),
+    })
 
   const [isLoading, setIsLoading, isLoadingRef] = useRefState(false)
 
