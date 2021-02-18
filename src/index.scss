@@ -19,6 +19,16 @@ video::cue {
   max-height: calc(100vh - 162px);
 }
 
+.scrollbar-wh-4-200-600::-webkit-scrollbar-thumb {
+  @apply bg-gray-600;
+}
+
+.scrollbar-wh-4-200-600::-webkit-scrollbar {
+  @apply bg-gray-200;
+  @apply w-2;
+  @apply h-2;
+}
+
 .scrollbar-wh-2-200-600::-webkit-scrollbar-thumb {
   @apply bg-gray-600;
 }
@@ -41,6 +51,16 @@ video::cue {
   @apply bg-gray-200;
   width: 1px;
   @apply h-0;
+}
+
+.scrollbar-h-2-200-600::-webkit-scrollbar-thumb {
+  @apply bg-gray-200;
+}
+
+.scrollbar-h-2-200-600::-webkit-scrollbar {
+  @apply bg-gray-600;
+  @apply w-0;
+  @apply h-1;
 }
 
 .scrollbar-h-1-200-600::-webkit-scrollbar-thumb {
