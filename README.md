@@ -21,10 +21,11 @@ yarn build
 
 ## 謝辞
 
-elaina および [SlashNephy/saya](https://github.com/SlashNephy/saya) は次のプロジェクトを利用/参考にして実装しています。
+elaina および [SlashNephy/saya](https://github.com/SlashNephy/saya) は次のプロジェクトを参考にして実装しています。
 
+- [Chinachu/Chinachu](https://github.com/Chinachu/Chinachu)
 - [tsukumijima/TVRemotePlus](https://github.com/tsukumijima/TVRemotePlus)
-- [tsukumijima/jikkyo-api](https://github.com/tsukumijima/jikkyo-api)
+- [l3tnun/EPGStation](https://github.com/l3tnun/EPGStation)
 
 DTV 実況コミュニティの皆さまに感謝します。
 
