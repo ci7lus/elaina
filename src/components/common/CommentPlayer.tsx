@@ -6,7 +6,7 @@ import DPlayer, {
 } from "dplayer"
 import { CommentPayload } from "../../types/struct"
 import Hls from "hls-b24.js"
-import * as b24 from "aribb24.js"
+import * as aribb24 from "aribb24.js"
 import { useUpdateEffect } from "react-use"
 import { Spinner } from "@chakra-ui/react"
 import { useBackend } from "../../hooks/backend"
@@ -53,7 +53,7 @@ export const CommentPlayer: React.VFC<{
         hls.loadSource(video.src)
         hls.attachMedia(video)
 
-        const b24Renderer = new b24.CanvasRenderer({
+        const b24Renderer = new aribb24.CanvasRenderer({
           forceStrokeColor: "black",
         })
         b24Renderer.attachMedia(video)
