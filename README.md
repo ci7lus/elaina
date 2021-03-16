@@ -1,4 +1,4 @@
-# elaina
+# <img src="https://i.gyazo.com/297a60290f2b9ecc7b766ac532841fd7.jpg" alt="elaina logo" width="20px"> elaina
 
 鋭意開発中
 
