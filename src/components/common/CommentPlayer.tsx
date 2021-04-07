@@ -53,7 +53,7 @@ export const CommentPlayer: React.VFC<{
         hls.loadSource(video.src)
         hls.attachMedia(video)
 
-        const b24Renderer = new aribb24.CanvasRenderer({
+        const b24Renderer = new aribb24.CanvasB24Renderer({
           forceStrokeColor: "black",
         })
         b24Renderer.attachMedia(video)
