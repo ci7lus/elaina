@@ -37,6 +37,9 @@ jobs:
       - name: Lint
         run: |
           yarn lint
+      - name: Type inspection
+        run: |
+          yarn tsc
   build:
     runs-on: ubuntu-latest
 
