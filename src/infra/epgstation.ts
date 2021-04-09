@@ -32,7 +32,7 @@ export class EPGStationAPI {
             }
           : {}),
       },
-      timeout: 5000,
+      timeout: 1000 * 30,
     })
   }
 

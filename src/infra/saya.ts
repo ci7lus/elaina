@@ -33,7 +33,7 @@ export class SayaAPI {
             }
           : {}),
       },
-      timeout: 5000,
+      timeout: 1000 * 30,
     })
   }
 
