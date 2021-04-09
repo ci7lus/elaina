@@ -66,6 +66,8 @@ export type ProgramRecord = {
   isProtected: boolean
 }
 
+export type ChannelType = "GR" | "BS" | "SKY"
+
 export type Channel = {
   id: number
   serviceId: number
@@ -73,7 +75,7 @@ export type Channel = {
   name: string
   halfWidthName: string
   hasLogoData: boolean
-  channelType: "GR" | "BS" | "SKY"
+  channelType: ChannelType
   channel: string
 }
 

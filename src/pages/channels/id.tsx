@@ -118,7 +118,8 @@ export const ChannelIdPage: React.FC<{ id: string }> = ({ id }) => {
     let s: ReconnectingWebSocket
     if (saya) {
       const wsUrl = saya.getLiveCommentSocketUrl({
-        id: schedule.channel.id,
+        channelType: schedule.channel.channelType,
+        serviceId: schedule.channel.serviceId,
       })
       s = new ReconnectingWebSocket(wsUrl)
       s.addEventListener("message", (e) => {

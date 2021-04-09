@@ -127,11 +127,12 @@ export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
   )
 
   useUpdateEffect(() => {
-    if (!record) return
+    if (!record || !channel) return
     let s: ReconnectingWebSocket
     if (saya) {
       const wsUrl = saya.getRecordCommentSocketUrl({
-        id: record.channelId,
+        channelType: channel.channelType,
+        serviceId: channel.serviceId,
         startAt: record.startAt / 1000,
         endAt: record.endAt / 1000,
       })
@@ -162,7 +163,7 @@ export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
     return () => {
       s?.close()
     }
-  }, [record])
+  }, [record, channel])
 
   const playerContainerRef = useRef<HTMLDivElement>(null)
   const [commentsHeight, setCommentsHeight] = useState(

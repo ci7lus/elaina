@@ -2,6 +2,7 @@ import axios from "axios"
 import type { SayaSetting } from "../types/setting"
 import querystring from "querystring"
 import type { ChannelComment, CommentStats } from "../types/saya"
+import { ChannelType } from "../types/struct"
 
 export class SayaAPI {
   public url: string
@@ -37,19 +38,29 @@ export class SayaAPI {
     })
   }
 
-  getLiveCommentSocketUrl({ id }: { id: number }) {
-    return `${this.wsUrl}/comments/${id}/live`
+  getLiveCommentSocketUrl({
+    channelType,
+    serviceId,
+  }: {
+    channelType: ChannelType
+    serviceId: number
+  }) {
+    return `${this.wsUrl}/comments/${channelType}_${serviceId}/live`
   }
   getRecordCommentSocketUrl({
-    id,
+    channelType,
+    serviceId,
     startAt,
     endAt,
   }: {
-    id: number
+    channelType: ChannelType
+    serviceId: number
     startAt: number
     endAt: number
   }) {
-    return `${this.wsUrl}/comments/${id}/timeshift?${querystring.stringify({
+    return `${
+      this.wsUrl
+    }/comments/${channelType}_${serviceId}/timeshift?${querystring.stringify({
       startAt,
       endAt,
     })}`
@@ -70,9 +81,15 @@ export class SayaAPI {
     const { data } = await this.client.get<ChannelComment[]>("comments")
     return data
   }
-  async getChannelComment({ id }: { id: number }) {
+  async getChannelComment({
+    channelType,
+    serviceId,
+  }: {
+    channelType: ChannelType
+    serviceId: number
+  }) {
     const { data } = await this.client.get<ChannelComment>(
-      `comments/${id}/info`
+      `comments/${channelType}_${serviceId}/info`
     )
     return data
   }

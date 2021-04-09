@@ -1,3 +1,5 @@
+import { ChannelType } from "./struct"
+
 export type CommentStats = {
   nico?: {
     source: string
@@ -13,7 +15,7 @@ export type CommentStats = {
 export type ChannelComment = {
   channel: {
     name: string
-    type: "GR" | "BS" | "SKY"
+    type: ChannelType
     serviceIds: number[]
     nicojkId: number
     hasOfficialNicolive: boolean
@@ -30,7 +32,7 @@ export type ChannelComment = {
     logoId: number | null
     keyId: number
     channel: string
-    type: "GR" | "BS" | "SKY"
+    type: ChannelType
   } | null
   force: number
   last: string
