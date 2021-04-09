@@ -9,6 +9,7 @@ import { useNow } from "./date"
 
 export const useSaya = () => {
   const sayaSetting = useRecoilValue(sayaSettingAtom)
+  if (!sayaSetting.url) return
   return new SayaAPI(sayaSetting)
 }
 
@@ -21,6 +22,7 @@ export const useChannelComments = () => {
   const now = useNow()
 
   useEffect(() => {
+    if (!saya) return
     saya
       .getChannelComments()
       .then((comments) => setChannelComments(comments))

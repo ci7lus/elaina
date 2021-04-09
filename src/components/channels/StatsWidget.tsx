@@ -16,6 +16,7 @@ export const StatsWidget: React.VFC<{
   const [stats, setStats] = useState<CommentStats | null>(null)
   const reload = () => {
     setLoading(true)
+    if (!saya) return
     saya
       .getCommentStatus(serviceId)
       .then((stats) => {

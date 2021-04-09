@@ -16,7 +16,7 @@ import { Genre, SubGenre } from "../../constants"
 import { genreColors } from "../../utils/genres"
 import { ChevronsRight } from "react-feather"
 import { useBackend } from "../../hooks/backend"
-import { useChannelComments, useSaya } from "../../hooks/saya"
+import { useChannelComments } from "../../hooks/saya"
 
 export const ChannelsPage: React.VFC<{}> = () => {
   const now = useNow()

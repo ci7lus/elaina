@@ -128,36 +128,39 @@ export const RecordIdPage: React.FC<{ id: string }> = ({ id }) => {
 
   useUpdateEffect(() => {
     if (!record) return
-    const wsUrl = saya.getRecordCommentSocketUrl({
-      id: record.channelId,
-      startAt: record.startAt / 1000,
-      endAt: record.endAt / 1000,
-    })
+    let s: ReconnectingWebSocket
+    if (saya) {
+      const wsUrl = saya.getRecordCommentSocketUrl({
+        id: record.channelId,
+        startAt: record.startAt / 1000,
+        endAt: record.endAt / 1000,
+      })
 
-    let isFirst = true
-    const s = new ReconnectingWebSocket(wsUrl)
-    s.reconnect()
-    s.addEventListener("message", (e) => {
-      const payload: CommentPayload = JSON.parse(e.data)
-      setComment(payload)
-      setComments((comments) => [...comments, payload])
-    })
-    s.addEventListener("open", () => {
-      if (isFirst) {
-        isFirst = false
-        return
-      }
-      syncToPosition()
-      send({ action: "Ready" })
-    })
-    socket.current = s
+      let isFirst = true
+      s = new ReconnectingWebSocket(wsUrl)
+      s.reconnect()
+      s.addEventListener("message", (e) => {
+        const payload: CommentPayload = JSON.parse(e.data)
+        setComment(payload)
+        setComments((comments) => [...comments, payload])
+      })
+      s.addEventListener("open", () => {
+        if (isFirst) {
+          isFirst = false
+          return
+        }
+        syncToPosition()
+        send({ action: "Ready" })
+      })
+      socket.current = s
+    }
 
     claimRecordStream(positionRef.current).then(() => {
       send({ action: "Ready" })
     })
 
     return () => {
-      s.close()
+      s?.close()
     }
   }, [record])
 

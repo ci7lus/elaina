@@ -28,7 +28,7 @@ export const SettingsPage = () => {
             <div>
               <BackendSettingForm />
             </div>
-            <div>
+            <div className="mt-4">
               <SayaSettingForm />
             </div>
           </TabPanel>

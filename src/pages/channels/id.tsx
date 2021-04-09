@@ -115,22 +115,25 @@ export const ChannelIdPage: React.FC<{ id: string }> = ({ id }) => {
 
   useEffect(() => {
     if (!schedule) return
-    const wsUrl = saya.getLiveCommentSocketUrl({
-      id: schedule.channel.id,
-    })
-    const s = new ReconnectingWebSocket(wsUrl)
-    s.addEventListener("message", (e) => {
-      const payload: CommentPayload = JSON.parse(e.data)
-      setTimeout(() => {
-        setComment(payload)
-        setComments((comments) => [...comments, payload])
-      }, Math.abs((playerSetting.commentDelay || 0) * 1000 - payload.timeMs || 0))
-    })
-    socket.current = s
+    let s: ReconnectingWebSocket
+    if (saya) {
+      const wsUrl = saya.getLiveCommentSocketUrl({
+        id: schedule.channel.id,
+      })
+      s = new ReconnectingWebSocket(wsUrl)
+      s.addEventListener("message", (e) => {
+        const payload: CommentPayload = JSON.parse(e.data)
+        setTimeout(() => {
+          setComment(payload)
+          setComments((comments) => [...comments, payload])
+        }, Math.abs((playerSetting.commentDelay || 0) * 1000 - payload.timeMs || 0))
+      })
+      socket.current = s
+    }
 
     claimChannelStream()
     return () => {
-      s.close()
+      s?.close()
     }
   }, [schedule])
 

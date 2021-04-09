@@ -25,9 +25,8 @@ const UsedRoutes: React.VFC<{}> = () => {
 }
 
 const Routes: React.VFC<{}> = () => {
-  const sayaSetting = useRecoilValue(sayaSettingAtom)
   const backendSetting = useRecoilValue(backendSettingAtom)
-  if (!sayaSetting.url || !backendSetting.url) return <InitialSettingPage />
+  if (!backendSetting.url) return <InitialSettingPage />
   return <UsedRoutes />
 }
 
