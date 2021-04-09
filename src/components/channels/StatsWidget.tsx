@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react"
 import { RefreshCw } from "react-feather"
 import { useNow } from "../../hooks/date"
 import { useSaya } from "../../hooks/saya"
-import { CommentStats } from "../../types/struct"
+import { CommentStats } from "../../types/saya"
 
 export const StatsWidget: React.VFC<{
   serviceId: number

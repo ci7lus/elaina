@@ -24,10 +24,9 @@ export const BackendSettingForm: React.FC<{}> = () => {
         <span>EPGStation の URL</span>
         <Input
           bgColor="gray.50"
-          name="url"
           placeholder="https://..."
           defaultValue={backendSetting.url || ""}
-          ref={register}
+          {...register("url")}
         />
       </label>
       <Heading as="h3" size="md" mt="4" mb="2">
@@ -37,21 +36,19 @@ export const BackendSettingForm: React.FC<{}> = () => {
         <span>ユーザー名</span>
         <Input
           bgColor="gray.50"
-          name="user"
           placeholder="elaina"
           defaultValue={backendSetting.user || ""}
-          ref={register}
+          {...register("user")}
         />
       </label>
       <label className="mt-2">
         <span>パスワード</span>
         <Input
           bgColor="gray.50"
-          name="pass"
           type="password"
           autoComplete="true"
           defaultValue={backendSetting.pass || ""}
-          ref={register}
+          {...register("pass")}
         />
       </label>
       <Button size="md" colorScheme="blue" type="submit" mt="4">

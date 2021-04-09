@@ -9,6 +9,6 @@ export type SayaSetting = UpstreamSetting
 export type BackendSetting = SayaSetting
 
 export type PlayerSetting = {
-  commentDelay: number | null
-  recordCommentDelay: number | null
+  commentDelay?: number | null
+  recordCommentDelay?: number | null
 }
