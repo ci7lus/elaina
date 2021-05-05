@@ -5,15 +5,15 @@ import DPlayer, {
   DPlayerVideoQuality,
 } from "dplayer"
 import { CommentPayload } from "../../types/struct"
-import Hls from "hls-b24.js"
+import mpegts from "mpegts.js"
 import * as aribb24 from "aribb24.js"
 import { useUpdateEffect } from "react-use"
 import { Spinner } from "@chakra-ui/react"
 import { useBackend } from "../../hooks/backend"
 import { trimCommentForFlow } from "../../utils/comment"
 
-export const CommentPlayer: React.VFC<{
-  hlsUrl: string | null
+export const CommentM2tsPlayer: React.VFC<{
+  liveUrl: string | null
   comment: CommentPayload | null
   isLive: boolean
   isAutoPlay: boolean
@@ -21,7 +21,7 @@ export const CommentPlayer: React.VFC<{
   onPositionChange?: React.Dispatch<React.SetStateAction<number>>
   onPauseChange?: (b: boolean) => unknown
 }> = ({
-  hlsUrl,
+  liveUrl,
   comment,
   isLive,
   isAutoPlay,
@@ -30,28 +30,37 @@ export const CommentPlayer: React.VFC<{
   onPauseChange,
 }) => {
   const backend = useBackend()
-  const hlsInstance = useRef<Hls | null>(null)
+  const mpegTsInstance = useRef<mpegts.Player | null>(null)
   const isPlaying = useRef(false)
-  const videoPayload: (hlsUrl: string) => DPlayerVideo = (hlsUrl) => ({
+  const videoPayload: (hlsUrl: string) => DPlayerVideo = (liveUrl) => ({
     type: "customHls",
-    url: hlsUrl,
+    url: liveUrl,
     customType: {
       customHls: (video: HTMLVideoElement, player: DPlayer) => {
-        if (hlsInstance.current) {
-          hlsInstance.current.destroy()
-          hlsInstance.current = null
+        if (mpegTsInstance.current) {
+          mpegTsInstance.current.destroy()
+          mpegTsInstance.current = null
         }
-        const hls = new Hls()
-
-        if (backend.isAuthorizationEnabled) {
-          hls.config.xhrSetup = (xhr, url) => {
-            xhr.setRequestHeader("Authorization", backend.authorizationToken)
+        const mpegtsPlayer = mpegts.createPlayer(
+          {
+            type: "mpegts",
+            isLive: true,
+            url: video.src,
+          },
+          {
+            isLive: true,
+            enableWorker: true,
+            headers: backend.isAuthorizationEnabled
+              ? {
+                  Authorization: backend.authorizationToken,
+                }
+              : {},
           }
-        }
-        hls.config.autoStartLoad = isLive
+        )
 
-        hls.loadSource(video.src)
-        hls.attachMedia(video)
+        mpegtsPlayer.attachMediaElement(video)
+        mpegtsPlayer.load()
+        mpegtsPlayer.play()
 
         const b24Renderer = new aribb24.CanvasB24Renderer({
           forceStrokeColor: "black",
@@ -65,22 +74,18 @@ export const CommentPlayer: React.VFC<{
         player.on("subtitle_hide" as DPlayerEvents.subtitle_hide, () => {
           b24Renderer.hide()
         })
-        hls.on(Hls.Events.FRAG_PARSING_PRIVATE_DATA, (event, data) => {
-          for (const sample of data.samples) {
-            b24Renderer.pushData(sample.pid, sample.data, sample.pts)
-          }
+        mpegtsPlayer.on(mpegts.Events.PES_PRIVATE_DATA_ARRIVED, (data) => {
+          b24Renderer.pushData(data.pid, data.data, data.pts)
         })
-        hls.on(Hls.Events.DESTROYING, () => {
+        /*hls.on(Hls.Events.DESTROYING, () => {
           b24Renderer.dispose()
-        })
+        })*/
 
         player.on("pause" as DPlayerEvents.pause, () => {
-          !isLive && hls.stopLoad()
           onPauseChange && onPauseChange(true)
           isPlaying.current = false
         })
         player.on("play" as DPlayerEvents.play, () => {
-          !isLive && hls.startLoad()
           onPauseChange && onPauseChange(false)
           isPlaying.current = true
         })
@@ -94,10 +99,10 @@ export const CommentPlayer: React.VFC<{
         })
 
         player.on("destroy" as DPlayerEvents.destroy, () => {
-          hls.destroy()
+          mpegtsPlayer.destroy()
         })
 
-        hlsInstance.current = hls
+        mpegTsInstance.current = mpegtsPlayer
       },
     },
   })
@@ -113,11 +118,11 @@ export const CommentPlayer: React.VFC<{
   const player = useRef<DPlayer | null>()
 
   useUpdateEffect(() => {
-    if (!player.current || !hlsUrl) return
+    if (!player.current || !liveUrl) return
     player.current.pause()
-    player.current.switchVideo(videoPayload(hlsUrl), danmaku)
+    player.current.switchVideo(videoPayload(liveUrl), danmaku)
     player.current.play()
-  }, [hlsUrl])
+  }, [liveUrl])
 
   useEffect(() => {
     if (!player.current || !comment || player.current.video.paused === true)
@@ -129,13 +134,13 @@ export const CommentPlayer: React.VFC<{
   }, [comment])
 
   useEffect(() => {
-    if (!hlsUrl) return
+    if (!liveUrl) return
     const playerInstance = new DPlayer({
       container: dplayerElementRef.current,
       live: isLive,
       autoplay: isAutoPlay,
       screenshot: true,
-      video: videoPayload(hlsUrl),
+      video: videoPayload(liveUrl),
       danmaku,
       lang: "ja-jp",
       pictureInPicture: true,
@@ -159,7 +164,6 @@ export const CommentPlayer: React.VFC<{
     })
 
     player.current = playerInstance
-    hlsInstance.current?.stopLoad()
 
     const timer = setInterval(() => {
       if (isPlaying.current) {
@@ -168,24 +172,24 @@ export const CommentPlayer: React.VFC<{
     }, 1000)
 
     return () => {
-      hlsInstance.current?.destroy()
+      mpegTsInstance.current?.destroy()
       player.current?.destroy()
       player.current = null
       clearInterval(timer)
     }
-  }, [hlsUrl])
+  }, [liveUrl])
   return (
     <div
       className="relative bg-black"
       style={{ paddingTop: "56.25%" }}
       ref={playerWrapRef}
     >
-      {hlsUrl && (
+      {liveUrl && (
         <div className="absolute left-0 top-0 w-full h-full">
           <div ref={dplayerElementRef}></div>
         </div>
       )}
-      {(!hlsUrl || isLoading) && (
+      {(!liveUrl || isLoading) && (
         <div className="absolute left-0 top-0 h-full w-full flex items-center justify-center pointer-events-none">
           <Spinner size="xl" color="gray.100" speed="1s" />
         </div>

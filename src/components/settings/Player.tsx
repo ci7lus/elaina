@@ -5,6 +5,7 @@ import {
   NumberInput,
   NumberInputField,
   NumberInputStepper,
+  Switch,
 } from "@chakra-ui/react"
 import React, { useState } from "react"
 import { useToasts } from "react-toast-notifications"
@@ -18,9 +19,16 @@ export const PlayerSettingForm: React.VFC<{}> = () => {
   const [recordCommentDelay, setRecordCommentDelay] = useState(
     playerSetting.recordCommentDelay
   )
+  const [useMpegTs, setUseMpegTs] = useState(playerSetting.useMpegTs)
+  const [mpegTsMode, setMpegTsMode] = useState(playerSetting.mpegTsMode)
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    setPlayerSetting({ commentDelay, recordCommentDelay })
+    setPlayerSetting({
+      commentDelay,
+      recordCommentDelay,
+      useMpegTs,
+      mpegTsMode,
+    })
     toast.addToast("設定を保存しました", {
       appearance: "success",
       autoDismiss: true,
@@ -65,6 +73,41 @@ export const PlayerSettingForm: React.VFC<{}> = () => {
           </span>
         </label>
       </div>
+      <div className="mt-2">
+        <label>
+          <span className="block">Mpegts設定</span>
+          <Switch
+            id="use-mpeg-ts"
+            className="my-2 block"
+            size="md"
+            isChecked={useMpegTs ?? false}
+            onChange={() => setUseMpegTs((value) => !value)}
+          />
+          <span className="block text-sm text-gray-600">
+            [実験的] mpegts.jsを利用したブラウザでのm2tsデコードを使用できます
+          </span>
+        </label>
+      </div>
+      {useMpegTs && (
+        <div className="mt-2">
+          <label>
+            <span className="block">Mpegts用プリセット番号</span>
+            <NumberInput
+              value={mpegTsMode ?? 1}
+              onChange={(value) => setMpegTsMode(parseInt(value))}
+            >
+              <NumberInputField bgColor="gray.50" />
+              <NumberInputStepper>
+                <NumberIncrementStepper />
+                <NumberDecrementStepper />
+              </NumberInputStepper>
+            </NumberInput>
+            <span className="block text-sm text-gray-600">
+              利用するストリームを指定してください
+            </span>
+          </label>
+        </div>
+      )}
       <Button size="md" colorScheme="blue" type="submit" mt="4">
         保存
       </Button>

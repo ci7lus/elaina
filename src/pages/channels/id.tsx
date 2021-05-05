@@ -19,6 +19,7 @@ import { useBackend } from "../../hooks/backend"
 import { wait } from "../../utils/wait"
 import { CaptureButton } from "../../components/common/CaptureButton"
 import { useRefState } from "../../hooks/util"
+import { CommentM2tsPlayer } from "../../components/common/CommentM2tsPlayer"
 
 export const ChannelIdPage: React.FC<{ id: string }> = ({ id }) => {
   const saya = useSaya()
@@ -27,9 +28,9 @@ export const ChannelIdPage: React.FC<{ id: string }> = ({ id }) => {
   const [schedule, setSchedule] = useState<Schedule | null | false>(null)
 
   const [currentStreamId, setCurrentStream, currentStreamRef] = useRefState(-1)
-  const [hlsUrl, setHlsUrl] = useState<string | null>(null)
+  const [liveUrl, setLiveUrl] = useState<string | null>(null)
   useUpdateEffect(() => {
-    setHlsUrl(backend.getHlsStreamUrl({ id: currentStreamId }))
+    setLiveUrl(backend.getHlsStreamUrl({ id: currentStreamId }))
   }, [currentStreamId])
 
   const isMounting = useRef(true)
@@ -132,7 +133,16 @@ export const ChannelIdPage: React.FC<{ id: string }> = ({ id }) => {
       socket.current = s
     }
 
-    claimChannelStream()
+    if (playerSetting.useMpegTs) {
+      setLiveUrl(
+        backend.getM2tsStreamUrl({
+          id: schedule.channel.id,
+          mode: playerSetting.mpegTsMode!,
+        })
+      )
+    } else {
+      claimChannelStream()
+    }
     return () => {
       s?.close()
     }
@@ -172,13 +182,23 @@ export const ChannelIdPage: React.FC<{ id: string }> = ({ id }) => {
     <div className="md:container mx-auto md:mt-8 md:px-2">
       <div className="flex flex-col md:flex-row items-start justify-around">
         <div className="w-full md:w-2/3" ref={playerContainerRef}>
-          <CommentPlayer
-            hlsUrl={hlsUrl}
-            comment={comment}
-            isLive={true}
-            isAutoPlay={true}
-            isLoading={isLoading}
-          />
+          {playerSetting.useMpegTs ? (
+            <CommentM2tsPlayer
+              liveUrl={liveUrl}
+              comment={comment}
+              isLive={true}
+              isAutoPlay={true}
+              isLoading={isLoading}
+            />
+          ) : (
+            <CommentPlayer
+              hlsUrl={liveUrl}
+              comment={comment}
+              isLive={true}
+              isAutoPlay={true}
+              isLoading={isLoading}
+            />
+          )}
         </div>
         <div
           className="bg-gray-50 w-full md:w-1/3 flex flex-col"

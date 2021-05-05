@@ -31,6 +31,7 @@
     "hls-b24.js": "^1.0.0-beta.4.0.canary.6766",
     "interweave": "^12.7.1",
     "interweave-autolink": "^4.4.1",
+    "mpegts.js": "^1.6.5",
     "react": "^17.0.2",
     "react-contexify": "^5.0.0",
     "react-dom": "^17.0.2",

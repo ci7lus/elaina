@@ -11,4 +11,6 @@ export type BackendSetting = SayaSetting
 export type PlayerSetting = {
   commentDelay?: number | null
   recordCommentDelay?: number | null
+  useMpegTs?: boolean | null
+  mpegTsMode: number | null
 }

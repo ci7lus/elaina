@@ -61,6 +61,11 @@ export class EPGStationAPI {
   getHlsStreamUrl({ id }: { id: number }) {
     return `${this.url}/streamfiles/stream${id}.m3u8`
   }
+  getM2tsStreamUrl({ id, mode = 0 }: { id: number; mode?: number }) {
+    return `${this.url}/api/streams/live/${id}/m2ts?${querystring.stringify({
+      mode,
+    })}`
+  }
   async startRecordHlsStream({
     id,
     ss = 0,
