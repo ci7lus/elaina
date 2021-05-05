@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react"
 import { Heading } from "@chakra-ui/react"
-import ScrollContainer from "react-indiana-drag-scroll"
+import ScrollContainer, { ScrollEvent } from "react-indiana-drag-scroll"
 import { useSchedules } from "../../hooks/television"
 import { TimetableProgramList } from "../../components/timetable/Programs"
 import { LeftTimeBar } from "../../components/timetable/TimetableParts"
@@ -111,8 +111,9 @@ export const TimetablePage: React.VFC<{}> = () => {
       <ScrollContainer
         className="timetableScrollContainer scrollbar-wh-4-200-600 relative overflow-auto h-full text-sm overscroll-none bg-gray-500"
         style={{ height: "calc(100vh - 162px)" }}
-        onScroll={onScroll}
-        onEndScroll={onScroll}
+        // ignore broken type
+        onScroll={onScroll as any}
+        onEndScroll={onScroll as any}
         innerRef={scrollRef}
         hideScrollbars={false}
       >
