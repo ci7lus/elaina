@@ -70,3 +70,19 @@ jobs:
       - name: Build
         run: |
           yarn build
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: dist
+          path: dist
+      - name: Prepare to deploy to surge
+        run: |
+          cp dist/index.html dist/200.html
+      - name: Deploy to surge
+        if: ${{ github.repository_owner == 'ci7lus' }}
+        uses: dswistowski/surge-sh-action@v1
+        with:
+          domain: "elaina.surge.sh"
+          project: "./dist"
+          login: ${{ secrets.SURGE_LOGIN }}
+          token: ${{ secrets.SURGE_TOKEN }}
