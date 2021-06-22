@@ -79,7 +79,7 @@ jobs:
         run: |
           cp dist/index.html dist/200.html
       - name: Deploy to surge
-        if: ${{ github.repository_owner == 'ci7lus' }}
+        if: ${{ github.ref == 'refs/heads/master' && github.repository_owner == 'ci7lus' }}
         uses: dswistowski/surge-sh-action@v1
         with:
           domain: "elaina.surge.sh"
