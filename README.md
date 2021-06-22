@@ -4,9 +4,18 @@
 
 ## これはなに
 
-[l3tnun/EPGStation](https://github.com/l3tnun/EPGStation) と [SlashNephy/saya](https://github.com/SlashNephy/saya) で動くコメント付き DTV 視聴 Web アプリです。  
+[l3tnun/EPGStation](https://github.com/l3tnun/EPGStation) と [SlashNephy/saya](https://github.com/SlashNephy/saya) で動くコメント付き DTV 視聴 Web アプリです。
 
 [![elaina 動作イメージ](https://i.gyazo.com/a028110a6b4befb003c5f3f9d045a663.jpg)](https://gyazo.com/a028110a6b4befb003c5f3f9d045a663)
+
+## 使用
+
+最新バージョンを [elaina.surge.sh](http://elaina.surge.sh) にて公開しています。<br />
+HTTPS は強制されませんので、使用している EPGStation の Scheme に合わせて使用してください。<br />
+EPGStation は `config.yml` にて `isAllowAllCORS: true` で CORS ヘッダーを付与するように設定してください（[詳細](https://github.com/l3tnun/EPGStation/blob/723dacd3f0344615c6b9e766f2f00cbc17251cd1/doc/conf-manual.md#isallowallcors)）。
+
+- [HTTP (http://elaina.surge.sh)](http://elaina.surge.sh)
+- [HTTPS (https://elaina.surge.sh)](https://elaina.surge.sh)
 
 ## 開発
 
@@ -17,7 +26,7 @@ yarn dev
 yarn build
 ```
 
-開発に使用する EPGStation/saya は前段の nginx などにて CORS の許可を行ってください。
+開発に使用する EPGStation は上記使用セクションの手順に従って CORS ヘッダーの付与を行ってください。
 
 ## 謝辞
 
