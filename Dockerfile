@@ -1,4 +1,4 @@
-FROM node:lts-alpine AS build
+FROM node:14.17.1-buster AS build
 
 # Install dependencies
 WORKDIR /app
@@ -25,7 +25,7 @@ RUN { \
     echo "    try_files \$uri \$uri/ /index.html;"; \
     echo "  }"; \
     echo "}"; \
-} > /etc/nginx/conf.d/default.conf
+    } > /etc/nginx/conf.d/default.conf
 
 COPY --from=build /app/dist/*.html /app/dist/*.js /app/dist/*.css /usr/share/nginx/html/
 
