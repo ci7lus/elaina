@@ -8,6 +8,7 @@ on:
       - "**.md"
     branches-ignore:
       - "releases/**"
+      - "dependabot/**"
 
   release:
     types:
