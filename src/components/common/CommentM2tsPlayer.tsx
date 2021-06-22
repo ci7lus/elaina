@@ -62,7 +62,7 @@ export const CommentM2tsPlayer: React.VFC<{
         mpegtsPlayer.load()
         mpegtsPlayer.play()
 
-        const b24Renderer = new aribb24.CanvasB24Renderer({
+        const b24Renderer = new aribb24.CanvasRenderer({
           forceStrokeColor: "black",
         })
         b24Renderer.attachMedia(video)
