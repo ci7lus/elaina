@@ -37,13 +37,17 @@ export const TimetablePage: React.VFC<{}> = () => {
   })
 
   const onResize = () => {
-    setClientWidth(scrollRef.current?.clientWidth || 0)
-    setClientHeight(scrollRef.current?.clientHeight || 0)
+    const el = scrollRef.current
+    if (!el) return
+    setClientWidth(el.clientWidth || 0)
+    setClientHeight(el.clientHeight || 0)
   }
 
-  const onScroll = (scrollLeft: number, scrollTop: number) => {
-    setClientLeft(scrollLeft)
-    setClientTop(scrollTop)
+  const onScroll = () => {
+    const el = scrollRef.current
+    if (!el) return
+    setClientLeft(el.scrollLeft)
+    setClientTop(el.scrollTop)
     onResize()
   }
 
@@ -111,9 +115,8 @@ export const TimetablePage: React.VFC<{}> = () => {
       <ScrollContainer
         className="timetableScrollContainer scrollbar-wh-4-200-600 relative overflow-auto h-full text-sm overscroll-none bg-gray-500"
         style={{ height: "calc(100vh - 162px)" }}
-        // ignore broken type
-        onScroll={onScroll as any}
-        onEndScroll={onScroll as any}
+        onScroll={onScroll}
+        onEndScroll={onScroll}
         innerRef={scrollRef}
         hideScrollbars={false}
       >
