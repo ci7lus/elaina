@@ -8,7 +8,6 @@
     "type": "git",
     "url": "https://github.com/ci7lus/elaina.git"
   },
-  "main": "dist/index.html",
   "scripts": {
     "dev": "parcel src/index.html",
     "build": "env IS_BUILD=yes parcel build src/index.html --no-scope-hoist",
@@ -51,7 +50,8 @@
     "zod": "^3.2.0"
   },
   "devDependencies": {
-    "@parcel/transformer-sass": "2.0.0-nightly.731",
+    "@parcel/transformer-image": "2.0.0-rc.0",
+    "@parcel/transformer-sass": "2.0.0-rc.0",
     "@types/dplayer": "^1.25.1",
     "@types/react": "17.0.11",
     "@types/react-dom": "17.0.8",
@@ -59,7 +59,7 @@
     "@types/react-toast-notifications": "^2.4.1",
     "@types/twemoji": "^12.1.1",
     "autoprefixer": "^10.2.6",
-    "parcel": "^2.0.0-nightly.729",
+    "parcel": "^2.0.0-rc.0",
     "postcss": "^8.3.5",
     "prettier": "^2.3.1",
     "sass": "^1.35.1",
