@@ -32,57 +32,64 @@ export const ProgramItem: React.VFC<{
       positions={["bottom", "top", "left", "right"]}
       reposition={true}
       onClickOutside={() => setIsOpen(false)}
-      content={({ position, childRect, popoverRect }) => (
-        <ArrowContainer
-          position={position}
-          childRect={childRect}
-          popoverRect={popoverRect}
-          arrowColor={"rgba(31, 41, 55, 0.9)"}
-          arrowSize={5}
-        >
-          <div className="bg-opacity-90 bg-gray-800 text-gray-100 rounded-md p-2 w-72">
-            <div className="py-1 rounded-md w-full bg-gray-200 text-gray-800 text-center">
-              <div className="font-bold">
-                <span className="text-lg">{startAt.format("MM/DD HH:mm")}</span>
-                <span className="text-gray-600 pl-1">+{duration / 60}min</span>
+      content={({ position, childRect, popoverRect }) => {
+        if (position === "custom") return <></>
+        return (
+          <ArrowContainer
+            position={position}
+            childRect={childRect}
+            popoverRect={popoverRect}
+            arrowColor={"rgba(31, 41, 55, 0.9)"}
+            arrowSize={5}
+          >
+            <div className="bg-opacity-90 bg-gray-800 text-gray-100 rounded-md p-2 w-72">
+              <div className="py-1 rounded-md w-full bg-gray-200 text-gray-800 text-center">
+                <div className="font-bold">
+                  <span className="text-lg">
+                    {startAt.format("MM/DD HH:mm")}
+                  </span>
+                  <span className="text-gray-600 pl-1">
+                    +{duration / 60}min
+                  </span>
+                </div>
+                <div className="text-sm text-gray-600">
+                  <span>
+                    {Math.abs(remain)}分{0 < remain ? "後" : "前"}
+                  </span>
+                  {channel && <span className="ml-1">{channel.name}</span>}
+                </div>
               </div>
-              <div className="text-sm text-gray-600">
-                <span>
-                  {Math.abs(remain)}分{0 < remain ? "後" : "前"}
-                </span>
-                {channel && <span className="ml-1">{channel.name}</span>}
-              </div>
-            </div>
-            <div className="mt-2 text-sm leading-relaxed">
-              {genre && (
-                <span
-                  className={`rounded-md px-2 py-1 text-gray-800 ${
-                    genreColor || "bg-gray-100"
-                  } mr-1`}
+              <div className="mt-2 text-sm leading-relaxed">
+                {genre && (
+                  <span
+                    className={`rounded-md px-2 py-1 text-gray-800 ${
+                      genreColor || "bg-gray-100"
+                    } mr-1`}
+                  >
+                    {genre}
+                    {subGenre && ` / ${subGenre}`}
+                  </span>
+                )}
+                <span className="font-semibold">{program.name}</span>
+                <div className="mt-1 text-xs">
+                  {program.description && 100 < program.description.length
+                    ? program.description.substring(0, 100) + "..."
+                    : program.description}
+                </div>
+                <div className="text-gray-400 text-sm">{program.id}</div>
+                <Link
+                  route={programsRoute.anyRoute}
+                  match={{ id: program.id.toString() }}
                 >
-                  {genre}
-                  {subGenre && ` / ${subGenre}`}
-                </span>
-              )}
-              <span className="font-semibold">{program.name}</span>
-              <div className="mt-1 text-xs">
-                {program.description && 100 < program.description.length
-                  ? program.description.substring(0, 100) + "..."
-                  : program.description}
+                  <button className="w-full rounded-md py-1 my-1 text-center bg-indigo-400 hover:bg-indigo-300">
+                    詳細
+                  </button>
+                </Link>
               </div>
-              <div className="text-gray-400 text-sm">{program.id}</div>
-              <Link
-                route={programsRoute.anyRoute}
-                match={{ id: program.id.toString() }}
-              >
-                <button className="w-full rounded-md py-1 my-1 text-center bg-indigo-400 hover:bg-indigo-300">
-                  詳細
-                </button>
-              </Link>
             </div>
-          </div>
-        </ArrowContainer>
-      )}
+          </ArrowContainer>
+        )
+      }}
     >
       <div
         onClick={() => setIsOpen((isOpen) => !isOpen)}
