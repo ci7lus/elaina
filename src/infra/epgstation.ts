@@ -6,10 +6,11 @@ import type {
   Channel,
   Schedule,
   Program,
+  ChannelType,
 } from "../types/struct"
 import querystring from "querystring"
 import dayjs from "dayjs"
-import { Stream } from "../types/epgstation"
+import { ApiDocs, Stream } from "../types/epgstation"
 
 export class EPGStationAPI {
   public url: string
@@ -35,7 +36,10 @@ export class EPGStationAPI {
       timeout: 1000 * 30,
     })
   }
-
+  async getApiDocs() {
+    const { data } = await this.client.get<ApiDocs>("api/docs")
+    return data
+  }
   async startChannelHlsStream({ id, mode = 0 }: { id: number; mode?: number }) {
     const { data } = await this.client.get<{ streamId: number }>(
       `${this.url}/api/streams/live/${id}/hls?${querystring.stringify({
@@ -113,27 +117,23 @@ export class EPGStationAPI {
   async getSchedules({
     startAt = dayjs().toDate().getTime(),
     endAt = dayjs().add(1, "day").toDate().getTime(),
-    GR = true,
-    BS = true,
-    CS = true,
-    SKY = true,
+    types = {
+      GR: true,
+      BS: true,
+      CS: true,
+      SKY: true,
+    },
   }: {
     startAt?: number
     endAt?: number
-    GR?: boolean
-    BS?: boolean
-    CS?: boolean
-    SKY?: boolean
+    types?: { [key: string]: boolean }
   }) {
     const { data } = await this.client.get<Schedule[]>("api/schedules", {
       params: {
         isHalfWidth: true,
         startAt,
         endAt,
-        GR,
-        BS,
-        CS,
-        SKY,
+        ...types,
       },
     })
     return data

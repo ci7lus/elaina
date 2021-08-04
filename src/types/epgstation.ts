@@ -8,3 +8,7 @@ export type Stream = {
   startAt: number
   endAt: number
 }
+
+export type ApiDocs = {
+  components: { schemas: { ChannelType: { enum: string[] } } }
+}

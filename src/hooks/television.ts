@@ -3,6 +3,7 @@ import { useEffect, useState } from "react"
 import { useToasts } from "react-toast-notifications"
 import { useRecoilState, useRecoilValue } from "recoil"
 import {
+  apiDocsAtom,
   channelsAtom,
   filteredSchedulesSelector,
   schedulesAtom,
@@ -48,15 +49,23 @@ export const useProgram = ({ id }: { id: number }) => {
 export const useSchedules = ({ startAt }: { startAt?: number }) => {
   const [schedules, setSchedules] = useRecoilState(schedulesAtom)
   const filteredSchedules = useRecoilValue(filteredSchedulesSelector)
+  const docs = useRecoilValue(apiDocsAtom)
 
   const toast = useToasts()
   const backend = useBackend()
 
   useEffect(() => {
+    if (!docs) return
     const endAt = startAt && dayjs(startAt).add(1, "day").toDate().getTime()
 
     backend
-      .getSchedules({ startAt, endAt })
+      .getSchedules({
+        startAt,
+        endAt,
+        types: Object.fromEntries(
+          docs.components.schemas.ChannelType.enum.map((_type) => [_type, true])
+        ),
+      })
       .then((schedules) => setSchedules(schedules))
       .catch((e) => {
         console.error(e)
@@ -65,7 +74,7 @@ export const useSchedules = ({ startAt }: { startAt?: number }) => {
           autoDismiss: true,
         })
       })
-  }, [startAt])
+  }, [startAt, docs])
 
   return { schedules, filteredSchedules }
 }

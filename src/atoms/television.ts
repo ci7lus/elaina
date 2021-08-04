@@ -1,7 +1,13 @@
 import { atom, selector } from "recoil"
+import { ApiDocs } from "../types/epgstation"
 import { Channel, Genre, Schedule } from "../types/struct"
 
 const prefix = "elaina:television"
+
+export const apiDocsAtom = atom<ApiDocs | null>({
+  key: `${prefix}.apidocs`,
+  default: null,
+})
 
 export const channelsAtom = atom<Channel[] | null>({
   key: `${prefix}:channels`,
