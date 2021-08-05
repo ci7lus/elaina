@@ -11,6 +11,7 @@ import { useUpdateEffect } from "react-use"
 import { Spinner } from "@chakra-ui/react"
 import { useBackend } from "../../hooks/backend"
 import { trimCommentForFlow } from "../../utils/comment"
+import { parseMalformedPES } from "../../utils/pes"
 
 export const CommentM2tsPlayer: React.VFC<{
   liveUrl: string | null
@@ -67,15 +68,43 @@ export const CommentM2tsPlayer: React.VFC<{
         })
         b24Renderer.attachMedia(video)
         b24Renderer.show()
+        const superimposeRenderer = new aribb24.CanvasRenderer({
+          forceStrokeColor: "black",
+        })
+        superimposeRenderer.attachMedia(video)
+        superimposeRenderer.show()
 
         player.on("subtitle_show" as DPlayerEvents.subtitle_show, () => {
           b24Renderer.show()
+          superimposeRenderer.show()
         })
         player.on("subtitle_hide" as DPlayerEvents.subtitle_hide, () => {
           b24Renderer.hide()
+          superimposeRenderer.hide()
         })
+        /**
+         * https://github.com/l3tnun/EPGStation/blob/master/client/src/components/video/LiveMpegTsVideo.vue#L112-L127
+         */
         mpegtsPlayer.on(mpegts.Events.PES_PRIVATE_DATA_ARRIVED, (data) => {
-          b24Renderer.pushData(data.pid, data.data, data.pts)
+          //console.log(data)
+          if (data.stream_id === 0xbd && data.data[0] === 0x80) {
+            // private_stream_1, caption
+            b24Renderer.pushData(data.pid, data.data, data.pts / 1000)
+          } else if (data.stream_id === 0xbf) {
+            // private_stream_2, superimpose
+            let payload = data.data
+            if (payload[0] !== 0x81) {
+              payload = parseMalformedPES(data.data)
+            }
+            if (payload[0] !== 0x81) {
+              return
+            }
+            superimposeRenderer.pushData(
+              data.pid,
+              payload,
+              data.nearest_pts / 1000
+            )
+          }
         })
         /*hls.on(Hls.Events.DESTROYING, () => {
           b24Renderer.dispose()
