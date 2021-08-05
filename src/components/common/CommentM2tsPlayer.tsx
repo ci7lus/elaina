@@ -64,12 +64,18 @@ export const CommentM2tsPlayer: React.VFC<{
         mpegtsPlayer.play()
 
         const b24Renderer = new aribb24.CanvasRenderer({
-          forceStrokeColor: "black",
+          keepAspectRatio: true,
+          normalFont: "'Rounded M+ 1m for ARIB'",
+          gaijiFont: "'Rounded M+ 1m for ARIB'",
+          drcsReplacement: true,
         })
         b24Renderer.attachMedia(video)
         b24Renderer.show()
         const superimposeRenderer = new aribb24.CanvasRenderer({
-          forceStrokeColor: "black",
+          keepAspectRatio: true,
+          normalFont: "'Rounded M+ 1m for ARIB'",
+          gaijiFont: "'Rounded M+ 1m for ARIB'",
+          drcsReplacement: true,
         })
         superimposeRenderer.attachMedia(video)
         superimposeRenderer.show()

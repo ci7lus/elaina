@@ -54,7 +54,10 @@ export const CommentPlayer: React.VFC<{
         hls.attachMedia(video)
 
         const b24Renderer = new aribb24.CanvasRenderer({
-          forceStrokeColor: "black",
+          keepAspectRatio: true,
+          normalFont: "'Rounded M+ 1m for ARIB'",
+          gaijiFont: "'Rounded M+ 1m for ARIB'",
+          drcsReplacement: true,
         })
         b24Renderer.attachMedia(video)
         b24Renderer.show()
