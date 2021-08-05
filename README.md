@@ -17,6 +17,8 @@ EPGStation は `config.yml` にて `isAllowAllCORS: true` で CORS ヘッダー�
 - [HTTP (http://elaina.surge.sh)](http://elaina.surge.sh)
 - [HTTPS (https://elaina.surge.sh)](https://elaina.surge.sh)
 
+必須ではありませんが、字幕の表示に [Rounded M+ 1m for ARIB](https://github.com/xtne6f/TVCaptionMod2/blob/3cc6c1767595e1973473124e892a57c7693c2154/TVCaptionMod2_Readme.txt#L49-L50) を指定しているので、フォントのインストールを推奨します。[ダウンロードはこちら](https://github.com/ci7lus/MirakTest/files/6555741/rounded-mplus-1m-arib.ttf.zip)。
+
 ## 開発
 
 ```bash
