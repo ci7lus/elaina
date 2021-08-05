@@ -26,6 +26,9 @@ export const ChannelsPage: React.VFC<{}> = () => {
   const { filteredSchedules } = useSchedules({
     startAt: startAt.toDate().getTime(),
   })
+  const channelTypes = Array.from(
+    new Set(filteredSchedules?.map((schedule) => schedule.channel.channelType))
+  )
 
   const { channelComments } = useChannelComments()
 
@@ -35,12 +38,14 @@ export const ChannelsPage: React.VFC<{}> = () => {
     <div className="container mx-auto px-2">
       <Tabs isFitted variant="enclosed" mt={4}>
         <TabList>
-          <Tab _selected={_selected}>GR</Tab>
-          <Tab _selected={_selected}>BS</Tab>
-          <Tab _selected={_selected}>Sky</Tab>
+          {channelTypes.map((channelType) => (
+            <Tab key={channelType} _selected={_selected}>
+              {channelType}
+            </Tab>
+          ))}
         </TabList>
         <TabPanels>
-          {["GR", "BS", "SKY"].map((channelType) => (
+          {channelTypes.map((channelType) => (
             <TabPanel key={channelType}>
               {filteredSchedules
                 ?.filter(
