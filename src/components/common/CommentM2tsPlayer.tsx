@@ -1,15 +1,12 @@
-import React, { useCallback, useEffect, useRef } from "react"
-import DPlayer, {
-  DPlayerVideo,
-  DPlayerEvents,
-  DPlayerVideoQuality,
-} from "dplayer"
-import { CommentPayload } from "../../types/struct"
-import mpegts from "mpegts.js"
-import * as aribb24 from "aribb24.js"
-import { useUpdateEffect } from "react-use"
 import { Spinner } from "@chakra-ui/react"
+import * as aribb24 from "aribb24.js"
+// eslint-disable-next-line import/no-unresolved
+import DPlayer, { DPlayerVideo, DPlayerEvents } from "dplayer"
+import mpegts from "mpegts.js"
+import React, { useEffect, useRef } from "react"
+import { useUpdateEffect } from "react-use"
 import { useBackend } from "../../hooks/backend"
+import { CommentPayload } from "../../types/struct"
 import { trimCommentForFlow } from "../../utils/comment"
 import { parseMalformedPES } from "../../utils/pes"
 
@@ -186,7 +183,7 @@ export const CommentM2tsPlayer: React.VFC<{
         color: "#fff",
         bottom: "40px",
         // TODO: Typing correctly
-      } as any,
+      } as never,
       apiBackend: {
         read: (option) => {
           option.success([{}])

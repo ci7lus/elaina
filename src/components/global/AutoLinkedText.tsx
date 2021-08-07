@@ -1,4 +1,3 @@
-import React from "react"
 import Interweave from "interweave"
 import {
   Email,
@@ -8,6 +7,7 @@ import {
   Url,
   UrlMatcher,
 } from "interweave-autolink"
+import React from "react"
 
 export const AutoLinkedText: React.FC<{ children: string }> = ({
   children,

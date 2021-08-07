@@ -1,15 +1,15 @@
 import { Heading, Spinner } from "@chakra-ui/react"
+import dayjs from "dayjs"
 import React, { useEffect, useMemo, useState } from "react"
 import { ArrowLeft, ArrowRight, Search } from "react-feather"
 import { useTable, usePagination, Column, useGlobalFilter } from "react-table"
-import type { ProgramRecord } from "../../types/struct"
-import dayjs from "dayjs"
+import { useToasts } from "react-toast-notifications"
 import { Link } from "rocon/react"
-import { recordsRoute } from "../../routes"
+import { RecordSearchModal } from "../../components/records/SearchModal"
 import { useBackend } from "../../hooks/backend"
 import { useChannels } from "../../hooks/television"
-import { useToasts } from "react-toast-notifications"
-import { RecordSearchModal } from "../../components/records/SearchModal"
+import { recordsRoute } from "../../routes"
+import type { ProgramRecord } from "../../types/struct"
 
 export const RecordsPage: React.VFC<{}> = () => {
   const backend = useBackend()
@@ -169,7 +169,7 @@ export const RecordsPage: React.VFC<{}> = () => {
                       .join("\n\n")}
                     {...row.getRowProps()}
                   >
-                    {row.cells.map((cell, idx, cells) => {
+                    {row.cells.map((cell, idx) => {
                       return (
                         <span
                           {...cell.getCellProps()}

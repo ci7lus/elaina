@@ -36,7 +36,8 @@ jobs:
           yarn
       - name: Lint
         run: |
-          yarn lint
+          yarn lint:prettier
+          yarn lint:eslint
       - name: Type inspection
         run: |
           yarn tsc

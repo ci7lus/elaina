@@ -1,17 +1,17 @@
-import React, { useEffect } from "react"
-import { isLocationNotFoundError, RoconRoot, useRoutes } from "rocon/react"
 import { ChakraProvider } from "@chakra-ui/react"
-import { routes } from "./routes"
-import { Layout } from "./layout"
-import { RecoilRoot, useRecoilState, useRecoilValue } from "recoil"
-import { NotFound } from "./components/global/NotFound"
+import React, { useEffect } from "react"
 import { ToastProvider, useToasts } from "react-toast-notifications"
+import { RecoilRoot, useRecoilState, useRecoilValue } from "recoil"
+import { isLocationNotFoundError, RoconRoot, useRoutes } from "rocon/react"
 import { initializeState } from "./atoms/initialize"
-import { RecoilWatcher } from "./components/global/RecoilWatcher"
 import { backendSettingAtom } from "./atoms/setting"
-import { InitialSettingPage } from "./components/global/InitialSetting"
 import { apiDocsAtom } from "./atoms/television"
+import { InitialSettingPage } from "./components/global/InitialSetting"
+import { NotFound } from "./components/global/NotFound"
+import { RecoilWatcher } from "./components/global/RecoilWatcher"
 import { useBackend } from "./hooks/backend"
+import { Layout } from "./layout"
+import { routes } from "./routes"
 
 const UsedRoutes: React.VFC<{}> = () => {
   try {
@@ -26,7 +26,7 @@ const UsedRoutes: React.VFC<{}> = () => {
   }
 }
 
-const BackendRoute: React.VFC<{}> = ({}) => {
+const BackendRoute: React.VFC<{}> = () => {
   const backend = useBackend()
   const toast = useToasts()
   const [docs, setDocs] = useRecoilState(apiDocsAtom)

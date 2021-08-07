@@ -1,6 +1,6 @@
 import { atom } from "recoil"
-import { BackendSetting, PlayerSetting, SayaSetting } from "../types/setting"
 import * as $ from "zod"
+import { BackendSetting, PlayerSetting, SayaSetting } from "../types/setting"
 
 const prefix = "elaina:setting"
 

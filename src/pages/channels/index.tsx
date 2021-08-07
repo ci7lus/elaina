@@ -1,4 +1,3 @@
-import React from "react"
 import {
   Progress,
   Tab,
@@ -7,21 +6,20 @@ import {
   TabPanels,
   Tabs,
 } from "@chakra-ui/react"
-import { useNow } from "../../hooks/date"
-import { useSchedules } from "../../hooks/television"
-import { Link } from "rocon/react"
-import { channelsRoute } from "../../routes"
 import dayjs from "dayjs"
-import { Genre, SubGenre } from "../../constants"
-import { genreColors } from "../../utils/genres"
+import React from "react"
 import { ChevronsRight } from "react-feather"
-import { useBackend } from "../../hooks/backend"
+import { Link } from "rocon/react"
+import { Genre, SubGenre } from "../../constants"
+import { useNow } from "../../hooks/date"
 import { useChannelComments } from "../../hooks/saya"
+import { useSchedules } from "../../hooks/television"
+import { channelsRoute } from "../../routes"
+import { genreColors } from "../../utils/genres"
 
 export const ChannelsPage: React.VFC<{}> = () => {
   const now = useNow()
   const startAt = now.clone().startOf("hour")
-  const backend = useBackend()
 
   const { filteredSchedules } = useSchedules({
     startAt: startAt.toDate().getTime(),
@@ -77,10 +75,6 @@ export const ChannelsPage: React.VFC<{}> = () => {
                       ? genreColors[genre]
                       : ""
                     : "bg-gray-200"
-                  // TODO: ロゴ表示確認
-                  const logo =
-                    channel.hasLogoData === true &&
-                    backend.getChannelLogoUrl({ id: channel.id })
                   const channelComment = channelComments?.find((ch) =>
                     ch.channel.serviceIds.includes(channel.serviceId)
                   )

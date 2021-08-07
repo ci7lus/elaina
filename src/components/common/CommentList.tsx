@@ -1,8 +1,5 @@
 import dayjs from "dayjs"
 import React, { memo, useRef, useState } from "react"
-import { useDebounce } from "react-use"
-import twemoji from "twemoji"
-import { CommentPayload } from "../../types/struct"
 import {
   Item,
   ItemParams,
@@ -12,6 +9,9 @@ import {
   animation,
 } from "react-contexify"
 import { useToasts } from "react-toast-notifications"
+import { useDebounce } from "react-use"
+import twemoji from "twemoji"
+import { CommentPayload } from "../../types/struct"
 import "react-contexify/dist/ReactContexify.css"
 
 const menuId = "comments-menu"
@@ -75,8 +75,6 @@ export const CommentList: React.VFC<{
   async function handleItemClick({
     event,
     props,
-    data,
-    triggerEvent,
   }: ItemParams<CommentPayload, unknown>) {
     if (!props) return
     switch (event.currentTarget.id) {

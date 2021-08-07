@@ -1,13 +1,13 @@
 import dayjs from "dayjs"
 import React from "react"
+import { Link } from "rocon/react"
+import { AutoLinkedText } from "../../components/global/AutoLinkedText"
 import { Loading } from "../../components/global/Loading"
 import { NotFound } from "../../components/global/NotFound"
-import { useChannels, useProgram } from "../../hooks/television"
-import { Link } from "rocon/react"
-import { channelsRoute } from "../../routes"
-import { useNow } from "../../hooks/date"
-import { AutoLinkedText } from "../../components/global/AutoLinkedText"
 import { Genre, SubGenre } from "../../constants"
+import { useNow } from "../../hooks/date"
+import { useChannels, useProgram } from "../../hooks/television"
+import { channelsRoute } from "../../routes"
 
 export const ProgramIdPage: React.FC<{ id: string }> = ({ id }) => {
   const pid = parseInt(id)

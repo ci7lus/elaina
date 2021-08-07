@@ -4,8 +4,8 @@
  */
 
 export const parseMalformedPES = (data: Uint8Array) => {
-  const pes_scrambling_control = (data[0] & 0x30) >>> 4
-  const pts_dts_flags = (data[1] & 0xc0) >>> 6
+  /*const pes_scrambling_control = (data[0] & 0x30) >>> 4
+  const pts_dts_flags = (data[1] & 0xc0) >>> 6*/
   const pes_header_data_length = data[2]
   const payload_start_index = 3 + pes_header_data_length
   const payload_length = data.byteLength - payload_start_index

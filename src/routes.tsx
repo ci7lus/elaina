@@ -1,13 +1,13 @@
 import React from "react"
 import Rocon from "rocon/react"
+import { ChannelsPage } from "./pages/channels"
 import { ChannelIdPage } from "./pages/channels/id"
 import { IndexPage } from "./pages/index"
-import { TimetablePage } from "./pages/timetable"
-import { SettingsPage } from "./pages/settings"
 import { ProgramIdPage } from "./pages/programs/id"
 import { RecordsPage } from "./pages/records"
 import { RecordIdPage } from "./pages/records/id"
-import { ChannelsPage } from "./pages/channels"
+import { SettingsPage } from "./pages/settings"
+import { TimetablePage } from "./pages/timetable"
 
 export const programsRoute = Rocon.Path()
   .any("id", {

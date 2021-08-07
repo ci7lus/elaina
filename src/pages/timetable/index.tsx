@@ -1,13 +1,13 @@
-import React, { useEffect, useRef, useState } from "react"
 import { Heading } from "@chakra-ui/react"
-import ScrollContainer, { ScrollEvent } from "react-indiana-drag-scroll"
-import { useSchedules } from "../../hooks/television"
+import React, { useEffect, useRef, useState } from "react"
+import ScrollContainer from "react-indiana-drag-scroll"
+import { useThrottleFn } from "react-use"
+import { Loading } from "../../components/global/Loading"
+import { TimetableChannel } from "../../components/timetable/Channels"
 import { TimetableProgramList } from "../../components/timetable/Programs"
 import { LeftTimeBar } from "../../components/timetable/TimetableParts"
-import { TimetableChannel } from "../../components/timetable/Channels"
-import { useThrottleFn } from "react-use"
 import { useNow } from "../../hooks/date"
-import { Loading } from "../../components/global/Loading"
+import { useSchedules } from "../../hooks/television"
 
 export const TimetablePage: React.VFC<{}> = () => {
   const now = useNow()

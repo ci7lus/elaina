@@ -1,6 +1,6 @@
 import { atom, selector } from "recoil"
 import { ApiDocs } from "../types/epgstation"
-import { Channel, Genre, Schedule } from "../types/struct"
+import { Channel, Schedule } from "../types/struct"
 
 const prefix = "elaina:television"
 

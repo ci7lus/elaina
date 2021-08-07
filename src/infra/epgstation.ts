@@ -1,16 +1,9 @@
-import axios from "axios"
-import type { BackendSetting } from "../types/setting"
-import type {
-  Genre,
-  ProgramRecord,
-  Channel,
-  Schedule,
-  Program,
-  ChannelType,
-} from "../types/struct"
 import querystring from "querystring"
+import axios from "axios"
 import dayjs from "dayjs"
 import { ApiDocs, Stream } from "../types/epgstation"
+import type { BackendSetting } from "../types/setting"
+import type { ProgramRecord, Channel, Schedule, Program } from "../types/struct"
 
 export class EPGStationAPI {
   public url: string

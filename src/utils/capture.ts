@@ -23,12 +23,12 @@ export const capturePlayer = async ({
       danmaku[i].getBoundingClientRect().left -
       video.getBoundingClientRect().left
     html = html.replace(
-      /transform: translateX\(.*?\)\;/,
+      /transform: translateX\(.*?\);/,
       "left: " + position + "px;"
     )
   }
   // twemoji 対処
-  html = html.replace(/<img.+?alt=\"(.+?)\".+?\>/g, (_, match) => match)
+  html = html.replace(/<img.+?alt="(.+?)".+?>/g, (_, match) => match)
 
   let scale = 1
   const minHeight = 1080

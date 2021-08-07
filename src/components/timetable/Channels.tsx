@@ -1,9 +1,9 @@
-import { ArrowContainer, Popover } from "react-tiny-popover"
+import { Button } from "@chakra-ui/react"
 import React, { memo, useState } from "react"
+import { ArrowContainer, Popover } from "react-tiny-popover"
 import { Link } from "rocon/react"
 import { channelsRoute } from "../../routes"
 import { Schedule } from "../../types/struct"
-import { Button } from "@chakra-ui/react"
 
 export const TimetableChannel: React.VFC<{
   schedule: Schedule

@@ -1,6 +1,6 @@
-import { ExternalLink } from "react-feather"
 import { Link } from "@chakra-ui/react"
 import React from "react"
+import { ExternalLink } from "react-feather"
 import { Heart } from "react-feather"
 
 export const TheFooter: React.VFC<{}> = () => (

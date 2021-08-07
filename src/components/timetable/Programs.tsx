@@ -1,11 +1,11 @@
-import { Link } from "rocon/react"
 import dayjs from "dayjs"
 import React, { memo, useState } from "react"
 import { ArrowContainer, Popover } from "react-tiny-popover"
+import { Link } from "rocon/react"
+import { Genre, SubGenre } from "../../constants"
+import { programsRoute } from "../../routes"
 import { Channel, Program, Schedule } from "../../types/struct"
 import { genreColors } from "../../utils/genres"
-import { programsRoute } from "../../routes"
-import { Genre, SubGenre } from "../../constants"
 
 export const ProgramItem: React.VFC<{
   channel: Channel

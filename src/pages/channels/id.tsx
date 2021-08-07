@@ -1,25 +1,24 @@
+import { Skeleton } from "@chakra-ui/react"
 import dayjs from "dayjs"
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import { ChevronsDown, ChevronsRight, RefreshCw } from "react-feather"
+import { useDebounce, useUpdateEffect } from "react-use"
+import { useRecoilValue } from "recoil"
+import ReconnectingWebSocket from "reconnecting-websocket"
+import { playerSettingAtom } from "../../atoms/setting"
+import { CaptureButton } from "../../components/common/CaptureButton"
+import { CommentList } from "../../components/common/CommentList"
+import { CommentM2tsPlayer } from "../../components/common/CommentM2tsPlayer"
 import { CommentPlayer } from "../../components/common/CommentPlayer"
+import { AutoLinkedText } from "../../components/global/AutoLinkedText"
 import { Loading } from "../../components/global/Loading"
 import { NotFound } from "../../components/global/NotFound"
-import { CommentList } from "../../components/common/CommentList"
-import { CommentPayload, Program, Schedule } from "../../types/struct"
-import ReconnectingWebSocket from "reconnecting-websocket"
-import { useDebounce, useUpdateEffect } from "react-use"
-import { Skeleton } from "@chakra-ui/react"
-import { useRecoilValue } from "recoil"
-import { playerSettingAtom } from "../../atoms/setting"
-import { useSaya } from "../../hooks/saya"
-import { StatsWidget } from "../../components/channels/StatsWidget"
-import { useNow } from "../../hooks/date"
-import { AutoLinkedText } from "../../components/global/AutoLinkedText"
 import { useBackend } from "../../hooks/backend"
-import { wait } from "../../utils/wait"
-import { CaptureButton } from "../../components/common/CaptureButton"
+import { useNow } from "../../hooks/date"
+import { useSaya } from "../../hooks/saya"
 import { useRefState } from "../../hooks/util"
-import { CommentM2tsPlayer } from "../../components/common/CommentM2tsPlayer"
+import { CommentPayload, Program, Schedule } from "../../types/struct"
+import { wait } from "../../utils/wait"
 
 export const ChannelIdPage: React.FC<{ id: string }> = ({ id }) => {
   const saya = useSaya()
@@ -133,11 +132,11 @@ export const ChannelIdPage: React.FC<{ id: string }> = ({ id }) => {
       socket.current = s
     }
 
-    if (playerSetting.useMpegTs) {
+    if (playerSetting.useMpegTs && playerSetting.mpegTsMode !== null) {
       setLiveUrl(
         backend.getM2tsStreamUrl({
           id: schedule.channel.id,
-          mode: playerSetting.mpegTsMode!,
+          mode: playerSetting.mpegTsMode,
         })
       )
     } else {

@@ -10,7 +10,7 @@ import {
 
 export const RecoilWatcher: React.VFC<{}> = () => {
   useRecoilTransactionObserver_UNSTABLE(({ snapshot }) => {
-    for (let atom of snapshot.getNodes_UNSTABLE({ isModified: true })) {
+    for (const atom of snapshot.getNodes_UNSTABLE({ isModified: true })) {
       switch (atom.key) {
         case sayaSettingAtom.key:
           try {

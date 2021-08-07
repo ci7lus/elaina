@@ -3,7 +3,6 @@ import dayjs from "dayjs"
 import React, { useState } from "react"
 import { useEffect } from "react"
 import { RefreshCw } from "react-feather"
-import { useToasts } from "react-toast-notifications"
 import { Link, useNavigate } from "rocon/react"
 import { useBackend } from "../../hooks/backend"
 import { useNow } from "../../hooks/date"
@@ -15,7 +14,6 @@ export const RecordingsWidget: React.VFC<{}> = () => {
   const [loading, setLoading] = useState(true)
   const [recordings, setRecordings] = useState<ProgramRecord[] | null>(null)
   const backend = useBackend()
-  const toast = useToasts()
   const reload = () => {
     setLoading(true)
     backend

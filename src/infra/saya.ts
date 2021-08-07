@@ -1,7 +1,7 @@
-import axios from "axios"
-import type { SayaSetting } from "../types/setting"
 import querystring from "querystring"
+import axios from "axios"
 import type { ChannelComment, CommentStats } from "../types/saya"
+import type { SayaSetting } from "../types/setting"
 import { ChannelType } from "../types/struct"
 
 export class SayaAPI {
