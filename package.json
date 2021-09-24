@@ -25,7 +25,7 @@
     "@emotion/styled": "^11.3.0",
     "@neneka/dplayer": "^1.26.0-patch.0",
     "aribb24.js": "^1.7.8",
-    "axios": "^0.21.1",
+    "axios": "^0.21.2",
     "dayjs": "^1.10.6",
     "framer-motion": "^4.1.17",
     "history": "^5.0.0",
