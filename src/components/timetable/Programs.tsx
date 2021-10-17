@@ -33,7 +33,6 @@ export const ProgramItem: React.VFC<{
       reposition={true}
       onClickOutside={() => setIsOpen(false)}
       content={({ position, childRect, popoverRect }) => {
-        if (position === "custom") return <></>
         return (
           <ArrowContainer
             position={position}

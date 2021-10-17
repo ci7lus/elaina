@@ -24,7 +24,9 @@ export const CaptureButton: React.VFC<{ withComment: boolean }> = ({
             canvas.toBlob((blob) => res(blob), "image/png", 1)
           )
           if (!blob) return
-          const item = new window.ClipboardItem({ "image/png": blob })
+          const item = new ClipboardItem({
+            "image/png": new Promise((res) => res(blob)),
+          })
           await navigator.clipboard.write([item])
           toast.addToast("キャプチャをクリップボードにコピーしました", {
             appearance: "success",
