@@ -12,3 +12,7 @@ export type Stream = {
 export type ApiDocs = {
   components: { schemas: { ChannelType: { enum: string[] } } }
 }
+
+export type Config = {
+  broadcast: { [key: string]: boolean }
+}

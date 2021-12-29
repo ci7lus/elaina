@@ -5,7 +5,7 @@ import { RecoilRoot, useRecoilState, useRecoilValue } from "recoil"
 import { isLocationNotFoundError, RoconRoot, useRoutes } from "rocon/react"
 import { initializeState } from "./atoms/initialize"
 import { backendSettingAtom } from "./atoms/setting"
-import { apiDocsAtom } from "./atoms/television"
+import { configAtom } from "./atoms/television"
 import { InitialSettingPage } from "./components/global/InitialSetting"
 import { NotFound } from "./components/global/NotFound"
 import { RecoilWatcher } from "./components/global/RecoilWatcher"
@@ -29,12 +29,12 @@ const UsedRoutes: React.VFC<{}> = () => {
 const BackendRoute: React.VFC<{}> = () => {
   const backend = useBackend()
   const toast = useToasts()
-  const [docs, setDocs] = useRecoilState(apiDocsAtom)
+  const [config, setConfig] = useRecoilState(configAtom)
 
   useEffect(() => {
     backend
-      .getApiDocs()
-      .then((docs) => setDocs(docs))
+      .getConfig()
+      .then((config) => setConfig(config))
       .catch((e) => {
         console.error(e)
         toast.addToast("設定の取得に失敗しました", {
@@ -43,7 +43,7 @@ const BackendRoute: React.VFC<{}> = () => {
         })
       })
   }, [])
-  if (!docs) return <InitialSettingPage />
+  if (!config) return <InitialSettingPage />
   return <UsedRoutes />
 }
 

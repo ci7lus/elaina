@@ -1,11 +1,11 @@
 import { atom, selector } from "recoil"
-import { ApiDocs } from "../types/epgstation"
+import { Config } from "../types/epgstation"
 import { Channel, Schedule } from "../types/struct"
 
 const prefix = "elaina:television"
 
-export const apiDocsAtom = atom<ApiDocs | null>({
-  key: `${prefix}.apidocs`,
+export const configAtom = atom<Config | null>({
+  key: `${prefix}.config`,
   default: null,
 })
 

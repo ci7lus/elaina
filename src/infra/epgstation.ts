@@ -1,7 +1,7 @@
 import querystring from "querystring"
 import axios from "axios"
 import dayjs from "dayjs"
-import { ApiDocs, Stream } from "../types/epgstation"
+import { ApiDocs, Config, Stream } from "../types/epgstation"
 import type { BackendSetting } from "../types/setting"
 import type { ProgramRecord, Channel, Schedule, Program } from "../types/struct"
 
@@ -31,6 +31,10 @@ export class EPGStationAPI {
   }
   async getApiDocs() {
     const { data } = await this.client.get<ApiDocs>("api/docs")
+    return data
+  }
+  async getConfig() {
+    const { data } = await this.client.get<Config>("api/config")
     return data
   }
   async startChannelHlsStream({ id, mode = 0 }: { id: number; mode?: number }) {
