@@ -10,8 +10,8 @@
   },
   "scripts": {
     "dev": "parcel src/index.html",
-    "build": "env IS_BUILD=yes parcel build src/index.html --no-scope-hoist",
-    "build:analyze": "env PARCEL_BUNDLE_ANALYZER=1 IS_BUILD=yes parcel build src/index.html --no-scope-hoist",
+    "build": "parcel build src/index.html",
+    "build:analyze": "env PARCEL_BUNDLE_ANALYZER=1 parcel build src/index.html",
     "lint:prettier": "prettier --check './src/**/*.{js,ts,tsx}'",
     "format:prettier": "prettier --write './src/**/*.{js,ts,tsx}'",
     "lint:eslint": "eslint --max-warnings 0 --cache './src/**/*.{js,ts,tsx}'",
@@ -53,7 +53,7 @@
   },
   "devDependencies": {
     "@ci7lus/eslint-config": "^1.0.1",
-    "@parcel/transformer-sass": "^2.0.0",
+    "@parcel/transformer-sass": "^2.2.0",
     "@types/dplayer": "^1.25.2",
     "@types/react": "17.0.30",
     "@types/react-dom": "17.0.9",
@@ -63,7 +63,7 @@
     "autoprefixer": "^10.3.7",
     "husky": "^7.0.2",
     "lint-staged": "^11.2.3",
-    "parcel": "^2.0.0",
+    "parcel": "^2.2.0",
     "postcss": "^8.3.9",
     "prettier": "^2.4.1",
     "sass": "^1.43.2",
