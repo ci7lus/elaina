@@ -60,6 +60,11 @@ export const capturePlayer = async ({
     const { canvas } = await htmlToCanvas(html, width, height, scale)
     canvasContext.drawImage(canvas, 0, 0, width, height)
   }
+  document
+    .querySelectorAll<HTMLCanvasElement>(".dplayer-video-wrap > canvas")
+    .forEach((canvas) => {
+      canvasContext.drawImage(canvas, 0, 0, width, height)
+    })
   return { canvas }
 }
 
