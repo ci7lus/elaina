@@ -2217,10 +2217,10 @@ aria-hidden@^1.1.1:
   dependencies:
     tslib "^1.0.0"
 
-aribb24.js@^1.7.11:
-  version "1.7.11"
-  resolved "https://registry.yarnpkg.com/aribb24.js/-/aribb24.js-1.7.11.tgz#8a6f33764a8a83caa7594f7a634bc48bec47c428"
-  integrity sha512-Qz/P+utUw0AEQ8Y+NKQ6VNZPG0QmsZGcwa9A+E94QcnHb68rSFwyf5fFdIkR5PdX5LqrSoTg0VWarH5KK9pS3Q==
+aribb24.js@^1.8.8:
+  version "1.8.8"
+  resolved "https://registry.yarnpkg.com/aribb24.js/-/aribb24.js-1.8.8.tgz#9780eda75247fda745e483229e058df5aa57607f"
+  integrity sha512-7tCEIOzDoDxvr5UuGTVDpszRYNcJFLRqAXf/lIbJi6DmeeDnfbYQdfr0DiRokG/MUSPx5rqyxRSyVSoWDanGNw==
   dependencies:
     spark-md5 "^3.0.1"
 

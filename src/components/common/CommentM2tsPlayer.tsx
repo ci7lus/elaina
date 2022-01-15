@@ -65,6 +65,7 @@ export const CommentM2tsPlayer: React.VFC<{
           normalFont: "'Rounded M+ 1m for ARIB'",
           gaijiFont: "'Rounded M+ 1m for ARIB'",
           drcsReplacement: true,
+          data_identifier: 0x80,
         })
         b24Renderer.attachMedia(video)
         b24Renderer.show()
@@ -73,6 +74,7 @@ export const CommentM2tsPlayer: React.VFC<{
           normalFont: "'Rounded M+ 1m for ARIB'",
           gaijiFont: "'Rounded M+ 1m for ARIB'",
           drcsReplacement: true,
+          data_identifier: 0x81,
         })
         superimposeRenderer.attachMedia(video)
         superimposeRenderer.show()
@@ -89,7 +91,6 @@ export const CommentM2tsPlayer: React.VFC<{
          * https://github.com/l3tnun/EPGStation/blob/master/client/src/components/video/LiveMpegTsVideo.vue#L112-L127
          */
         mpegtsPlayer.on(mpegts.Events.PES_PRIVATE_DATA_ARRIVED, (data) => {
-          //console.log(data)
           if (data.stream_id === 0xbd && data.data[0] === 0x80) {
             // private_stream_1, caption
             b24Renderer.pushData(data.pid, data.data, data.pts / 1000)
